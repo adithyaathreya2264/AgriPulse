@@ -1,0 +1,75 @@
+# ==============================
+# Python
+# ==============================
+
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# ==============================
+# Environment / Secrets
+# ==============================
+
+.env
+.env.*
+!.env.example
+
+# ==============================
+# Frontend
+# ==============================
+
+kisanmitra-frontend/node_modules/
+kisanmitra-frontend/build/
+kisanmitra-frontend/.cache/
+
+# ==============================
+# Large datasets
+# ==============================
+
+app/ai/datasets/
+
+# ==============================
+# Runtime uploaded files
+# ==============================
+
+uploads/
+test_images/
+
+# ==============================
+# Large ML model files
+# ==============================
+
+*.pth
+*.pt
+*.onnx
+*.h5
+*.keras
+
+# ==============================
+# Python generated files
+# ==============================
+
+*.log
+
+# ==============================
+# VS Code
+# ==============================
+
+.vscode/
+
+# ==============================
+# OS generated files
+# ==============================
+
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Temporary files
+# ==============================
+
+*.tmp
+*.temp
