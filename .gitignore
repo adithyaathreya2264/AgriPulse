@@ -48,6 +48,10 @@ test_images/
 *.h5
 *.keras
 
+# Project models that should be included in GitHub
+!app/ai/models/efficientnet.pth
+!yolov8n.pt
+
 # ==============================
 # Python generated files
 # ==============================
