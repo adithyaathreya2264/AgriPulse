@@ -1,0 +1,1325 @@
+{
+ "_note": "SAMPLE DATA generated around each district headquarters so the nearby-branch feature can be tried. These are not real branch addresses. Replace with the lead-bank / NABARD branch list and the CSC locator (https://findmycsc.nic.in) before real use.",
+ "entries": [
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Bagalkot (sample)",
+   "district": "Bagalkot",
+   "lat": 16.1857,
+   "lng": 75.6988,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Bagalkot (sample)",
+   "district": "Bagalkot",
+   "lat": 16.1787,
+   "lng": 75.7008,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Bagalkot (sample)",
+   "district": "Bagalkot",
+   "lat": 16.1877,
+   "lng": 75.6918,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Bagalkot (sample)",
+   "district": "Bagalkot",
+   "lat": 16.1767,
+   "lng": 75.6938,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Bagalkot (sample)",
+   "district": "Bagalkot",
+   "lat": 16.1837,
+   "lng": 75.6898,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Ballari (sample)",
+   "district": "Ballari",
+   "lat": 15.1434,
+   "lng": 76.9244,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Ballari (sample)",
+   "district": "Ballari",
+   "lat": 15.1364,
+   "lng": 76.9264,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Ballari (sample)",
+   "district": "Ballari",
+   "lat": 15.1454,
+   "lng": 76.9174,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Ballari (sample)",
+   "district": "Ballari",
+   "lat": 15.1344,
+   "lng": 76.9194,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Ballari (sample)",
+   "district": "Ballari",
+   "lat": 15.1414,
+   "lng": 76.9154,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Belagavi (sample)",
+   "district": "Belagavi",
+   "lat": 15.8537,
+   "lng": 74.5007,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Belagavi (sample)",
+   "district": "Belagavi",
+   "lat": 15.8467,
+   "lng": 74.5027,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Belagavi (sample)",
+   "district": "Belagavi",
+   "lat": 15.8557,
+   "lng": 74.4937,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Belagavi (sample)",
+   "district": "Belagavi",
+   "lat": 15.8447,
+   "lng": 74.4957,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Belagavi (sample)",
+   "district": "Belagavi",
+   "lat": 15.8517,
+   "lng": 74.4917,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Bengaluru (sample)",
+   "district": "Bengaluru",
+   "lat": 12.9756,
+   "lng": 77.5976,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Bengaluru (sample)",
+   "district": "Bengaluru",
+   "lat": 12.9686,
+   "lng": 77.5996,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Bengaluru (sample)",
+   "district": "Bengaluru",
+   "lat": 12.9776,
+   "lng": 77.5906,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Bengaluru (sample)",
+   "district": "Bengaluru",
+   "lat": 12.9666,
+   "lng": 77.5926,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Bengaluru (sample)",
+   "district": "Bengaluru",
+   "lat": 12.9736,
+   "lng": 77.5886,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Bengaluru Rural (sample)",
+   "district": "Bengaluru Rural",
+   "lat": 13.2886,
+   "lng": 77.61,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Bengaluru Rural (sample)",
+   "district": "Bengaluru Rural",
+   "lat": 13.2816,
+   "lng": 77.612,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Bengaluru Rural (sample)",
+   "district": "Bengaluru Rural",
+   "lat": 13.2906,
+   "lng": 77.603,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Bengaluru Rural (sample)",
+   "district": "Bengaluru Rural",
+   "lat": 13.2796,
+   "lng": 77.605,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Bengaluru Rural (sample)",
+   "district": "Bengaluru Rural",
+   "lat": 13.2866,
+   "lng": 77.601,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Bidar (sample)",
+   "district": "Bidar",
+   "lat": 17.9144,
+   "lng": 77.5229,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Bidar (sample)",
+   "district": "Bidar",
+   "lat": 17.9074,
+   "lng": 77.5249,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Bidar (sample)",
+   "district": "Bidar",
+   "lat": 17.9164,
+   "lng": 77.5159,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Bidar (sample)",
+   "district": "Bidar",
+   "lat": 17.9054,
+   "lng": 77.5179,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Bidar (sample)",
+   "district": "Bidar",
+   "lat": 17.9124,
+   "lng": 77.5139,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Chamarajanagar (sample)",
+   "district": "Chamarajanagar",
+   "lat": 11.9301,
+   "lng": 76.9467,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Chamarajanagar (sample)",
+   "district": "Chamarajanagar",
+   "lat": 11.9231,
+   "lng": 76.9487,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Chamarajanagar (sample)",
+   "district": "Chamarajanagar",
+   "lat": 11.9321,
+   "lng": 76.9397,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Chamarajanagar (sample)",
+   "district": "Chamarajanagar",
+   "lat": 11.9211,
+   "lng": 76.9417,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Chamarajanagar (sample)",
+   "district": "Chamarajanagar",
+   "lat": 11.9281,
+   "lng": 76.9377,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Chikkaballapur (sample)",
+   "district": "Chikkaballapur",
+   "lat": 13.4395,
+   "lng": 77.7345,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Chikkaballapur (sample)",
+   "district": "Chikkaballapur",
+   "lat": 13.4325,
+   "lng": 77.7365,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Chikkaballapur (sample)",
+   "district": "Chikkaballapur",
+   "lat": 13.4415,
+   "lng": 77.7275,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Chikkaballapur (sample)",
+   "district": "Chikkaballapur",
+   "lat": 13.4305,
+   "lng": 77.7295,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Chikkaballapur (sample)",
+   "district": "Chikkaballapur",
+   "lat": 13.4375,
+   "lng": 77.7255,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Chikkamagaluru (sample)",
+   "district": "Chikkamagaluru",
+   "lat": 13.3193,
+   "lng": 75.7784,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Chikkamagaluru (sample)",
+   "district": "Chikkamagaluru",
+   "lat": 13.3123,
+   "lng": 75.7804,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Chikkamagaluru (sample)",
+   "district": "Chikkamagaluru",
+   "lat": 13.3213,
+   "lng": 75.7714,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Chikkamagaluru (sample)",
+   "district": "Chikkamagaluru",
+   "lat": 13.3103,
+   "lng": 75.7734,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Chikkamagaluru (sample)",
+   "district": "Chikkamagaluru",
+   "lat": 13.3173,
+   "lng": 75.7694,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Chitradurga (sample)",
+   "district": "Chitradurga",
+   "lat": 14.2291,
+   "lng": 76.401,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Chitradurga (sample)",
+   "district": "Chitradurga",
+   "lat": 14.2221,
+   "lng": 76.403,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Chitradurga (sample)",
+   "district": "Chitradurga",
+   "lat": 14.2311,
+   "lng": 76.394,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Chitradurga (sample)",
+   "district": "Chitradurga",
+   "lat": 14.2201,
+   "lng": 76.396,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Chitradurga (sample)",
+   "district": "Chitradurga",
+   "lat": 14.2271,
+   "lng": 76.392,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Dakshina Kannada (sample)",
+   "district": "Dakshina Kannada",
+   "lat": 12.8478,
+   "lng": 75.2509,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Dakshina Kannada (sample)",
+   "district": "Dakshina Kannada",
+   "lat": 12.8408,
+   "lng": 75.2529,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Dakshina Kannada (sample)",
+   "district": "Dakshina Kannada",
+   "lat": 12.8498,
+   "lng": 75.2439,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Dakshina Kannada (sample)",
+   "district": "Dakshina Kannada",
+   "lat": 12.8388,
+   "lng": 75.2459,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Dakshina Kannada (sample)",
+   "district": "Dakshina Kannada",
+   "lat": 12.8458,
+   "lng": 75.2419,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Mangalore (sample)",
+   "district": "Mangalore",
+   "lat": 12.9181,
+   "lng": 74.859,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Mangalore (sample)",
+   "district": "Mangalore",
+   "lat": 12.9111,
+   "lng": 74.861,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Mangalore (sample)",
+   "district": "Mangalore",
+   "lat": 12.9201,
+   "lng": 74.852,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Mangalore (sample)",
+   "district": "Mangalore",
+   "lat": 12.9091,
+   "lng": 74.854,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Mangalore (sample)",
+   "district": "Mangalore",
+   "lat": 12.9161,
+   "lng": 74.85,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Davanagere (sample)",
+   "district": "Davanagere",
+   "lat": 14.4684,
+   "lng": 75.9248,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Davanagere (sample)",
+   "district": "Davanagere",
+   "lat": 14.4614,
+   "lng": 75.9268,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Davanagere (sample)",
+   "district": "Davanagere",
+   "lat": 14.4704,
+   "lng": 75.9178,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Davanagere (sample)",
+   "district": "Davanagere",
+   "lat": 14.4594,
+   "lng": 75.9198,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Davanagere (sample)",
+   "district": "Davanagere",
+   "lat": 14.4664,
+   "lng": 75.9158,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Dharwad (sample)",
+   "district": "Dharwad",
+   "lat": 15.4629,
+   "lng": 75.0108,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Dharwad (sample)",
+   "district": "Dharwad",
+   "lat": 15.4559,
+   "lng": 75.0128,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Dharwad (sample)",
+   "district": "Dharwad",
+   "lat": 15.4649,
+   "lng": 75.0038,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Dharwad (sample)",
+   "district": "Dharwad",
+   "lat": 15.4539,
+   "lng": 75.0058,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Dharwad (sample)",
+   "district": "Dharwad",
+   "lat": 15.4609,
+   "lng": 75.0018,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Gadag (sample)",
+   "district": "Gadag",
+   "lat": 15.4206,
+   "lng": 75.63,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Gadag (sample)",
+   "district": "Gadag",
+   "lat": 15.4136,
+   "lng": 75.632,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Gadag (sample)",
+   "district": "Gadag",
+   "lat": 15.4226,
+   "lng": 75.623,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Gadag (sample)",
+   "district": "Gadag",
+   "lat": 15.4116,
+   "lng": 75.625,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Gadag (sample)",
+   "district": "Gadag",
+   "lat": 15.4186,
+   "lng": 75.621,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Hassan (sample)",
+   "district": "Hassan",
+   "lat": 13.0108,
+   "lng": 76.1034,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Hassan (sample)",
+   "district": "Hassan",
+   "lat": 13.0038,
+   "lng": 76.1054,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Hassan (sample)",
+   "district": "Hassan",
+   "lat": 13.0128,
+   "lng": 76.0964,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Hassan (sample)",
+   "district": "Hassan",
+   "lat": 13.0018,
+   "lng": 76.0984,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Hassan (sample)",
+   "district": "Hassan",
+   "lat": 13.0088,
+   "lng": 76.0944,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Haveri (sample)",
+   "district": "Haveri",
+   "lat": 14.7991,
+   "lng": 75.4077,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Haveri (sample)",
+   "district": "Haveri",
+   "lat": 14.7921,
+   "lng": 75.4097,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Haveri (sample)",
+   "district": "Haveri",
+   "lat": 14.8011,
+   "lng": 75.4007,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Haveri (sample)",
+   "district": "Haveri",
+   "lat": 14.7901,
+   "lng": 75.4027,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Haveri (sample)",
+   "district": "Haveri",
+   "lat": 14.7971,
+   "lng": 75.3987,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Kalaburagi (sample)",
+   "district": "Kalaburagi",
+   "lat": 17.3337,
+   "lng": 76.8373,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Kalaburagi (sample)",
+   "district": "Kalaburagi",
+   "lat": 17.3267,
+   "lng": 76.8393,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Kalaburagi (sample)",
+   "district": "Kalaburagi",
+   "lat": 17.3357,
+   "lng": 76.8303,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Kalaburagi (sample)",
+   "district": "Kalaburagi",
+   "lat": 17.3247,
+   "lng": 76.8323,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Kalaburagi (sample)",
+   "district": "Kalaburagi",
+   "lat": 17.3317,
+   "lng": 76.8283,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Kodagu (sample)",
+   "district": "Kodagu",
+   "lat": 12.4284,
+   "lng": 75.7412,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Kodagu (sample)",
+   "district": "Kodagu",
+   "lat": 12.4214,
+   "lng": 75.7432,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Kodagu (sample)",
+   "district": "Kodagu",
+   "lat": 12.4304,
+   "lng": 75.7342,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Kodagu (sample)",
+   "district": "Kodagu",
+   "lat": 12.4194,
+   "lng": 75.7362,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Kodagu (sample)",
+   "district": "Kodagu",
+   "lat": 12.4264,
+   "lng": 75.7322,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Kolar (sample)",
+   "district": "Kolar",
+   "lat": 13.1397,
+   "lng": 78.1356,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Kolar (sample)",
+   "district": "Kolar",
+   "lat": 13.1327,
+   "lng": 78.1376,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Kolar (sample)",
+   "district": "Kolar",
+   "lat": 13.1417,
+   "lng": 78.1286,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Kolar (sample)",
+   "district": "Kolar",
+   "lat": 13.1307,
+   "lng": 78.1306,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Kolar (sample)",
+   "district": "Kolar",
+   "lat": 13.1377,
+   "lng": 78.1266,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Koppal (sample)",
+   "district": "Koppal",
+   "lat": 15.3492,
+   "lng": 76.1578,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Koppal (sample)",
+   "district": "Koppal",
+   "lat": 15.3422,
+   "lng": 76.1598,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Koppal (sample)",
+   "district": "Koppal",
+   "lat": 15.3512,
+   "lng": 76.1508,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Koppal (sample)",
+   "district": "Koppal",
+   "lat": 15.3402,
+   "lng": 76.1528,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Koppal (sample)",
+   "district": "Koppal",
+   "lat": 15.3472,
+   "lng": 76.1488,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Mandya (sample)",
+   "district": "Mandya",
+   "lat": 12.5258,
+   "lng": 76.8981,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Mandya (sample)",
+   "district": "Mandya",
+   "lat": 12.5188,
+   "lng": 76.9001,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Mandya (sample)",
+   "district": "Mandya",
+   "lat": 12.5278,
+   "lng": 76.8911,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Mandya (sample)",
+   "district": "Mandya",
+   "lat": 12.5168,
+   "lng": 76.8931,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Mandya (sample)",
+   "district": "Mandya",
+   "lat": 12.5238,
+   "lng": 76.8891,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Mysuru (sample)",
+   "district": "Mysuru",
+   "lat": 12.2998,
+   "lng": 76.6424,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Mysuru (sample)",
+   "district": "Mysuru",
+   "lat": 12.2928,
+   "lng": 76.6444,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Mysuru (sample)",
+   "district": "Mysuru",
+   "lat": 12.3018,
+   "lng": 76.6354,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Mysuru (sample)",
+   "district": "Mysuru",
+   "lat": 12.2908,
+   "lng": 76.6374,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Mysuru (sample)",
+   "district": "Mysuru",
+   "lat": 12.2978,
+   "lng": 76.6334,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Raichur (sample)",
+   "district": "Raichur",
+   "lat": 16.22,
+   "lng": 77.3596,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Raichur (sample)",
+   "district": "Raichur",
+   "lat": 16.213,
+   "lng": 77.3616,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Raichur (sample)",
+   "district": "Raichur",
+   "lat": 16.222,
+   "lng": 77.3526,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Raichur (sample)",
+   "district": "Raichur",
+   "lat": 16.211,
+   "lng": 77.3546,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Raichur (sample)",
+   "district": "Raichur",
+   "lat": 16.218,
+   "lng": 77.3506,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Ramanagara (sample)",
+   "district": "Ramanagara",
+   "lat": 12.7197,
+   "lng": 77.284,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Ramanagara (sample)",
+   "district": "Ramanagara",
+   "lat": 12.7127,
+   "lng": 77.286,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Ramanagara (sample)",
+   "district": "Ramanagara",
+   "lat": 12.7217,
+   "lng": 77.277,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Ramanagara (sample)",
+   "district": "Ramanagara",
+   "lat": 12.7107,
+   "lng": 77.279,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Ramanagara (sample)",
+   "district": "Ramanagara",
+   "lat": 12.7177,
+   "lng": 77.275,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Shivamogga (sample)",
+   "district": "Shivamogga",
+   "lat": 13.9339,
+   "lng": 75.5711,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Shivamogga (sample)",
+   "district": "Shivamogga",
+   "lat": 13.9269,
+   "lng": 75.5731,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Shivamogga (sample)",
+   "district": "Shivamogga",
+   "lat": 13.9359,
+   "lng": 75.5641,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Shivamogga (sample)",
+   "district": "Shivamogga",
+   "lat": 13.9249,
+   "lng": 75.5661,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Shivamogga (sample)",
+   "district": "Shivamogga",
+   "lat": 13.9319,
+   "lng": 75.5621,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Tumakuru (sample)",
+   "district": "Tumakuru",
+   "lat": 13.3419,
+   "lng": 77.1203,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Tumakuru (sample)",
+   "district": "Tumakuru",
+   "lat": 13.3349,
+   "lng": 77.1223,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Tumakuru (sample)",
+   "district": "Tumakuru",
+   "lat": 13.3439,
+   "lng": 77.1133,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Tumakuru (sample)",
+   "district": "Tumakuru",
+   "lat": 13.3329,
+   "lng": 77.1153,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Tumakuru (sample)",
+   "district": "Tumakuru",
+   "lat": 13.3399,
+   "lng": 77.1113,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Udupi (sample)",
+   "district": "Udupi",
+   "lat": 13.3449,
+   "lng": 74.7451,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Udupi (sample)",
+   "district": "Udupi",
+   "lat": 13.3379,
+   "lng": 74.7471,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Udupi (sample)",
+   "district": "Udupi",
+   "lat": 13.3469,
+   "lng": 74.7381,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Udupi (sample)",
+   "district": "Udupi",
+   "lat": 13.3359,
+   "lng": 74.7401,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Udupi (sample)",
+   "district": "Udupi",
+   "lat": 13.3429,
+   "lng": 74.7361,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Uttara Kannada (sample)",
+   "district": "Uttara Kannada",
+   "lat": 14.7977,
+   "lng": 74.6899,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Uttara Kannada (sample)",
+   "district": "Uttara Kannada",
+   "lat": 14.7907,
+   "lng": 74.6919,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Uttara Kannada (sample)",
+   "district": "Uttara Kannada",
+   "lat": 14.7997,
+   "lng": 74.6829,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Uttara Kannada (sample)",
+   "district": "Uttara Kannada",
+   "lat": 14.7887,
+   "lng": 74.6849,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Uttara Kannada (sample)",
+   "district": "Uttara Kannada",
+   "lat": 14.7957,
+   "lng": 74.6809,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Karwar (sample)",
+   "district": "Karwar",
+   "lat": 14.8177,
+   "lng": 74.132,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Karwar (sample)",
+   "district": "Karwar",
+   "lat": 14.8107,
+   "lng": 74.134,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Karwar (sample)",
+   "district": "Karwar",
+   "lat": 14.8197,
+   "lng": 74.125,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Karwar (sample)",
+   "district": "Karwar",
+   "lat": 14.8087,
+   "lng": 74.127,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Karwar (sample)",
+   "district": "Karwar",
+   "lat": 14.8157,
+   "lng": 74.123,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Vijayapura (sample)",
+   "district": "Vijayapura",
+   "lat": 16.8342,
+   "lng": 75.713,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Vijayapura (sample)",
+   "district": "Vijayapura",
+   "lat": 16.8272,
+   "lng": 75.715,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Vijayapura (sample)",
+   "district": "Vijayapura",
+   "lat": 16.8362,
+   "lng": 75.706,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Vijayapura (sample)",
+   "district": "Vijayapura",
+   "lat": 16.8252,
+   "lng": 75.708,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Vijayapura (sample)",
+   "district": "Vijayapura",
+   "lat": 16.8322,
+   "lng": 75.704,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Vijayanagara (sample)",
+   "district": "Vijayanagara",
+   "lat": 15.273,
+   "lng": 76.39,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Vijayanagara (sample)",
+   "district": "Vijayanagara",
+   "lat": 15.266,
+   "lng": 76.392,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Vijayanagara (sample)",
+   "district": "Vijayanagara",
+   "lat": 15.275,
+   "lng": 76.383,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Vijayanagara (sample)",
+   "district": "Vijayanagara",
+   "lat": 15.264,
+   "lng": 76.385,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Vijayanagara (sample)",
+   "district": "Vijayanagara",
+   "lat": 15.271,
+   "lng": 76.381,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Karnataka Grameena Bank - Yadgir (sample)",
+   "district": "Yadgir",
+   "lat": 16.774,
+   "lng": 77.141,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "State Bank of India - Yadgir (sample)",
+   "district": "Yadgir",
+   "lat": 16.767,
+   "lng": 77.143,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "Canara Bank - Yadgir (sample)",
+   "district": "Yadgir",
+   "lat": 16.776,
+   "lng": 77.134,
+   "sample": true
+  },
+  {
+   "type": "bank",
+   "name": "District Central Co-operative Bank - Yadgir (sample)",
+   "district": "Yadgir",
+   "lat": 16.765,
+   "lng": 77.136,
+   "sample": true
+  },
+  {
+   "type": "csc",
+   "name": "Common Service Centre (CSC) - Yadgir (sample)",
+   "district": "Yadgir",
+   "lat": 16.772,
+   "lng": 77.132,
+   "sample": true
+  }
+ ]
+}

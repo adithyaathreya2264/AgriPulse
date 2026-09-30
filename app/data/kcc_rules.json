@@ -1,0 +1,73 @@
+{
+  "_note": "ILLUSTRATIVE VALUES. Real scale of finance is fixed every year per district by the District Level Technical Committee (DLTC) and published by NABARD / the lead bank; policy limits change with RBI circulars. Replace these numbers with official ones before relying on the estimate.",
+
+  "limit_rules": {
+    "post_harvest_percent": 10,
+    "maintenance_percent": 20,
+    "max_cropping_intensity": 2.0,
+    "annual_escalation_percent": 10
+  },
+
+  "policy": {
+    "collateral_free_limit": 200000,
+    "interest_subvention_cap": 500000,
+    "base_interest_percent": 7,
+    "prompt_repayment_benefit_percent": 3,
+    "min_age": 18,
+    "max_age": 75,
+    "soil_card_valid_years": 3,
+    "policy_note": "As of 2025: collateral-free KCC up to Rs 2 lakh, interest subvention (7%, effective 4% with prompt repayment) on loans up to Rs 5 lakh. Verify the current RBI / Government of India circulars."
+  },
+
+  "required_documents": {
+    "always": ["aadhaar", "bank_passbook", "photo"],
+    "owner": ["land_record"],
+    "tenant": ["lease_agreement"],
+    "sharecropper": ["lease_agreement"],
+    "labels": {
+      "aadhaar": "Aadhaar card",
+      "bank_passbook": "Bank account passbook",
+      "photo": "Passport size photo",
+      "land_record": "Land record (RTC / Pahani / 7-12)",
+      "lease_agreement": "Lease / tenancy agreement",
+      "soil_health_card": "Soil Health Card",
+      "pan": "PAN card",
+      "voter_id": "Voter ID"
+    }
+  },
+
+  "default_crop": { "scale_of_finance": 40000, "ph": [6.0, 7.5] },
+
+  "crops": {
+    "paddy":     { "scale_of_finance": 42000,  "ph": [5.5, 7.0] },
+    "ragi":      { "scale_of_finance": 24000,  "ph": [5.5, 7.5] },
+    "maize":     { "scale_of_finance": 34000,  "ph": [5.8, 7.0] },
+    "jowar":     { "scale_of_finance": 20000,  "ph": [6.0, 8.0] },
+    "bajra":     { "scale_of_finance": 18000,  "ph": [6.0, 8.0] },
+    "wheat":     { "scale_of_finance": 32000,  "ph": [6.0, 7.5] },
+    "tur":       { "scale_of_finance": 26000,  "ph": [6.0, 7.5] },
+    "gram":      { "scale_of_finance": 24000,  "ph": [6.0, 7.5] },
+    "groundnut": { "scale_of_finance": 32000,  "ph": [6.0, 7.0] },
+    "sunflower": { "scale_of_finance": 28000,  "ph": [6.0, 7.5] },
+    "cotton":    { "scale_of_finance": 52000,  "ph": [6.0, 8.0] },
+    "sugarcane": { "scale_of_finance": 95000,  "ph": [6.0, 7.5] },
+    "tomato":    { "scale_of_finance": 85000,  "ph": [6.0, 7.0] },
+    "potato":    { "scale_of_finance": 75000,  "ph": [5.0, 6.5] },
+    "onion":     { "scale_of_finance": 72000,  "ph": [6.0, 7.5] },
+    "chilli":    { "scale_of_finance": 80000,  "ph": [6.0, 7.0] },
+    "coconut":   { "scale_of_finance": 60000,  "ph": [5.5, 7.5] },
+    "arecanut":  { "scale_of_finance": 70000,  "ph": [5.5, 7.0] },
+    "banana":    { "scale_of_finance": 110000, "ph": [6.0, 7.5] },
+    "ginger":    { "scale_of_finance": 120000, "ph": [5.5, 6.5] },
+    "turmeric":  { "scale_of_finance": 100000, "ph": [5.5, 7.5] },
+    "coffee":    { "scale_of_finance": 90000,  "ph": [6.0, 6.5] }
+  },
+
+  "soil_thresholds": {
+    "_note": "Soil Health Card categories (kg/ha; organic carbon in %).",
+    "oc_percent":  { "low_below": 0.5,  "high_above": 0.75 },
+    "n_kg_ha":     { "low_below": 280,  "high_above": 560 },
+    "p_kg_ha":     { "low_below": 10,   "high_above": 25 },
+    "k_kg_ha":     { "low_below": 108,  "high_above": 280 }
+  }
+}
