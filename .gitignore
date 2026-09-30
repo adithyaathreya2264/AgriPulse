@@ -50,6 +50,7 @@ test_images/
 
 # Project models that should be included in GitHub
 !app/ai/models/efficientnet.pth
+!app/ai/models/yolov8_disease.pt
 !yolov8n.pt
 
 # ==============================
@@ -77,3 +78,11 @@ Thumbs.db
 
 *.tmp
 *.temp
+
+datasets/**/*
+# ==============================
+# Training data and runs
+# ==============================
+
+datasets/
+runs/

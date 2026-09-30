@@ -1,3 +1,5 @@
+import os
+
 import torch
 torch.set_num_threads(2)
 import torch.nn as nn
@@ -62,7 +64,6 @@ model = efficientnet_b0(weights="DEFAULT")
 
 for param in model.features.parameters():
     param.requires_grad = False
-    model=efficientnet_b0(weights="DEFAULT")
 
 num_classes = len(dataset.classes)
 
@@ -81,6 +82,8 @@ optimizer = optim.Adam(
 )
 
 epochs = 5
+best_accuracy = 0
+os.makedirs("app/ai/models", exist_ok=True)
 
 for epoch in range(epochs):
 
@@ -135,9 +138,15 @@ for epoch in range(epochs):
         f"Accuracy: {accuracy:.2f}%"
     )
 
-torch.save(
-    model.state_dict(),
-    "app/ai/models/efficientnet.pth"
-)
+    # Keep only the best-performing epoch
+    if accuracy > best_accuracy:
+        best_accuracy = accuracy
 
-print("Model saved successfully!")
+        torch.save(
+            model.state_dict(),
+            "app/ai/models/efficientnet.pth"
+        )
+
+        print(f"Best model saved ({best_accuracy:.2f}%)")
+
+print(f"Training finished. Best accuracy: {best_accuracy:.2f}%")

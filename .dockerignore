@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+venv/
+.git/
+__pycache__/
+*.pyc
+node_modules/
+kisanmitra-frontend/
+datasets/
+runs/
+uploads/
+tests/
+docs/
+scripts/
+*.docx
+yolov8n.pt

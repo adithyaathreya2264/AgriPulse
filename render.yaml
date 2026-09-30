@@ -1,0 +1,45 @@
+# Render Blueprint: New + > Blueprint, pick this repository.
+services:
+  - type: web
+    name: agripulse-api
+    runtime: docker
+    plan: standard            # 2 GB RAM: PyTorch + YOLO do not fit in the 512 MB free/starter plans
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: agripulse
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: AGMARKNET_API_KEY
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_WHATSAPP_FROM
+        value: whatsapp:+14155238886
+      - key: CORS_ORIGINS
+        sync: false           # your Vercel URL, e.g. https://agripulse.vercel.app
+      - key: FRONTEND_URL
+        sync: false           # same Vercel URL
+      - key: PUBLIC_BASE_URL
+        sync: false           # this service's URL, e.g. https://agripulse-api.onrender.com
+      - key: DISEASE_MODEL
+        value: yolo
+      - key: FAKE_AUTH
+        value: "true"         # demo OTP 123456 - see docs/DEPLOY.md before going public
