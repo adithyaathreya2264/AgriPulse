@@ -1,0 +1,241 @@
+/* Motion for the SVG scenes and the logo */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.logo svg {
+  flex: none;
+  filter: drop-shadow(0 4px 10px rgba(15, 157, 88, 0.35));
+}
+
+.logo-word {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.logo-word b {
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.logo-light .logo-word {
+  color: #fff;
+}
+
+.logo-light .logo-word b {
+  color: #fde68a;
+}
+
+.logo-pulse {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: draw 2.6s ease-in-out infinite;
+}
+
+@keyframes draw {
+  0% {
+    stroke-dashoffset: 60;
+  }
+  55%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* field scene */
+
+.art-stalk {
+  animation: sway 3.4s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3.5deg);
+  }
+}
+
+.art-sun {
+  animation: pulse-sun 6s ease-in-out infinite;
+  transform-origin: 610px 120px;
+}
+
+@keyframes pulse-sun {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.art-cloud-1 {
+  animation: cloud 26s linear infinite;
+}
+
+.art-cloud-2 {
+  animation: cloud 38s linear -14s infinite;
+}
+
+@keyframes cloud {
+  from {
+    transform: translateX(-120px);
+  }
+  to {
+    transform: translateX(560px);
+  }
+}
+
+/* weather art */
+
+.wx-art {
+  overflow: visible;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.18));
+}
+
+.wx-sun {
+  transform-origin: 75px 75px;
+  animation: spin 24s linear infinite;
+}
+
+.wx-cloud {
+  animation: bob 5s ease-in-out infinite;
+}
+
+.wx-drop {
+  animation: rain 1s linear infinite;
+}
+
+.wx-bolt {
+  animation: flash 3s ease-in-out infinite;
+}
+
+.wx-mist {
+  animation: mist 4s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes rain {
+  0% {
+    transform: translate(0, -6px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-6px, 16px);
+    opacity: 0;
+  }
+}
+
+@keyframes flash {
+  0%,
+  86%,
+  100% {
+    opacity: 0.25;
+  }
+  90%,
+  94% {
+    opacity: 1;
+  }
+}
+
+@keyframes mist {
+  0%,
+  100% {
+    transform: translateX(-6px);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(8px);
+    opacity: 0.9;
+  }
+}
+
+/* leaf scanner overlay */
+
+.scanner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(15, 157, 88, 0.08), rgba(15, 157, 88, 0.02));
+}
+
+.scanner-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 70px;
+  top: -70px;
+  background: linear-gradient(180deg, transparent, rgba(52, 211, 153, 0.55) 85%, #a7f3d0);
+  border-bottom: 2px solid #a7f3d0;
+  box-shadow: 0 8px 30px rgba(52, 211, 153, 0.7);
+  animation: scan 1.9s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: -70px;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.scanner-corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #a7f3d0;
+  border-radius: 6px;
+}
+
+.scanner-corner.tl {
+  top: 14px;
+  left: 14px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.scanner-corner.tr {
+  top: 14px;
+  right: 14px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.scanner-corner.bl {
+  bottom: 14px;
+  left: 14px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.scanner-corner.br {
+  bottom: 14px;
+  right: 14px;
+  border-left: 0;
+  border-top: 0;
+}

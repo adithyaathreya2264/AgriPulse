@@ -1,0 +1,125 @@
+/* Footer and the floating voice button (the frame itself is in site.css) */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 22px;
+  padding: 22px 32px 28px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.footer .logo-word {
+  font-size: 16px;
+}
+
+/* -------------------------------------------------- floating voice button */
+
+.voice-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 58px;
+  padding: 0 22px 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--grad-gold);
+  color: #3b2a00;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 12px 34px rgba(240, 169, 32, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.voice-fab:hover {
+  transform: translateY(-3px);
+}
+
+.voice-fab:active {
+  transform: scale(0.95);
+}
+
+.voice-fab-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #3b2a00;
+  color: #fde68a;
+}
+
+.voice-fab:not(.voice-recording):not(.voice-processing) .voice-fab-icon {
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+.voice-recording {
+  background: linear-gradient(135deg, #ff7a7f, #e0454b);
+  color: #fff;
+  box-shadow: 0 12px 34px rgba(224, 69, 75, 0.55);
+}
+
+.voice-recording .voice-fab-icon {
+  background: #fff;
+  color: var(--danger);
+}
+
+.fab-ring {
+  position: absolute;
+  left: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: ring 1.6s ease-out infinite;
+}
+
+.fab-ring-2 {
+  animation-delay: 0.8s;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 42, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(59, 42, 0, 0);
+  }
+}
+
+@media (max-width: 900px) {
+  .footer {
+    padding-bottom: 96px;
+  }
+
+  .voice-fab {
+    right: 16px;
+    bottom: 20px;
+    height: 54px;
+    padding: 0 8px;
+  }
+
+  .voice-fab-label {
+    display: none;
+  }
+
+  .voice-fab-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .fab-ring {
+    width: 40px;
+    height: 40px;
+  }
+}
