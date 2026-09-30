@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
-from app.db.database import SessionLocal
+from app.db.database import get_db
 from app.ai.assistant.chat_agent import ask_ai
+from app.services.translation_service import (
+    translate_to_english,
+    translate_to_user_language
+)
 from app.services.ai_session_service import (
     load_report,
     load_conversation,
@@ -15,18 +18,11 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     question: str
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    lang: str | None = None  # en, hi, kn, te, ta, mr
 
 
 @router.post("/ai-chat")
-def ai_chat(request: ChatRequest, db: Session = Depends(get_db)):
+def ai_chat(request: ChatRequest, db=Depends(get_db)):
 
     # Load latest disease report
     report = load_report(db)
@@ -40,15 +36,18 @@ def ai_chat(request: ChatRequest, db: Session = Depends(get_db)):
     # Load previous conversation
     conversation = load_conversation(db)
 
+    # Understand the question in any supported language
+    question, detected_lang = translate_to_english(request.question)
+
     # Ask Gemini AI
     answer = ask_ai(
         report=report,
-        question=request.question
+        question=question
     )
 
-    # Save new conversation
+    # Save the conversation in English
     conversation.append({
-        "user": request.question,
+        "user": question,
         "assistant": answer
     })
 
@@ -59,6 +58,9 @@ def ai_chat(request: ChatRequest, db: Session = Depends(get_db)):
 
     return {
         "success": True,
-        "answer": answer,
+        "answer": translate_to_user_language(
+            answer,
+            request.lang or detected_lang
+        ),
         "conversation": conversation
     }

@@ -1,181 +1,142 @@
-from urllib import response
+"""
+The Twilio WhatsApp webhook. The bot itself lives in app/whatsapp/.
 
-from fastapi import APIRouter, Request, Response, Depends
+What happens to a message:
+  1. Twilio's signature is checked (nobody else can post fake messages)
+  2. duplicates (Twilio retries) and message floods are dropped
+  3. the bot decides what to say
+  4. slow work (prices, photos, AI answers) does not have to fit into
+     Twilio's 15 second limit: when Twilio credentials are set we answer
+     "looking it up..." at once and send the result as a second message
+"""
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
+from fastapi.concurrency import run_in_threadpool
 from twilio.twiml.messaging_response import MessagingResponse
-import requests
-from requests.auth import HTTPBasicAuth
-import os
-from sqlalchemy.orm import Session
 
-from app.services.disease_service import predict_disease
-from app.services.prediction_service import save_predictions
-from app.services.voice_service import convert_ogg_to_wav, speech_to_text
-from app.services.translation_service import translate_to_english
-from app.db.database import SessionLocal
-from app.services.price_service import predict_price
-from app.routes.weather_routes import get_weather
+from app.db.database import get_db
+from app.whatsapp import bot, media, twilio_io
+from app.whatsapp.localize import localize
+from app.whatsapp.state import record_message
+from app.whatsapp.types import Incoming, Outcome
 
 router = APIRouter()
 
-UPLOAD_DIR = "uploads"
+ERROR_TEXT = "Sorry, something went wrong. Please try again in a moment."
 
-ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+EMPTY = '<?xml version="1.0" encoding="UTF-8"?><Response></Response>'
 
 
-# 🔥 Robust media download function
-def download_media(media_url):
-    try:
-        print("Media URL:", media_url)
+def parse_form(form):
+    def number(name):
+        try:
+            return float(form.get(name))
+        except (TypeError, ValueError):
+            return None
 
-        # Try with auth
-        response = requests.get(
-            media_url,
-            auth=HTTPBasicAuth(ACCOUNT_SID, AUTH_TOKEN),
-            headers={"User-Agent": "Mozilla/5.0"},
-            stream=True
-        )
+    return Incoming(
+        phone=(form.get("From") or "").replace("whatsapp:", "").strip(),
+        body=form.get("Body") or "",
+        sid=form.get("MessageSid") or form.get("SmsMessageSid"),
+        media_url=form.get("MediaUrl0") if int(form.get("NumMedia") or 0) > 0 else None,
+        media_type=form.get("MediaContentType0") or "",
+        latitude=number("Latitude"),
+        longitude=number("Longitude"),
+        profile_name=form.get("ProfileName"),
+    )
 
-        if response.status_code == 200:
-            return response.content
 
-        print("Auth failed, trying without auth...")
+def voice_url_for(outcome: Outcome, texts):
+    """A voice note of the last answer, when the farmer sent a voice note."""
 
-        # Try without auth
-        response = requests.get(
-            media_url,
-            headers={"User-Agent": "Mozilla/5.0"},
-            stream=True
-        )
-
-        if response.status_code == 200:
-            return response.content
-
-        print("Download failed. Status:", response.status_code)
+    if not outcome.voice or not texts:
         return None
 
+    return media.save_voice_reply(texts[-1], outcome.lang)
+
+
+def twiml(texts, media_url=None):
+    response = MessagingResponse()
+
+    parts = [part for text in texts for part in twilio_io.split_message(text)]
+
+    for index, part in enumerate(parts):
+        message = response.message(part)
+
+        if media_url and index == len(parts) - 1:
+            message.media(media_url)
+
+    return Response(content=str(response), media_type="application/xml")
+
+
+def run_deferred(db, incoming: Incoming, outcome: Outcome):
+    """Background task: do the slow work, then message the farmer."""
+
+    try:
+        texts = outcome.deferred()
     except Exception as e:
-        print("Download error:", e)
-        return None
+        print("Bot background error:", e)
+        texts = [ERROR_TEXT]
+
+    localized = localize(db, texts, outcome.lang)
+
+    twilio_io.send_messages(incoming.phone, localized, voice_url_for(outcome, localized))
 
 
 @router.post("/whatsapp")
-async def whatsapp_reply(request: Request, db: Session = Depends(get_db)):
+async def whatsapp_reply(
+    request: Request,
+    background: BackgroundTasks,
+    db=Depends(get_db)
+):
+    form = await request.form()
+
+    if not twilio_io.valid_signature(request, form):
+        raise HTTPException(status_code=403, detail="Invalid Twilio signature")
+
+    incoming = parse_form(form)
+
+    if not incoming.phone:
+        return Response(content=EMPTY, media_type="application/xml")
+
+    status = record_message(db, incoming.sid, incoming.phone)
+
+    if status == "duplicate":
+        return Response(content=EMPTY, media_type="application/xml")
+
     try:
-        form = await request.form()
-        num_media = int(form.get("NumMedia", 0))
-        response = MessagingResponse()
+        outcome = await run_in_threadpool(
+            bot.handle, db, incoming, status == "rate_limited"
+        )
 
-        # =========================
-        # MEDIA (IMAGE / AUDIO)
-        # =========================
-        if num_media > 0:
-            media_url = form.get("MediaUrl0")
-            content_type = form.get("MediaContentType0", "")
+        texts = list(outcome.replies)
 
-            media_content = download_media(media_url)
+        if outcome.deferred:
+            if twilio_io.rest_configured():
+                # Answer now, send the real result when it is ready
+                if outcome.ack:
+                    texts.append(outcome.ack)
 
-            if not media_content:
-                response.message("Failed to download media.")
-                return Response(str(response), media_type="application/xml")
-
-            # VOICE
-            if "audio" in content_type:
-                ogg_path = os.path.join(UPLOAD_DIR, "voice.ogg")
-                wav_path = os.path.join(UPLOAD_DIR, "voice.wav")
-
-                with open(ogg_path, "wb") as f:
-                    f.write(media_content)
-
-                convert_ogg_to_wav(ogg_path, wav_path)
-                text = speech_to_text(wav_path)
-
-                translated = translate_to_english(text)
-
-                response.message(f"You said (voice): {translated}")
-
-            # 📸 IMAGE
-            elif "image" in content_type:
-                image_path = os.path.join(UPLOAD_DIR, "image.jpg")
-
-                with open(image_path, "wb") as f:
-                    f.write(media_content)
-
-                predictions = predict_disease(image_path)
-                save_predictions(db, "image.jpg", predictions, phone=form.get("From").replace("whatsapp:", ""))
-
-                if predictions:
-                    result = predictions[0]
-                    message = (
-                        f"Disease: {result['disease']}\n"
-                        f"Confidence: {result['confidence']}\n"
-                        f"Treatment: {result['treatment']}"
-                    )
-                else:
-                    message = "⚠️ Something went wrong. Please try again."
-
-                response.message(message)
+                background.add_task(run_deferred, db, incoming, outcome)
 
             else:
-                response.message("Unsupported media type.")
+                texts.extend(await run_in_threadpool(outcome.deferred))
 
-        # =========================
-        # TEXT
-        # =========================
-        else:
-            incoming_msg = form.get("Body", "")
-            translated = translate_to_english(incoming_msg).lower()
-            
-            #price command
-            if translated.startswith("price"):
-                try:
-                    parts=translated.split()
-                    crop=parts[1]
-                    result=predict_price(crop)
-                    if "error" in result:
-                        message="Crop not found"
-                    else:
-                        message=(
-                            f"Crop: {result['crop']}\n"
-                            f"Month: {result['month']}\n"
-                            f"Predicted Price: {result['predicted_price']}"
-                        )
-                except:
-                    message="⚠️ Use formate: price <crop>"
-                response.message(message)
+        localized = await run_in_threadpool(
+            localize, db, texts, outcome.lang, outcome.static and not outcome.deferred
+        )
 
-            elif translated.startswith("weather"):
-                try:
-                    parts=translated.split()
-                    city=parts[1]
-                    result=get_weather(city)
-                    if "error" in result:
-                        message="City not found"
-                    else:
-                        message=(
-                            f"City: {result['city']}\n"
-                            f"Temperature: {result['temperature']}°C\n"
-                            f"Condition: {result['condition']}\n"
-                            f"Advice: {result['advice']}"
-                        )
-                except:
-                    message="⚠️ Use format: weather <city>"
-                response.message(message)    
-            else:
-                response.message(f"Processed: {translated}")
-            
-        return Response(content=str(response), media_type="application/xml")
+        if outcome.prefix and localized:
+            localized[0] = outcome.prefix + localized[0]
+
+        voice = None
+
+        if not (outcome.deferred and twilio_io.rest_configured()):
+            voice = await run_in_threadpool(voice_url_for, outcome, localized)
+
+        return twiml(localized, voice)
 
     except Exception as e:
-        print("ERROR:", e)
-        response = MessagingResponse()
-        response.message(f"Error: {str(e)}")
-        return Response(content=str(response), media_type="application/xml")
+        print("WhatsApp error:", e)
+
+        return twiml([ERROR_TEXT])

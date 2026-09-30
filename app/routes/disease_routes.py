@@ -1,38 +1,37 @@
-from fastapi import APIRouter, UploadFile, File, Depends, Form
+from fastapi import APIRouter, UploadFile, File, Depends, Form, HTTPException
 import shutil
 import os
+import uuid
 
 from app.services.disease_service import predict_disease
-from sqlalchemy.orm import Session
-from app.db.database import SessionLocal
-from app.models.prediction import Prediction
+from app.db.database import get_db
 from app.services.prediction_service import save_predictions, get_all_predictions
 from app.services.disease_intelligent_service import analyze_crop
+from app.services.translation_service import translate_payload
+from app.ai.classifier.common import ModelNotFoundError
 router = APIRouter()
 
 UPLOAD_DIR = "uploads"
-
-#db dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/detect-disease")
 def detect_disease(
     file: UploadFile = File(...),
     city: str = Form(...),
-    db: Session = Depends(get_db)
+    lang: str = Form("en"),
+    db=Depends(get_db)
 ):
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    extension = os.path.splitext(file.filename or "")[1].lower()
+    file_path = os.path.join(UPLOAD_DIR, f"{uuid.uuid4().hex}{extension}")
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     # Generate complete AI report
-    report = analyze_crop(file_path, city)
+    try:
+        report = analyze_crop(file_path, city)
+    except ModelNotFoundError as e:
+        raise HTTPException(status_code=503, detail=str(e))
 
     # Save AI report for chat assistant
     from app.services.ai_session_service import save_report
@@ -41,16 +40,16 @@ def detect_disease(
     # Save prediction history
     save_predictions(db, file.filename, report)
 
+    # History and chat memory stay in English; only the response is translated
     return {
         "filename": file.filename,
-        "report": report
+        "report": translate_payload(report, lang)
     }
 @router.get("/predictions")
-def get_predictions(db: Session = Depends(get_db)):
+def get_predictions(db=Depends(get_db)):
     return get_all_predictions(db)
 
 @router.delete("/predictions")
-def delete_predictions(db: Session = Depends(get_db)):
-    db.query(Prediction).delete()
-    db.commit()
+def delete_predictions(db=Depends(get_db)):
+    db.predictions.delete_many({})
     return {"message": "All predictions deleted"}
