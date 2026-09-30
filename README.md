@@ -1,96 +1,328 @@
-# AgriPulse (KisanMitra AI)
+---
+title: AgriPulse API
+emoji: 🌾
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+pinned: false
+---
 
-AI-assisted farming platform: crop disease diagnosis, mandi price forecasting, weather advice,
-an equipment rental marketplace, a voice-first multilingual interface and a Kisan Credit Card
-(KCC) eligibility advisor. *AgriPulse* and *KisanMitra AI* are the same product.
+<div align="center">
 
-**Stack:** React (Create React App) · FastAPI · MongoDB Atlas · YOLOv8-cls / EfficientNet ·
-Gemini · Sarvam AI · Razorpay (test mode) · Twilio WhatsApp.
+# AgriPulse
 
-## What is implemented
+### *KisanMitra AI* — the AI farming companion that speaks your language
 
-| Feature | Status | Notes |
-|---|---|---|
-| **Disease diagnosis** (web + WhatsApp) | Working, needs trained weights | YOLOv8-cls (`train_yolo_classifier.py`), EfficientNet-B0 fallback. Trained on PlantVillage folders, one class per folder. Replies in the farmer's language. |
-| **Mandi price forecast** | Working, needs `AGMARKNET_API_KEY` | 5 years of Agmarknet history + rainfall/temperature (Open-Meteo), gradient-boosting model per horizon (7/14/21/28 days), backtested against a linear baseline, best-time-to-sell, price alerts (in-app + WhatsApp). Agmarknet has no arrivals column, so demand-supply is **not** a feature. |
-| **Equipment marketplace** | Working | Login (owner / renter), GPS + 10 km search, day **and** hourly booking, drones/harvesters, owner availability toggle and location updates, Razorpay checkout with UPI first, verified payments + webhook, booking expiry and automatic Confirmed → Active → Completed. Live GPS tracker hardware is not integrated: the owner (or a device) posts the position. |
-| **Voice + 14 languages** | Working (Sarvam key in `.env`) | Mic input on every page, "speak a command" navigation, spoken answers, WhatsApp voice notes in/out. Sarvam first (translation for 13 languages, speech-to-text with automatic language detection, voices for 11 languages); Gemini / browser speech as fallback. Bhojpuri is served by Gemini, and Urdu / Assamese have no Sarvam voice (the phone's own voice is used). UI labels are translated for hi, kn, te, ta, mr (hand-written, please review); other languages fall back to English until `scripts/generate_ui_translations.py` is run. |
-| **Loan eligibility advisor (KCC)** | Working with **demo data** | Score, estimated limit, missing documents, tips, weather-risk score, nearby bank/CSC, printable report. The DigiLocker adapter is a **mock**; the real integration needs government partner access. Scale-of-finance values and the bank/CSC directory are **illustrative samples**. |
+Scan a sick leaf · forecast mandi prices · read the sky · rent a tractor · check a farm loan
+— by typing, by voice, or on WhatsApp.
 
-## Setup
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.136-009688?logo=fastapi&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47a248?logo=mongodb&logoColor=white)
+![YOLOv8](https://img.shields.io/badge/YOLOv8--cls-94.5%25_top--1-orange)
+![Languages](https://img.shields.io/badge/languages-14-blueviolet)
+![Tests](https://img.shields.io/badge/tests-510%2B_passing-brightgreen)
+
+</div>
+
+> *AgriPulse* and *KisanMitra AI* are the same product.
+
+---
+
+## Contents
+
+1. [What it does](#what-it-does)
+2. [The experience](#the-experience)
+3. [Architecture](#architecture)
+4. [Feature details](#feature-details)
+5. [Tech stack](#tech-stack)
+6. [Project structure](#project-structure)
+7. [Quick start](#quick-start)
+8. [Configuration](#configuration)
+9. [Training the disease model](#training-the-disease-model)
+10. [WhatsApp bot](#whatsapp-bot)
+11. [API overview](#api-overview)
+12. [Testing](#testing)
+13. [Deployment](#deployment)
+14. [Security and honesty notes](#security-and-honesty-notes)
+15. [Known limits](#known-limits)
+
+---
+
+## What it does
+
+| Feature | In one line |
+|---|---|
+| **Disease detection** | Photo of a leaf → disease name, confidence, medicine, cost, weather-aware advice, in the farmer's language. |
+| **Mandi price forecast** | Today's price plus a 4-week forecast, the best week to sell, and price alerts on WhatsApp. |
+| **Weather advisory** | Live weather for a district turned into plain farming advice. |
+| **Equipment marketplace** | Rent tractors, harvesters and drones within 10 km, by the day or the hour, paid by UPI. |
+| **Loan advisor** | Kisan Credit Card (KCC) eligibility, estimated limit, missing documents, nearest bank / CSC. |
+| **AI assistant** | Ask any farming question; answers use your district and your latest diagnosis. |
+| **Voice first, 14 languages** | Speak instead of type on every screen; answers are spoken back. |
+| **WhatsApp bot** | Everything above from a chat: photos, voice notes, shared location. |
+
+Supported languages: English, हिन्दी, ಕನ್ನಡ, తెలుగు, தமிழ், മലയാളം, मराठी, বাংলা, ગુજરાતી, ਪੰਜਾਬੀ, ଓଡ଼ିଆ, اردو
+(right-to-left), অসমীয়া, भोजपुरी.
+
+## The experience
+
+1. **Splash** — a branded opening animation.
+2. **Story page** — a scrollable, motion-driven page that explains what AgriPulse can do (public, no login).
+3. **Hidden menu** (three lines, top left) — a full-width curtain menu with every tool and the language chooser.
+4. **Profile** (top right) — a circular reveal with the farmer's details, edit profile, theme and logout.
+5. **Login on demand** — phone + OTP. Picking a tool as a guest plays a page transition into the login,
+   then lands on that tool. First-time users answer a 3-step onboarding once.
+6. **Tools** — dashboard, disease scan, prices, weather, marketplace, assistant, loan advisor, history.
+   Light and dark themes, mobile-first layout, reduced-motion friendly.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client
+      W[React web app<br/>Vercel]
+      P[WhatsApp user]
+    end
+    W -- HTTPS / JWT --> API
+    P -- Twilio --> API
+    subgraph API[FastAPI backend]
+      R[Routes] --> S[Services]
+      S --> ML[YOLOv8-cls / EfficientNet]
+      S --> FC[Price forecast<br/>GradientBoosting]
+      S --> BOT[WhatsApp bot engine]
+    end
+    S --> DB[(MongoDB Atlas)]
+    S --> G[Gemini]
+    S --> SV[Sarvam AI<br/>translate · STT · TTS]
+    S --> AG[Agmarknet + Open-Meteo + OpenWeather]
+    S --> RZ[Razorpay]
+```
+
+## Feature details
+
+### Disease detection
+- **YOLOv8-cls** (transfer-learned from `yolov8n.pt`) trained on **71 classes**, **94.5 % top-1 accuracy** on
+  6,529 held-out images; **EfficientNet-B0** is the automatic fallback if the YOLO weights are missing.
+- Below a confidence threshold the answer is "Uncertain" with retake tips instead of a wrong guess.
+- Treatment for classes the medicine table does not know is generated by Gemini and translated.
+- On WhatsApp the farmer can confirm or correct the result; corrections are kept for retraining.
+
+### Mandi price forecast
+- Five years of Agmarknet history per crop and market, plus rainfall / temperature from Open-Meteo.
+- One gradient-boosting model per horizon (7 / 14 / 21 / 28 days), back-tested against a straight-line
+  baseline; reports its own average error and falls back to the linear model when history is short.
+- **Best time to sell**, confidence band, and alerts (rise, fall, best time) delivered in-app and on WhatsApp.
+
+### Equipment marketplace
+- Owners list machines (tractor, harvester, rotavator, cultivator, seeder, sprayer, drone, sprayer drone, trailer).
+- **GPS radius search** (5–50 km), distance on every card, "live" badge while a position is being reported
+  (from the owner's phone or a GPS tracker using a per-machine key).
+- **Day or hourly booking** with overlap protection, booked-slot display and an availability toggle.
+- **Razorpay** checkout (UPI first), server-side signature verification, payment fetch, idempotent webhook,
+  automatic lifecycle: *Pending → Confirmed → Active → Completed / Expired*.
+
+### Loan advisor (KCC)
+- Four-step form (farm & land, crops, soil & loans, documents) → score out of 100, verdict, estimated limit
+  breakdown (cultivation, post-harvest, maintenance, existing loans), collateral-free amount, weather-risk
+  score, missing documents, next steps, nearest bank / Common Service Centre with directions, printable report.
+- The explanation is written by Gemini in the farmer's language and can be read aloud.
+- DigiLocker is a **mock adapter** and the scale-of-finance table and bank list are **samples** — see
+  [`docs/REPLACE_DEMO_DATA.md`](docs/REPLACE_DEMO_DATA.md).
+
+### Voice and languages
+- **Sarvam AI** first: translation (13 languages), speech-to-text with automatic language detection, and
+  text-to-speech voices; **Gemini** and the browser's own voices are the fallbacks (Bhojpuri goes through Gemini).
+- Microphone button on every input, a global **"speak a command"** button ("show weather in Mysuru"),
+  and a **Listen** button on answers.
+- The interface labels are hand-translated for all 14 languages; other text is translated on demand by the server.
+
+### WhatsApp bot
+Diagnose a leaf photo, weather, prices with forecast and alerts, equipment near a shared location, the loan
+check, bookings, a 7 a.m. morning message, voice notes in and out. Signature-verified webhook, duplicate
+protection, flood limit, STOP / START opt-out. Full guide: [`docs/WHATSAPP_BOT.md`](docs/WHATSAPP_BOT.md).
+
+### Accounts
+Phone + OTP login with JWT sessions. Onboarding data (name, date of birth, state, district, language, role)
+is stored in MongoDB and restored on the next login. *(The OTP is a fixed demo code — see
+[security notes](#security-and-honesty-notes).)*
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19 (Create React App), Framer Motion, Lucide icons, custom CSS design system (light / dark) |
+| Backend | Python 3.13, FastAPI, Uvicorn, Pydantic |
+| Database | MongoDB Atlas (PyMongo); `mongomock` in tests |
+| ML | Ultralytics YOLOv8-cls, PyTorch / torchvision (EfficientNet-B0), scikit-learn (gradient boosting) |
+| AI services | Google Gemini, Sarvam AI (translate / STT / TTS) |
+| Data | Agmarknet (data.gov.in), Open-Meteo archive, OpenWeather |
+| Payments | Razorpay (test mode) |
+| Messaging | Twilio WhatsApp |
+| Hosting | Vercel (frontend), Docker on Hugging Face Spaces / Render (backend), Atlas (data) |
+
+## Project structure
+
+```
+AgriPulse/
+├─ app/
+│  ├─ main.py                 FastAPI app, lifespan tasks, CORS, static media
+│  ├─ routes/                 auth, disease, price, weather, equipment, loan, voice, i18n, chat, alerts, whatsapp
+│  ├─ services/               forecast, price history, weather, rentals, payments, loan advisor, Sarvam, translation …
+│  ├─ ai/
+│  │  ├─ classifier/          YOLOv8-cls + EfficientNet backends (shared contract)
+│  │  ├─ agent/ tools/        Gemini agent, medicine table, tool planner
+│  │  ├─ models/              trained weights + metrics / report
+│  │  └─ training/            dataset preparation
+│  ├─ whatsapp/               bot engine, natural-language parsing, per-feature handlers, Twilio I/O
+│  ├─ db/                     Mongo client, counters, indexes
+│  └─ data/                   states / districts, KCC rules, bank directory (samples)
+├─ kisanmitra-frontend/
+│  └─ src/
+│     ├─ Splash.js · Landing.js · Site.js · AuthFlow.js     opening, story page, menu / profile frame, login
+│     ├─ pages/                                             dashboard, disease, price, weather, marketplace …
+│     ├─ ui/                                                design kit, icons, SVG art, notifications
+│     ├─ i18n/                                              14 language files
+│     └─ styles/                                            tokens, components, pages, site
+├─ scripts/                   dataset preparation, model evaluation, UI-translation generator
+├─ tests/                     470+ backend tests (in-memory MongoDB, no network)
+├─ docs/                      WhatsApp bot, replacing demo data, deployment
+├─ train_yolo_classifier.py   YOLOv8-cls training
+├─ Dockerfile · render.yaml   container deployment
+└─ requirements.txt
+```
+
+## Quick start
+
+**Prerequisites:** Python 3.13, Node 20+, a MongoDB Atlas database, FFmpeg (voice), and the API keys you want to use.
 
 ```powershell
-# Backend
+# 1. Backend
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env        # then fill in the keys
+copy .env.example .env               # fill in the keys (see Configuration)
 python -m uvicorn app.main:app --reload --port 5556
 
-# Frontend (second terminal)
+# 2. Frontend (second terminal)
 cd kisanmitra-frontend
 npm install
-npm start                     # http://localhost:5555
+npm start                            # http://localhost:5555
 ```
 
-FFmpeg is needed for voice (`winget install Gyan.FFmpeg`). The frontend reads
-`kisanmitra-frontend/.env` (`PORT=5555`, `REACT_APP_API_URL=http://127.0.0.1:5556`).
+The frontend reads `REACT_APP_API_URL` (default `http://127.0.0.1:5556`). FFmpeg on Windows:
+`winget install Gyan.FFmpeg`. Open the app, tap **Get started**, use any 10-digit number and OTP **123456**.
 
-## Configuration (`.env`)
+## Configuration
 
-See `.env.example`. Minimum: `MONGODB_URI`, `JWT_SECRET`. Each feature also needs its own keys
-(`GEMINI_API_KEY`, `AGMARKNET_API_KEY`, `WEATHER_API_KEY`, `RAZORPAY_*`, `TWILIO_*`, `SARVAM_API_KEY`).
-Missing keys switch that feature off or make it fall back; the rest of the app keeps running.
+Copy `.env.example` to `.env`. The minimum is `MONGODB_URI` and `JWT_SECRET`; a missing key switches only that
+feature off or makes it fall back.
 
-## Train the disease model
+| Variable | Purpose |
+|---|---|
+| `MONGODB_URI`, `MONGODB_DB` | Atlas connection |
+| `JWT_SECRET` | signs login tokens |
+| `GEMINI_API_KEY` | assistant, treatments, explanations, translation fallback |
+| `SARVAM_API_KEY` | translation, speech-to-text, text-to-speech |
+| `AGMARKNET_API_KEY` | mandi prices (data.gov.in) |
+| `WEATHER_API_KEY` | OpenWeather |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | payments |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` | WhatsApp |
+| `PUBLIC_BASE_URL` | public URL of the backend (webhook signature, voice replies) |
+| `CORS_ORIGINS`, `FRONTEND_URL` | allowed web origin(s) and the link sent on WhatsApp |
+| `DISEASE_MODEL`, `CONFIDENCE_THRESHOLD` | `yolo` / `efficientnet`, and the "Uncertain" cut-off |
+| `FAKE_AUTH` | `true` = demo OTP `123456`; `false` disables login until a real SMS provider exists |
+| `DIGILOCKER_PROVIDER` | `mock` (default) or `real` |
+| `DIGEST_HOUR` | hour of the WhatsApp morning message |
 
-Dataset: one folder per class named `Crop___disease` (for example `Tomato___late_blight`) under
-`datasets/leaf_disease_detection_dataset/` (71 classes, ~116k images; not in git).
+## Training the disease model
+
+Dataset: one folder per class named `Crop___disease` under `datasets/leaf_disease_detection_dataset/`
+(71 classes, ~116k images; not in git).
 
 ```powershell
-python scripts/prepare_dataset.py        # balanced train/val split -> datasets/prepared (report included)
-python train_yolo_classifier.py          # trains yolov8n-cls, saves app/ai/models/yolov8_disease.pt
-python train_yolo_classifier.py --resume # continue an interrupted run
-python scripts/evaluate_model.py         # per-class accuracy, mistakes, recommended CONFIDENCE_THRESHOLD
+python scripts/prepare_dataset.py          # balanced train / val split + report
+python train_yolo_classifier.py            # trains yolov8n-cls, saves app/ai/models/yolov8_disease.pt
+python train_yolo_classifier.py --resume   # continue an interrupted run
+python scripts/evaluate_model.py           # per-class accuracy, confusions, recommended threshold
 ```
 
-Classes are capped at 500 training images so the run stays affordable on a CPU and a class with
-13,000 photos does not drown one with 70. `yolov8n.pt` in the project root is a *detection*
-checkpoint: its backbone is transferred into a classification model (use `--weights yolov8n-cls.pt`
-for the ImageNet classification checkpoint instead). `DISEASE_MODEL=yolo` (default) uses the new
-weights and falls back to `efficientnet.pth` if they are missing.
+Classes are capped at 500 training images so a CPU run stays affordable. The backbone of `yolov8n.pt` is
+transferred into a classification model. Current result: **94.49 % top-1** over 6,529 validation images.
 
 ## WhatsApp bot
 
-Farmers can send a leaf photo, a voice note, a shared location or a question. It covers disease
-diagnosis with feedback, weather, mandi prices with forecasts and alerts, equipment near you, the
-loan check, bookings, a daily morning message and 14 languages. Setup steps (what you have to do),
-the command list and the limits are in **`docs/WHATSAPP_BOT.md`**.
+```
+phone → WhatsApp → Twilio → your server → /whatsapp → bot → reply
+```
 
-## Tests
+Send a leaf photo, `weather Mysuru`, `price tomato`, a voice note, a shared location, `loan`, `bookings`,
+`language kannada`, `menu`, `STOP`. Setup (Twilio sandbox, tunnel or hosted URL, webhook) and limits:
+[`docs/WHATSAPP_BOT.md`](docs/WHATSAPP_BOT.md).
+
+## API overview
+
+Interactive docs at `/docs` (Swagger) when the backend is running. Main groups:
+
+| Group | Endpoints (examples) |
+|---|---|
+| Auth | `POST /auth/send-otp`, `POST /auth/verify-otp`, `GET /auth/me`, `PUT /auth/profile`, `GET /auth/regions` |
+| Disease | `POST /detect-disease`, `GET/DELETE /predictions` |
+| Prices | `GET /predict-price`, `POST/GET/DELETE /alerts`, `GET /notifications` |
+| Weather | `GET /weather` |
+| Marketplace | `GET/POST /equipment`, `PATCH /equipment/{id}/location`, `POST /rent-equipment`, `POST /create-payment-order`, `POST /verify-payment`, `POST /razorpay-webhook`, `GET /rentals`, `POST /tracker/update` |
+| Loan | `GET/POST /loan/profile`, `POST /loan/digilocker/fetch`, `POST /loan/report`, `GET /loan/nearby` |
+| Voice / i18n | `POST /voice/transcribe`, `/voice/speak`, `/voice/command`, `POST /i18n/translate` |
+| Assistant | `POST /ai-chat` |
+| WhatsApp | `POST /whatsapp` |
+| Ops | `GET /health`, `GET /dashboard-stats` |
+
+## Testing
 
 ```powershell
 pip install -r requirements-dev.txt
-pytest                                   # backend, in-memory MongoDB, no network
-cd kisanmitra-frontend; npm test -- --watchAll=false
+pytest                                       # backend: in-memory MongoDB, no network
+cd kisanmitra-frontend
+npm test -- --watchAll=false                 # frontend: 35 tests
 ```
 
-`scripts/manual_check_*.py` are manual checks that call live services.
+`scripts/manual_check_*.py` call live services and are run by hand.
 
-## Login (demo)
+## Deployment
 
-Phone + OTP with a **fake constant OTP `123456`** (no SMS is sent). New users answer a short onboarding
-form (name, date of birth, state, district, language, role); it is stored in MongoDB (`users`) and comes
-back when the same phone logs in again. The user id shown in the app is the first 2 + last 2 digits of
-the phone number (several phones can share one; accounts are keyed by the full number).
+- **Frontend → Vercel:** import the repository with **Root Directory** `kisanmitra-frontend`, set
+  `REACT_APP_API_URL` to the backend URL.
+- **Backend → Docker** (Hugging Face Spaces, Render, or any container host): the included `Dockerfile` installs
+  FFmpeg and curl. PyTorch needs about 1 GB of RAM, so very small free tiers cannot run leaf diagnosis.
+- **Database → MongoDB Atlas** (allow the host's IPs in Network Access).
+- After deploying, set `CORS_ORIGINS`, `FRONTEND_URL`, `PUBLIC_BASE_URL`, and point the Twilio and Razorpay
+  webhooks at the backend URL.
 
-**Anyone who knows a phone number can log in as it.** Set `FAKE_AUTH=false` to switch it off (the login
-endpoints then answer 501) until a real SMS OTP provider is connected.
+
+## Security and honesty notes
+
+- **Demo login:** with `FAKE_AUTH=true` anyone who knows a phone number can log in as it (OTP is always
+  `123456`). Fine for a demo; connect a real SMS OTP provider and set `FAKE_AUTH=false` before real users.
+- **Secrets** live only in `.env` / the host's dashboard and are never committed; API keys are masked in logs.
+- **Payments** are verified server-side (signature + payment fetch) and the webhook is idempotent; use Razorpay
+  test keys until fully tested.
+- **WhatsApp** requests must carry Twilio's signature; duplicates and floods are rejected.
+- Photos sent on WhatsApp are deleted after diagnosis unless the farmer corrects the result.
 
 ## Known limits
 
-- DigiLocker (real) is not implemented. Sarvam and Gemini were checked live; Twilio and Razorpay are unit-tested with mocks and need your credentials for a live end-to-end check.
-- Price forecasts are statistical estimates, not guarantees. The KCC report is advisory only.
-- Rental times are server-local wall-clock time.
+- DigiLocker is a mock; KCC scale-of-finance values and the bank / CSC list are illustrative samples.
+- Price forecasts are statistical estimates, not guarantees; the KCC report is advisory only, not a bank decision.
+- The Twilio sandbox only reaches phones that joined it and only within 24 hours of their last message.
+- Live GPS tracker hardware is not bundled: the owner's phone (or a device with a key) posts the position.
+- Most page text outside the navigation is English; the assistant, advice and voice replies follow the chosen language.
+- Rental times use server-local wall-clock time.
 
-See `docs/REPLACE_DEMO_DATA.md` to swap the Loan Advisor's demo data for real data.
+---
+
+<div align="center">
+
+Built for farmers.
+
+</div>
