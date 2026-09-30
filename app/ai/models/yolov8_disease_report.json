@@ -1,0 +1,246 @@
+{
+  "images": 6529,
+  "top1_accuracy": 0.9449,
+  "classes": 71,
+  "worst_classes": [
+    [
+      "Coffee___red_spider_mite",
+      0.0909
+    ],
+    [
+      "Cassava___green_mottle",
+      0.58
+    ],
+    [
+      "Cassava___healthy",
+      0.64
+    ],
+    [
+      "Potato___nematode",
+      0.6429
+    ],
+    [
+      "Cassava___bacterial_blight",
+      0.67
+    ],
+    [
+      "Cassava___brown_streak_disease",
+      0.71
+    ],
+    [
+      "Potato___phytophthora",
+      0.8261
+    ],
+    [
+      "Cassava___mosaic_disease",
+      0.86
+    ],
+    [
+      "Potato___pests",
+      0.86
+    ],
+    [
+      "Coffee___rust",
+      0.88
+    ]
+  ],
+  "top_confusions": [
+    {
+      "actual": "Coffee___red_spider_mite",
+      "predicted": "Coffee___rust",
+      "count": 26
+    },
+    {
+      "actual": "Cassava___bacterial_blight",
+      "predicted": "Cassava___healthy",
+      "count": 18
+    },
+    {
+      "actual": "Cassava___green_mottle",
+      "predicted": "Cassava___healthy",
+      "count": 17
+    },
+    {
+      "actual": "Cassava___green_mottle",
+      "predicted": "Cassava___mosaic_disease",
+      "count": 16
+    },
+    {
+      "actual": "Cassava___healthy",
+      "predicted": "Cassava___bacterial_blight",
+      "count": 13
+    },
+    {
+      "actual": "Cassava___brown_streak_disease",
+      "predicted": "Cassava___healthy",
+      "count": 11
+    },
+    {
+      "actual": "Cassava___bacterial_blight",
+      "predicted": "Cassava___brown_streak_disease",
+      "count": 10
+    },
+    {
+      "actual": "Cassava___healthy",
+      "predicted": "Cassava___green_mottle",
+      "count": 10
+    },
+    {
+      "actual": "Corn___northern_leaf_blight",
+      "predicted": "Corn___gray_leaf_spot",
+      "count": 10
+    },
+    {
+      "actual": "Cassava___healthy",
+      "predicted": "Cassava___brown_streak_disease",
+      "count": 9
+    },
+    {
+      "actual": "Coffee___rust",
+      "predicted": "Coffee___healthy",
+      "count": 9
+    },
+    {
+      "actual": "Potato___phytophthora",
+      "predicted": "Potato___pests",
+      "count": 8
+    },
+    {
+      "actual": "Sugercane___mosaic",
+      "predicted": "Sugercane___healthy",
+      "count": 8
+    },
+    {
+      "actual": "Cassava___green_mottle",
+      "predicted": "Cassava___brown_streak_disease",
+      "count": 7
+    },
+    {
+      "actual": "Cassava___mosaic_disease",
+      "predicted": "Cassava___brown_streak_disease",
+      "count": 7
+    }
+  ],
+  "confidence_table": [
+    {
+      "threshold": 0,
+      "accepted_share": 1.0,
+      "accuracy_of_accepted": 0.9449
+    },
+    {
+      "threshold": 50,
+      "accepted_share": 0.9778,
+      "accuracy_of_accepted": 0.955
+    },
+    {
+      "threshold": 60,
+      "accepted_share": 0.9527,
+      "accuracy_of_accepted": 0.9659
+    },
+    {
+      "threshold": 70,
+      "accepted_share": 0.9266,
+      "accuracy_of_accepted": 0.9744
+    },
+    {
+      "threshold": 80,
+      "accepted_share": 0.8936,
+      "accuracy_of_accepted": 0.9849
+    },
+    {
+      "threshold": 85,
+      "accepted_share": 0.8723,
+      "accuracy_of_accepted": 0.99
+    },
+    {
+      "threshold": 90,
+      "accepted_share": 0.8476,
+      "accuracy_of_accepted": 0.993
+    },
+    {
+      "threshold": 95,
+      "accepted_share": 0.805,
+      "accuracy_of_accepted": 0.9954
+    },
+    {
+      "threshold": 98,
+      "accepted_share": 0.7379,
+      "accuracy_of_accepted": 0.9973
+    }
+  ],
+  "precision_target": 0.95,
+  "recommended_confidence_threshold": 50,
+  "per_class_accuracy": {
+    "Apple___alternaria_leaf_spot": 0.9464,
+    "Apple___black_rot": 1.0,
+    "Apple___brown_spot": 0.9535,
+    "Apple___gray_spot": 0.9367,
+    "Apple___healthy": 0.97,
+    "Apple___rust": 0.96,
+    "Apple___scab": 0.97,
+    "Bell_pepper___bacterial_spot": 1.0,
+    "Bell_pepper___healthy": 0.97,
+    "Blueberry___healthy": 1.0,
+    "Cassava___bacterial_blight": 0.67,
+    "Cassava___brown_streak_disease": 0.71,
+    "Cassava___green_mottle": 0.58,
+    "Cassava___healthy": 0.64,
+    "Cassava___mosaic_disease": 0.86,
+    "Cherry___healthy": 1.0,
+    "Cherry___powdery_mildew": 1.0,
+    "Coffee___healthy": 0.97,
+    "Coffee___red_spider_mite": 0.0909,
+    "Coffee___rust": 0.88,
+    "Corn___common_rust": 1.0,
+    "Corn___gray_leaf_spot": 0.95,
+    "Corn___healthy": 1.0,
+    "Corn___northern_leaf_blight": 0.9,
+    "Grape___Leaf_blight": 1.0,
+    "Grape___black_measles": 0.99,
+    "Grape___black_rot": 1.0,
+    "Grape___healthy": 0.99,
+    "Orange___citrus_greening": 1.0,
+    "Peach___bacterial_spot": 1.0,
+    "Peach___healthy": 1.0,
+    "Potato___bacterial_wilt": 0.99,
+    "Potato___early_blight": 0.98,
+    "Potato___healthy": 0.88,
+    "Potato___late_blight": 0.95,
+    "Potato___leafroll_virus": 0.99,
+    "Potato___mosaic_virus": 0.96,
+    "Potato___nematode": 0.6429,
+    "Potato___pests": 0.86,
+    "Potato___phytophthora": 0.8261,
+    "Raspberry___healthy": 1.0,
+    "Rice___bacterial_blight": 0.99,
+    "Rice___blast": 0.97,
+    "Rice___brown_spot": 0.98,
+    "Rice___tungro": 1.0,
+    "Rose___healthy": 1.0,
+    "Rose___rust": 0.99,
+    "Rose___slug_sawfly": 1.0,
+    "Soybean___healthy": 0.98,
+    "Squash___powdery_mildew": 1.0,
+    "Strawberry___healthy": 1.0,
+    "Strawberry___leaf_scorch": 1.0,
+    "Sugercane___healthy": 0.97,
+    "Sugercane___mosaic": 0.8804,
+    "Sugercane___red_rot": 0.94,
+    "Sugercane___rust": 0.98,
+    "Sugercane___yellow_leaf": 0.97,
+    "Tomato___bacterial_spot": 0.98,
+    "Tomato___early_blight": 0.96,
+    "Tomato___healthy": 1.0,
+    "Tomato___late_blight": 0.91,
+    "Tomato___leaf_curl": 0.98,
+    "Tomato___leaf_mold": 1.0,
+    "Tomato___mosaic_virus": 1.0,
+    "Tomato___septoria_leaf_spot": 0.94,
+    "Tomato___spider_mites": 1.0,
+    "Tomato___target_spot": 0.93,
+    "Watermelon___anthracnose": 1.0,
+    "Watermelon___downy_mildew": 0.9868,
+    "Watermelon___healthy": 1.0,
+    "Watermelon___mosaic_virus": 1.0
+  }
+}
