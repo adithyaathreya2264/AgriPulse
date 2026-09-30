@@ -1,25 +1,18 @@
-from app.db.database import SessionLocal
-from app.models.equipment import Equipment
+from app.db.database import get_database
+
+
 def execute():
 
-    db = SessionLocal()
+    equipment = get_database().equipment.find(
+        {"availability": "Available"}
+    )
 
-    try:
-
-        equipment = db.query(Equipment).filter(
-            Equipment.availability == "Available"
-        ).all()
-
-        return [
-            {
-                "name": item.equipment_name,
-                "owner": item.owner_name,
-                "location": item.location,
-                "price": item.price_per_day
-            }
-            for item in equipment
-        ]
-
-    finally:
-
-        db.close()
+    return [
+        {
+            "name": item["equipment_name"],
+            "owner": item["owner_name"],
+            "location": item["location"],
+            "price": item["price_per_day"]
+        }
+        for item in equipment
+    ]

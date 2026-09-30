@@ -1,30 +1,19 @@
-from unittest import result
-
-from app.db.database import SessionLocal
-from app.models.prediction import Prediction
+from app.db.database import get_database
 
 
 def execute():
 
-    db = SessionLocal()
+    history = get_database().predictions.find().sort("id", -1).limit(5)
 
-    try:
+    result = []
 
-        history = db.query(Prediction).order_by(
-            Prediction.id.desc()
-        ).limit(5).all()
+    for item in history:
+        result.append({
+            "id": item["id"],
+            "image_name": item["image_name"],
+            "disease": item["disease"],
+            "confidence": item["confidence"],
+            "treatment": item["treatment"]
+        })
 
-        result=[]
-        for item in history:
-            result.append({
-            "id":item.id,
-            "image_name":item.image_name,
-            "disease":item.disease,
-            "confidence":item.confidence,
-            "treatment":item.treatment
-            })
-        return result
-        
-    finally:
-
-        db.close()
+    return result

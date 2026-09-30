@@ -1,15 +1,11 @@
 import os
 import json
 from dotenv import load_dotenv
-import google.generativeai as genai
+from app.ai.gemini_client import generate_content
 
 load_dotenv()
 
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
 
-model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 def dispatch(question: str):
@@ -77,7 +73,7 @@ Question:
 {question}
 """
 
-    response = model.generate_content(prompt)
+    response = generate_content(prompt)
 
     text = response.text.strip()
     text = text.replace("```json", "")
