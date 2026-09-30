@@ -1,1777 +1,415 @@
-/*import { useState } from "react";*/
+import { useEffect, useRef, useState } from "react";
+import { MotionConfig, motion } from "framer-motion";
+import "./styles/base.css";
+import "./styles/art.css";
+import "./styles/auth.css";
+import "./styles/shell.css";
+import "./styles/site.css";
+import "./styles/pages.css";
+import { makeT, missingLabels } from "./i18n";
+import { API_URL, VoiceCommandButton } from "./voice";
+import { notify } from "./ui/notify";
+import { UIProvider, useTheme } from "./ui/kit";
+import AuthFlow from "./AuthFlow";
+import Site from "./Site";
+import Splash from "./Splash";
+import Landing from "./Landing";
+import LoanAdvisor from "./LoanAdvisor";
+import HomePage from "./pages/HomePage";
+import DiseasePage from "./pages/DiseasePage";
+import PricePage from "./pages/PricePage";
+import WeatherPage from "./pages/WeatherPage";
+import MarketplacePage from "./pages/MarketplacePage";
+import HistoryPage from "./pages/HistoryPage";
+import AssistantPage from "./pages/AssistantPage";
+import ProfilePage from "./pages/ProfilePage";
 
-import "./App.css";
-import { useState, useEffect, useRef } from "react";
+const PAGES = ["landing", "auth", "home", "disease", "price", "weather", "marketplace", "history", "assistant", "loan", "profile"];
+
+const readSaved = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+};
+
+const GROUP = (page) => (page === "landing" ? "landing" : page === "auth" ? "auth" : "app");
+
+const CURTAIN_LABEL = {
+  disease: "DETECT DISEASE",
+  price: "PRICE FORECAST",
+  weather: "WEATHER ADVISORY",
+  marketplace: "EQUIPMENT MARKETPLACE",
+  assistant: "AI ASSISTANT",
+  loan: "LOAN ADVISOR",
+  home: "DASHBOARD",
+  history: "HISTORY",
+  profile: "PROFILE",
+  landing: "AGRIPULSE",
+  auth: "SIGN IN",
+};
+
+// The colour sheet that sweeps over the screen while the page changes
+function Curtain({ curtain }) {
+  return (
+    <motion.div
+      className="curtain"
+      aria-hidden="true"
+      initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
+      animate={{ clipPath: curtain.phase === "in" ? "inset(0% 0% 0% 0%)" : "inset(0% 0% 100% 0%)" }}
+      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+    >
+      <motion.span
+        className="curtain-label"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: curtain.phase === "in" ? 1 : 0, y: curtain.phase === "in" ? 0 : -24 }}
+        transition={{ duration: 0.45, delay: curtain.phase === "in" ? 0.3 : 0 }}
+      >
+        {curtain.label}
+      </motion.span>
+    </motion.div>
+  );
+}
 
 function App() {
-  const [page, setPage] = useState(localStorage.getItem("page") || "home");
+  // Every visit starts on the information page (after the splash)
+  const [page, setPage] = useState("landing");
+  const [splashDone, setSplashDone] = useState(false);
+  const [authTarget, setAuthTarget] = useState(null);
+  const [curtain, setCurtain] = useState(null);
+  const busy = useRef(false);
+  const pageRef = useRef("landing");
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
+  const [extraLabels, setExtraLabels] = useState({});
+  const t = makeT(lang, extraLabels);
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [user, setUser] = useState(readSaved("user", null));
+  const [theme, toggleTheme] = useTheme();
 
-  const [file, setFile] = useState(null);
-  const [result, setResult] = useState(null);
-
-  const [history, setHistory] = useState([]);
-
-  const [equipment, setEquipment] = useState([]);
-  const [crop, setCrop] = useState("");
-  const [priceResult, setPriceResult] = useState(null);
-  const [city, setCity] = useState("");
-  const [diseaseCity, setDiseaseCity] = useState("");
-  const [weatherResult, setWeatherResult] = useState(null);
-  const [equipmentName, setEquipmentName] = useState("");
-  const [ownerName, setOwnerName] = useState("");
-  const [location, setLocation] = useState("");
-  const [pricePerDay, setPricePerDay] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [stats, setStats] = useState(null);
+  // The assistant chat lives here so a diagnosis can start a conversation
   const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
-  const [loadingChat, setLoadingChat] = useState(false);
-  const chatEndRef = useRef(null);
-  const [market, setMarket] = useState("");
-  const [district, setDistrict] = useState("");
-  const [marketOptions, setMarketOptions] = useState([]);
-  const [marketSearch, setMarketSearch] = useState("");
-  const [equipmentCategory, setEquipmentCategory] = useState("");
-  const [equipmentDescription, setEquipmentDescription] = useState("");
-  const [equipmentImage, setEquipmentImage] = useState("");
 
-  const [showAddEquipment, setShowAddEquipment] = useState(false);
-  const [selectedEquipment, setSelectedEquipment] = useState(null);
+  // A spoken command ("show weather in Mysuru") is handed to the page it opens
+  const [intent, setIntent] = useState(null);
 
-  const [renterName, setRenterName] = useState("");
-  const [renterPhone, setRenterPhone] = useState("");
-  const [rentalStartDate, setRentalStartDate] = useState("");
-  const [rentalEndDate, setRentalEndDate] = useState("");
+  const authHeaders = (extra = {}) => ({
+    ...extra,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  });
 
-  const [marketplaceSearch, setMarketplaceSearch] = useState("");
-  const [marketplaceCategory, setMarketplaceCategory] = useState("All");
-  const [showCheckout, setShowCheckout] = useState(false);
+  const jsonHeaders = () => authHeaders({ "Content-Type": "application/json" });
 
-  const searchMarkets = async () => {
-    if (!crop.trim()) {
-      setPriceResult({
-        error: "Please enter a crop name"
-      });
+  const logout = () => {
+    setToken("");
+    setUser(null);
+    switchPage("landing");
+    setChatMessages([]);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  };
+
+  // A protected request came back 401: the session is over
+  const sessionExpired = () => {
+    logout();
+    notify("Your session has expired. Please login again.", "error");
+  };
+
+  const saveSession = (newToken, newUser) => {
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(newUser));
+  };
+
+  // OTP verified: a returning farmer goes straight in, a new one onboards first
+  const handleLoggedIn = (newToken, newUser) => {
+    saveSession(newToken, newUser);
+
+    if (newUser.onboarded) {
+      if (newUser.language) setLang(newUser.language);
+      switchPage(authTarget || "home");
+      setAuthTarget(null);
+    }
+  };
+
+  const handleProfileSaved = (newUser) => {
+    saveSession(token, newUser);
+
+    if (newUser.language) setLang(newUser.language);
+
+    notify("Profile saved", "success");
+    switchPage(authTarget || "home");
+    setAuthTarget(null);
+  };
+
+  const signedIn = Boolean(token && user && user.onboarded);
+
+  // Moving between the information page, the login and the tools plays a
+  // colour transition; moving between two tools keeps the quick fade.
+  const switchPage = (target, label) => {
+    if (busy.current) return;
+
+    if (GROUP(pageRef.current) === GROUP(target)) {
+      setPage(target);
       return;
     }
 
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/predict-price?crop=${encodeURIComponent(crop)}`
-      );
+    busy.current = true;
+    setCurtain({ phase: "in", label: label || CURTAIN_LABEL[target] });
 
-      const data = await response.json();
+    setTimeout(() => {
+      window.scrollTo({ top: 0 });
+      setPage(target);
+      setCurtain((old) => old && { ...old, phase: "out" });
+    }, 850);
 
-      console.log(data);
+    setTimeout(() => {
+      setCurtain(null);
+      busy.current = false;
+    }, 1650);
+  };
 
-      if (data.error) {
-        setMarketOptions([]);
-        setPriceResult(data);
-        return;
-      }
-      console.log("price result:", data);
+  // The information page is public; every tool needs a signed-in farmer
+  const go = (target) => {
+    window.scrollTo({ top: 0 });
 
-      setMarketOptions(data.markets || []);
-      setMarketSearch("");
-      setMarket("");
-      setDistrict("");
-      setPriceResult(null);
-
-    } catch (error) {
-      console.error(error);
-
-      setPriceResult({
-        error: "Failed to fetch market data"
-      });
+    if (target !== "landing" && target !== "auth" && !signedIn) {
+      setAuthTarget(target);
+      switchPage("auth", CURTAIN_LABEL[target]);
+      return;
     }
+
+    switchPage(target);
   };
 
-  const loadDashboard = async () => {
-    const res = await fetch("http://127.0.0.1:8000/dashboard-stats");
-    const data = await res.json();
-    setStats(data);
+  const goLogin = () => {
+    setAuthTarget(page === "landing" ? null : page);
+    switchPage("auth");
   };
+
+  const handleVoiceCommand = (command) => {
+    const target = PAGES.includes(command.page) ? command.page : page;
+
+    setIntent({
+      id: Date.now(),
+      page: target,
+      action: command.action,
+      params: command.params || {},
+    });
+
+    setPage(target);
+  };
+
   useEffect(() => {
-    loadDashboard();
-    fetchEquipment();
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("page", page);
+    pageRef.current = page;
+
+    // A spoken command only belongs to the page it opened
+    setIntent((old) => (old && old.page !== page ? null : old));
   }, [page]);
 
-  const addEquipment = async () => {
-    if (
-      !equipmentName.trim() ||
-      !ownerName.trim() ||
-      !location.trim() ||
-      !pricePerDay ||
-      !contactNumber.trim()
-    ) {
-      alert("Please fill all required fields");
-      return;
-    }
-
-    try {
-      const params = new URLSearchParams({
-        equipment_name: equipmentName,
-        owner_name: ownerName,
-        price_per_day: pricePerDay,
-        location: location,
-        contact_number: contactNumber,
-        category: equipmentCategory || "Other",
-        description: equipmentDescription,
-        image_url: equipmentImage,
-      });
-
-      const res = await fetch(
-        `http://127.0.0.1:8000/equipment?${params.toString()}`,
-        {
-          method: "POST",
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.detail || "Failed to add equipment");
-        return;
-      }
-
-      alert("Equipment added successfully!");
-
-      setEquipmentName("");
-      setOwnerName("");
-      setLocation("");
-      setPricePerDay("");
-      setContactNumber("");
-      setEquipmentCategory("");
-      setEquipmentDescription("");
-      setEquipmentImage("");
-
-      setShowAddEquipment(false);
-
-      fetchEquipment();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add equipment");
-    }
-  };
-
-  // Disease Detection
-  const handleUpload = async () => {
-    if (!file) {
-      alert("Please select an image");
-      return;
-    }
-    if (!diseaseCity.trim()) {
-      alert("Please enter your city");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("city", diseaseCity);
-
-    try {
-      const res = await fetch(
-        "http://127.0.0.1:8000/detect-disease",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await res.json();
-      console.log(data);
-      setResult(data);
-      setChatMessages([
-        {
-          sender: "assistant",
-          text:
-            `Disease: ${data.report.disease}
-
-            Confidence: ${data.report.confidence}%
-
-            Medicine: ${data.report.medicine}
-
-            Estimated Cost: ${data.report.estimated_cost}
-
-            You can now ask me anything about this disease.`
-        }
-      ]);
-
-      //setPage("assistant");
-    } catch (err) {
-      console.error(err);
-      alert("Upload failed");
-    }
-  };
-
-  // History
-  const fetchHistory = async () => {
-    const res = await fetch(
-      "http://127.0.0.1:8000/predictions"
-    );
-
-    const data = await res.json();
-
-    setHistory(data);
-  };
-
-  const clearHistory = async () => {
-    await fetch(
-      "http://127.0.0.1:8000/predictions",
-      {
-        method: "DELETE",
-      }
-    );
-
-    setHistory([]);
-  };
-
-  // Marketplace
-  const fetchEquipment = async () => {
-    const res = await fetch(
-      "http://127.0.0.1:8000/equipment"
-    );
-
-
-    const data = await res.json();
-
-    setEquipment(data);
-  };
-
-  const rentEquipment = async () => {
-    if (!selectedEquipment) {
-      alert("Please select equipment");
-      return;
-    }
-
-    if (!renterName.trim() || !renterPhone.trim()) {
-      alert("Please enter your name and phone number");
-      return;
-    }
-
-    if (!rentalStartDate || !rentalEndDate) {
-      alert("Please select rental dates");
-      return;
-    }
-
-    try {
-      // ========================================================
-      // STEP 1: CREATE RENTAL
-      // ========================================================
-
-      const rentalParams = new URLSearchParams({
-        equipment_id: selectedEquipment.id,
-        renter_name: renterName,
-        renter_phone: renterPhone,
-        start_date: rentalStartDate,
-        end_date: rentalEndDate,
-      });
-
-      const rentalResponse = await fetch(
-        `http://127.0.0.1:8000/rent-equipment?${rentalParams.toString()}`,
-        {
-          method: "POST",
-        }
-      );
-
-      const rentalData = await rentalResponse.json();
-
-      if (!rentalResponse.ok) {
-        alert(rentalData.detail || "Failed to create rental");
-        return;
-      }
-
-      // ========================================================
-      // STEP 2: CREATE RAZORPAY ORDER
-      // ========================================================
-
-      const paymentResponse = await fetch(
-        `http://127.0.0.1:8000/create-payment-order?rental_id=${rentalData.rental_id}`,
-        {
-          method: "POST",
-        }
-      );
-
-      const paymentData = await paymentResponse.json();
-
-      if (!paymentResponse.ok) {
-        alert(paymentData.detail || "Failed to create payment order");
-        return;
-      }
-
-      // ========================================================
-      // STEP 3: OPEN RAZORPAY CHECKOUT
-      // ========================================================
-
-      if (!window.Razorpay) {
-        alert("Razorpay Checkout failed to load. Please refresh the page.");
-        return;
-      }
-
-      const options = {
-        key: paymentData.key_id,
-
-        amount: paymentData.amount,
-
-        currency: paymentData.currency,
-
-        name: "AgriPulse",
-
-        description: `Equipment Rental - ${selectedEquipment.equipment_name}`,
-
-        order_id: paymentData.order_id,
-
-        prefill: {
-          name: renterName,
-          contact: renterPhone,
-        },
-
-        notes: {
-          rental_id: String(rentalData.rental_id),
-          equipment: selectedEquipment.equipment_name,
-        },
-
-        theme: {
-          color: "#2e7d32",
-        },
-
-        handler: async function (response) {
-          // ====================================================
-          // STEP 4: VERIFY PAYMENT ON BACKEND
-          // ====================================================
-
-          try {
-            const verifyParams = new URLSearchParams({
-              rental_id: String(rentalData.rental_id),
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-
-            const verifyResponse = await fetch(
-              `http://127.0.0.1:8000/verify-payment?${verifyParams.toString()}`,
-              {
-                method: "POST",
-              }
-            );
-
-            const verifyData = await verifyResponse.json();
-
-            if (!verifyResponse.ok) {
-              alert(
-                verifyData.detail ||
-                "Payment verification failed"
-              );
-              return;
-            }
-
-            // ==================================================
-            // PAYMENT SUCCESS
-            // ==================================================
-
-            alert(
-              `Payment successful! 🎉\n\n` +
-              `Equipment: ${selectedEquipment.equipment_name}\n` +
-              `Rental ID: ${rentalData.rental_id}\n` +
-              `Total Paid: ₹${rentalData.total_amount}\n\n` +
-              `Your rental has been confirmed.`
-            );
-
-            setSelectedEquipment(null);
-            setRenterName("");
-            setRenterPhone("");
-            setRentalStartDate("");
-            setRentalEndDate("");
-
-            fetchEquipment();
-
-          } catch (error) {
-            console.error(
-              "Payment verification error:",
-              error
-            );
-
-            alert(
-              "Payment was completed, but verification failed. Please contact the administrator."
-            );
-          }
-        },
-
-        modal: {
-          ondismiss: function () {
-            console.log(
-              "Razorpay checkout closed by user"
-            );
-          },
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-
-      razorpay.on(
-        "payment.failed",
-        function (response) {
-          console.error(
-            "Payment failed:",
-            response.error
-          );
-
-          alert(
-            response.error.description ||
-            "Payment failed. Please try again."
-          );
-        }
-      );
-
-      razorpay.open();
-
-    } catch (error) {
-      console.error(
-        "Rental/payment error:",
-        error
-      );
-
-      alert(
-        "Something went wrong while processing the rental."
-      );
-    }
-  };
-  const calculateRentalDays = () => {
-    if (!rentalStartDate || !rentalEndDate) {
-      return 0;
-    }
-
-    const start = new Date(rentalStartDate);
-    const end = new Date(rentalEndDate);
-
-    const difference =
-      (end - start) / (1000 * 60 * 60 * 24);
-
-    return difference >= 0 ? difference + 1 : 0;
-  };
-
-  const rentalDays = calculateRentalDays();
-
-  const rentalTotal =
-    rentalDays > 0 && selectedEquipment
-      ? rentalDays * Number(selectedEquipment.price_per_day)
-      : 0;
-
-  const predictPrice = async () => {
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/predict-price?crop=${encodeURIComponent(crop)}&district=${encodeURIComponent(district)}&market=${encodeURIComponent(market)}`
-      );
-
-      const data = await response.json();
-      console.log(data);
-
-      setPriceResult(data);
-    } catch (error) {
-      setPriceResult({ error: "Failed to fetch price prediction" });
-    }
-  };
-
-  const getWeather = async () => {
-    try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/weather?city=${encodeURIComponent(city)}`
-      );
-
-      const data = await res.json();
-      console.log(data);
-
-      setWeatherResult(data);
-    } catch (error) {
-      console.error(error)
-    }
-  };
-  const sendMessage = async () => {
-    if (!chatInput.trim()) return;
-    const question = chatInput;
-    setChatMessages((prev) => [...prev, {
-      sender: "user",
-      text: question,
-    },])
-    setChatInput("");
-    setLoadingChat(true);
-    try {
-      const res = await fetch(
-        "http://127.0.0.1:8000/ai-chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            question: question,
-          }),
-        }
-      );
-      const data = await res.json();
-      setChatMessages((prev) => [...prev, {
-        sender: "assistant",
-        text: data.answer || data.Message,
-      },]);
-
-    } catch (err) {
-      console.error(err);
-    }
-    //setChatInput("");
-    setLoadingChat(false);
-
-  };
+  // Languages without hand-written labels: the server translates them once
+  // (and caches them), we keep a copy in the browser too.
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [chatMessages]);
+    const missing = missingLabels(lang);
+
+    if (Object.keys(missing).length === 0) {
+      setExtraLabels({});
+      return;
+    }
+
+    const cacheKey = `ui_labels_${lang}_${Object.keys(missing).length}`;
+
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+
+      if (cached) {
+        setExtraLabels(cached);
+        return;
+      }
+    } catch (error) {
+      // ignore a broken cache
+    }
+
+    setExtraLabels({});
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/i18n/translate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, labels: missing }),
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (cancelled || !data.labels) return;
+
+        setExtraLabels(data.labels);
+
+        // Only keep a complete result, so missing labels are asked again later
+        if (Object.keys(data.labels).length === Object.keys(missing).length) {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(data.labels));
+          } catch (error) {
+            // storage full or blocked: not a problem
+          }
+        }
+      } catch (error) {
+        console.warn("Could not translate the labels:", error.message);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lang]);
+
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+    document.documentElement.setAttribute("lang", lang);
+    // Urdu is written right to left
+    document.documentElement.setAttribute("dir", lang === "ur" ? "rtl" : "ltr");
+  }, [lang]);
+
+  // Refresh the profile from the database when the app opens; an expired
+  // token logs the farmer out quietly.
+  useEffect(() => {
+    if (!token) return;
+
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/auth/me`, { headers: authHeaders() });
+
+        if (res.status === 401) {
+          logout();
+        } else if (res.ok) {
+          const fresh = await res.json();
+
+          // Only trust a real profile (never overwrite it with an odd reply)
+          if (fresh && typeof fresh === "object" && fresh.id) {
+            setUser(fresh);
+            localStorage.setItem("user", JSON.stringify(fresh));
+          }
+        }
+      } catch (error) {
+        console.warn("Could not refresh the profile:", error.message);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  // A diagnosis opens a conversation about it
+  const handleDiagnosed = (data) => {
+    const report = data.report;
+
+    setChatMessages([
+      {
+        sender: "assistant",
+        text:
+          `Disease: ${report.disease}\n\n` +
+          `Confidence: ${report.confidence}%\n\n` +
+          `Medicine: ${report.medicine}\n\n` +
+          `Estimated Cost: ${report.estimated_cost}\n\n` +
+          `You can now ask me anything about this disease.`,
+      },
+    ]);
+  };
+
+  // ---------------------------------------------------------------- render
+  const views = {
+    landing: <Landing ready={splashDone} go={go} signedIn={signedIn} />,
+    home: signedIn && <HomePage user={user} lang={lang} t={t} go={go} />,
+    disease: signedIn && <DiseasePage user={user} lang={lang} t={t} onDiagnosed={handleDiagnosed} go={go} />,
+    price: signedIn && (
+      <PricePage
+        token={token}
+        lang={lang}
+        t={t}
+        jsonHeaders={jsonHeaders}
+        sessionExpired={sessionExpired}
+        goLogin={goLogin}
+        intent={intent && intent.page === "price" ? intent : null}
+      />
+    ),
+    weather: signedIn && (
+      <WeatherPage user={user} lang={lang} t={t} intent={intent && intent.page === "weather" ? intent : null} />
+    ),
+    marketplace: signedIn && (
+      <MarketplacePage
+        token={token}
+        user={user}
+        lang={lang}
+        t={t}
+        jsonHeaders={jsonHeaders}
+        sessionExpired={sessionExpired}
+        goLogin={goLogin}
+      />
+    ),
+    history: signedIn && <HistoryPage go={go} />,
+    assistant: signedIn && (
+      <AssistantPage
+        user={user}
+        lang={lang}
+        t={t}
+        messages={chatMessages}
+        setMessages={setChatMessages}
+        intent={intent && intent.page === "assistant" ? intent : null}
+      />
+    ),
+    loan: signedIn && <LoanAdvisor apiUrl={API_URL} user={user} token={token} lang={lang} t={t} onLogin={goLogin} />,
+    profile: signedIn && (
+      <ProfilePage apiUrl={API_URL} token={token} user={user} onProfileSaved={handleProfileSaved} />
+    ),
+  };
 
   return (
-    <div className="app-container">
-
-      {/* Navbar */}
-      <div
-        className="navbar"
-      >
-        <button className={`nav-btn ${page === "home" ? "active-nav" : ""}`} onClick={() => setPage("home")}>
-          Home
-        </button>
-
-        <button className={`nav-btn ${page === "disease" ? "active-nav" : ""}`} onClick={() => setPage("disease")}>
-          Disease Detection
-        </button>
-
-        <button className={`nav-btn ${page === "price" ? "active-nav" : ""}`} onClick={() => setPage("price")}>
-          Price Prediction
-        </button>
-
-        <button className={`nav-btn ${page === "weather" ? "active-nav" : ""}`} onClick={() => setPage("weather")}>
-          Weather
-        </button>
-
-        <button className={`nav-btn ${page === "marketplace" ? "active-nav" : ""}`} onClick={() => setPage("marketplace")}>
-          Marketplace
-        </button>
-
-        <button className={`nav-btn ${page === "history" ? "active-nav" : ""}`} onClick={() => setPage("history")}>
-          History
-        </button>
-
-        <button
-          className={`nav-btn ${page === "assistant" ? "active-nav" : ""}`} onClick={() => setPage("assistant")}
-        >
-          AI Assistant
-        </button>
-      </div>
-
-      {/* Home */}
-      {page === "home" && (
-        <div className="home-page">
-          <div className="hero-section">
-
-            <h1 className="hero-title">
-              AgriPulse
-            </h1>
-
-            <h2 className="hero-subtitle">
-              AI-Powered Smart Agriculture Platform
-            </h2>
-
-            <p className="hero-text">
-              Helping farmers with crop disease detection,
-              weather advisory, crop price prediction,
-              multilingual support, Whatsapp assistance,
-              and farm equipment rental services.
-            </p>
-            <div className="feature-badges">
-              <span>Disease Detection </span>
-              <span>Weather Advisory </span>
-              <span>Price Prediction </span>
-              <span>Equipment Rental </span>
-            </div>
-          </div>
-          {stats && (
-            <div className="dashboard-cards">
-
-              <div className="dashboard-card">
-                <h3>Predictions</h3>
-                <h2>{stats.total_predictions}</h2>
-              </div>
-
-              <div className="dashboard-card">
-                <h3>Equipment</h3>
-                <h2>{stats.total_equipment}</h2>
-              </div>
-
-              <div className="dashboard-card">
-                <h3>Rentals</h3>
-                <h2>{stats.total_rentals}</h2>
-              </div>
-
-              <div className="dashboard-card">
-                <h3>Users</h3>
-                <h2>{stats.total_users}</h2>
-              </div>
-
-            </div>
-          )}
-          <h2 className="featured-title">Featured Equipment</h2>
-          <div className="featured-equipment">
-            {[...equipment].sort((a, b) =>
-              a.availability === "Available" &&
-                b.availability !== "Available" ? -1 : a.availability !== "Available" &&
-                  b.availability === "Available" ? 1 : 0).map((item) => (
-                    <div key={item.id} className="featured-card">
-                      <h3>{item.equipment_name}</h3>
-                      <p>{item.location}</p>
-                      <p>₹{item.price_per_day}/day</p>
-                      <p>Status:
-                        <span className={
-                          item.availability === "Available"
-                            ? "status-available"
-                            : "status-rented"
-                        }
-                        >
-                          {" "}{item.availability}
-                        </span>
-                      </p>
-                    </div>
-                  ))}
-          </div>
-        </div>
-      )}
-
-      {/* Disease Detection */}
-      {page === "disease" && (
-        <div>
-          <h2>Disease Detection</h2>
-          <div className="result-container"></div>
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+    <MotionConfig reducedMotion="user">
+      <UIProvider>
+        {page === "auth" ? (
+          <AuthFlow
+            apiUrl={API_URL}
+            token={token}
+            user={user}
+            onLoggedIn={handleLoggedIn}
+            onProfileSaved={handleProfileSaved}
+            onBack={() => switchPage("landing")}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
-          <br /><br />
-          <input
-            type="text"
-            placeholder="Enter your city"
-            value={diseaseCity}
-            onChange={(e) =>
-              setDiseaseCity(e.target.value)
-            }
-          />
-          <br /><br />
-
-          <button onClick={handleUpload}>
-            Upload
-          </button>
-
-          {result &&
-            result.report && (
-              <div>
-                <h3>
-                  Disease:{" "}
-                  {
-                    result.report.disease
-                  }
-                </h3>
-
-                <p>
-                  Confidence:{" "}
-                  {
-                    result.report.confidence
-                  }%
-                </p>
-                <h3>Weather</h3>
-                <p>City: {result.report.weather.city}</p>
-                <p>Temperature: {result.report.weather.temperature}°C</p>
-                <p>Humidity: {result.report.weather.humidity}%</p>
-                <p>Condition: {result.report.weather.condition}</p>
-
-                <h3>Medicine</h3>
-                <p>
-                  {
-                    result.report.medicine
-                  }
-                </p>
-                <h3>Estimated Cost</h3>
-                <p>{result.report.estimated_cost}</p>
-
-                <h3>AI Recommendation</h3>
-
-                {typeof result.report.analysis === 'object' ? (
-                  <>
-                    <p>
-                      <b>Cause:</b>{" "}
-                      {result.report.analysis.cause}
-                    </p>
-
-                    <p>
-                      <b>Severity:</b>{" "}
-                      {result.report.analysis.severity}
-                    </p>
-
-                    <p>
-                      <b>Weather Risk:</b>{" "}
-                      {result.report.analysis.weather_risk}
-                    </p>
-
-                    <p>
-                      <b>Medicine Usage:</b>{" "}
-                      {result.report.analysis.medicine_usage}
-                    </p>
-
-                    <p>
-                      <b>Recommendation:</b>{" "}
-                      {result.report.analysis.recommendation}
-                    </p>
-
-                    <b>Precautions:</b>
-
-                    <ul>
-                      {result.report.analysis.precautions?.map(
-                        (item, index) => (
-                          <li key={index}>{item}</li>
-                        )
-                      )}
-                    </ul>
-                  </>
-                ) : (
-                  <pre
-                    style={{
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {result.report.analysis}
-                  </pre>
-                )}
-              </div>
-            )}
-        </div>
-      )}
-
-      {page === "price" && (
-        <div className="price-page">
-
-          <h2>Price Prediction & Market Trend</h2>
-
-          {/* Crop Search */}
-          <input
-            type="text"
-            placeholder="Search crop..."
-            value={crop}
-            onChange={(e) => {
-              setCrop(e.target.value);
-              setMarket("");
-              setDistrict("");
-              setMarketOptions([]);
-              setPriceResult(null);
-            }}
-          />
-
-          <button onClick={searchMarkets}>
-            Search
-          </button>
-
-
-          {/* Market Results */}
-          {marketOptions.length > 0 && (
-            <div className="market-results">
-
-              <input
-                type="text"
-                placeholder="Search district or market..."
-                value={marketSearch}
-                onChange={(e) => setMarketSearch(e.target.value)}
-              />
-
-              {/* Today's price markets */}
-              {marketOptions.filter(
-                (item) =>
-                  item.current_price_available &&
-                  `${item.district} ${item.market}`
-                    .toLowerCase()
-                    .includes(marketSearch.toLowerCase())
-              ).length > 0 && (
-                  <>
-                    <h4 className="market-section-title today-title">
-                      Today's Price Available
-                    </h4>
-
-                    <div className="market-list">
-                      {marketOptions
-                        .filter(
-                          (item) =>
-                            item.current_price_available &&
-                            `${item.district} ${item.market}`
-                              .toLowerCase()
-                              .includes(marketSearch.toLowerCase())
-                        )
-                        .map((item, index) => (
-                          <div
-                            key={`today-${index}`}
-                            className="market-option today-market"
-                            onClick={() => {
-                              setMarket(item.market);
-                              setDistrict(item.district);
-                              setMarketOptions([]);
-                              setMarketSearch("");
-                            }}
-                          >
-                            <div className="market-name">
-                              {item.market}
-                            </div>
-
-                            <div className="market-district">
-                              {item.district}
-                            </div>
-
-                            <div className="market-price">
-                              ₹{item.current_price} / quintal
-                            </div>
-
-                            <div className="market-date">
-                              {item.date}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                )}
-
-              {/* Latest available price markets */}
-              {marketOptions.filter(
-                (item) =>
-                  !item.current_price_available &&
-                  `${item.district} ${item.market}`
-                    .toLowerCase()
-                    .includes(marketSearch.toLowerCase())
-              ).length > 0 && (
-                  <>
-                    <h4 className="market-section-title latest-title">
-                      Latest Available Price
-                    </h4>
-
-                    <div className="market-list">
-                      {marketOptions
-                        .filter(
-                          (item) =>
-                            !item.current_price_available &&
-                            `${item.district} ${item.market}`
-                              .toLowerCase()
-                              .includes(marketSearch.toLowerCase())
-                        )
-                        .map((item, index) => (
-                          <div
-                            key={`latest-${index}`}
-                            className="market-option latest-market"
-                            onClick={() => {
-                              setMarket(item.market);
-                              setDistrict(item.district);
-                              setMarketOptions([]);
-                              setMarketSearch("");
-                            }}
-                          >
-                            <div className="market-name">
-                              {item.market}
-                            </div>
-
-                            <div className="market-district">
-                              {item.district}
-                            </div>
-
-                            <div className="market-price">
-                              ₹{item.latest_price} / quintal
-                            </div>
-
-                            <div className="market-date">
-                              {item.latest_price_date}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                )}
-
-            </div>
-          )}
-
-
-          {/* Selected Market */}
-          {market && (
-            <div className="selected-market">
-
-              <p>
-                Selected Market:
-                <strong> {market}</strong>
-              </p>
-
-              <p>
-                District:
-                <strong> {district}</strong>
-              </p>
-
-            </div>
-          )}
-
-
-          {/* Prediction Button */}
-          <button
-            onClick={predictPrice}
-            disabled={!crop || !market || !district}
-          >
-            Get Price & Prediction
-          </button>
-
-
-          {/* Result */}
-          {priceResult && !priceResult.error && (
-            <div className="result-card">
-
-              <h3>{priceResult.crop}</h3>
-
-              <p>
-                District: {priceResult.district}
-              </p>
-
-              <p>
-                Market: {priceResult.market}
-              </p>
-
-              {/* Current price available */}
-              {priceResult.current_price_available ? (
-                <>
-                  <p>
-                    Current Price: ₹{priceResult.current_price}
-                  </p>
-
-                  <p>
-                    Date: {priceResult.date}
-                  </p>
-
-                  <p>
-                    Minimum Price: ₹{priceResult.min_price}
-                  </p>
-
-                  <p>
-                    Maximum Price: ₹{priceResult.max_price}
-                  </p>
-                </>
-              ) : (
-                <>
-                  {/* Current price unavailable */}
-                  <p>
-                    Today's current market price is not available.
-                  </p>
-
-                  <p>
-                    Latest Available Price: ₹{priceResult.latest_price}
-                  </p>
-
-                  <p>
-                    Latest Price Date: {priceResult.latest_price_date}
-                  </p>
-                </>
-              )}
-
-              <hr />
-
-              <p>
-                Predicted Price: ₹{priceResult.predicted_price}
-              </p>
-
-              <p>
-                Prediction Period: {priceResult.prediction_period}
-              </p>
-
-              <p>
-                Trend: {priceResult.trend}
-              </p>
-
-              <p>
-                {priceResult.recommendation}
-              </p>
-
-            </div>
-          )}
-
-
-          {/* Error */}
-          {priceResult?.error && (
-            <p className="error-message">
-              {priceResult.error}
-            </p>
-          )}
-
-        </div>
-      )}
-
-      {/* Weather */}
-      {page === "weather" && (
-        <div>
-          <h2>Weather Advisory</h2>
-          <div className="result-card"></div>
-          <input
-            type="text"
-            placeholder="Enter city name"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-          />
-
-          <button onClick={getWeather}>
-            Get Weather
-          </button>
-
-          {weatherResult &&
-            !weatherResult.error && (
-              <div>
-                <h3><strong>City:</strong> {weatherResult.city}</h3>
-                <p><strong>Temperature:</strong> {weatherResult.temperature}°C</p>
-                <p><strong>Humidity:</strong> {weatherResult.humidity}%</p>
-                <p><strong>Condition:</strong> {weatherResult.condition}</p>
-                <p><strong>Advice:</strong> {weatherResult.advice}</p>
-              </div>
-            )}
-          {weatherResult?.error && (
-            <p>{weatherResult.error}</p>
-          )}
-        </div>
-      )}
-
-      {/* Marketplace */}
-      {page === "marketplace" && (
-        <div className="marketplace-page">
-
-          <div className="marketplace-header">
-            <div>
-              <h2>Equipment Marketplace</h2>
-              <p>Rent agricultural equipment from nearby owners.</p>
-            </div>
-
-            <button
-              className="add-equipment-btn"
-              onClick={() => setShowAddEquipment(!showAddEquipment)}
+        ) : (
+          <>
+            <Site
+              page={page}
+              go={go}
+              t={t}
+              lang={lang}
+              setLang={setLang}
+              user={user}
+              signedIn={signedIn}
+              onLogout={logout}
+              onLogin={goLogin}
+              theme={theme}
+              onToggleTheme={toggleTheme}
             >
-              {showAddEquipment ? "Close" : "+ Add Equipment"}
-            </button>
-          </div>
-
-
-          {/* ADD EQUIPMENT */}
-
-          {showAddEquipment && (
-            <div className="equipment-form-card">
-
-              <h3>List Your Equipment</h3>
-
-              <input
-                placeholder="Equipment Name *"
-                value={equipmentName}
-                onChange={(e) => setEquipmentName(e.target.value)}
-              />
-
-              <select
-                value={equipmentCategory}
-                onChange={(e) => setEquipmentCategory(e.target.value)}
-              >
-                <option value="">Select Category</option>
-                <option value="Tractor">Tractor</option>
-                <option value="Harvester">Harvester</option>
-                <option value="Rotavator">Rotavator</option>
-                <option value="Cultivator">Cultivator</option>
-                <option value="Seeder">Seeder</option>
-                <option value="Sprayer">Sprayer</option>
-                <option value="Trailer">Trailer</option>
-                <option value="Other">Other</option>
-              </select>
-
-              <input
-                placeholder="Owner Name *"
-                value={ownerName}
-                onChange={(e) => setOwnerName(e.target.value)}
-              />
-
-              <input
-                placeholder="Location *"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-
-              <input
-                type="number"
-                placeholder="Price Per Day ₹ *"
-                value={pricePerDay}
-                onChange={(e) => setPricePerDay(e.target.value)}
-              />
-
-              <input
-                placeholder="Contact Number *"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-              />
-
-              <input
-                placeholder="Equipment Image URL"
-                value={equipmentImage}
-                onChange={(e) => setEquipmentImage(e.target.value)}
-              />
-
-              <textarea
-                placeholder="Equipment description"
-                value={equipmentDescription}
-                onChange={(e) => setEquipmentDescription(e.target.value)}
-                rows="4"
-              />
-
-              <button onClick={addEquipment}>
-                List Equipment
-              </button>
-
-            </div>
-          )}
-
-
-          {/* SEARCH + FILTER */}
-
-          <div className="marketplace-controls">
-
-            <input
-              type="text"
-              placeholder=" Search equipment, owner or location..."
-              value={marketplaceSearch}
-              onChange={(e) => setMarketplaceSearch(e.target.value)}
-            />
-
-            <select
-              value={marketplaceCategory}
-              onChange={(e) => setMarketplaceCategory(e.target.value)}
-            >
-              <option value="All">All Categories</option>
-              <option value="Tractor">Tractor</option>
-              <option value="Harvester">Harvester</option>
-              <option value="Rotavator">Rotavator</option>
-              <option value="Cultivator">Cultivator</option>
-              <option value="Seeder">Seeder</option>
-              <option value="Sprayer">Sprayer</option>
-              <option value="Trailer">Trailer</option>
-              <option value="Other">Other</option>
-            </select>
-
-          </div>
-
-
-          {/* EQUIPMENT CARDS */}
-
-          <div className="equipment-grid">
-
-            {equipment
-              .filter((item) => {
-
-                const search = marketplaceSearch.toLowerCase();
-
-                const matchesSearch =
-                  !search ||
-                  item.equipment_name?.toLowerCase().includes(search) ||
-                  item.owner_name?.toLowerCase().includes(search) ||
-                  item.location?.toLowerCase().includes(search) ||
-                  item.category?.toLowerCase().includes(search);
-
-                const matchesCategory =
-                  marketplaceCategory === "All" ||
-                  item.category === marketplaceCategory;
-
-                return matchesSearch && matchesCategory;
-              })
-              .map((item) => (
-
-                <div
-                  key={item.id}
-                  className="equipment-card"
-                >
-
-                  <div className="equipment-image">
-
-                    {item.image_url ? (
-                      <img
-                        src={item.image_url}
-                        alt={item.equipment_name}
-                      />
-                    ) : (
-                      <div className="equipment-placeholder">
-                        🚜
-                      </div>
-                    )}
-
-                    <span
-                      className={
-                        item.availability === "Available"
-                          ? "equipment-status available"
-                          : "equipment-status rented"
-                      }
-                    >
-                      {item.availability}
-                    </span>
-
-                  </div>
-
-
-                  <div className="equipment-card-body">
-
-                    <span className="equipment-category">
-                      {item.category || "Other"}
-                    </span>
-
-                    <h3>{item.equipment_name}</h3>
-
-                    {item.description && (
-                      <p className="equipment-description">
-                        {item.description}
-                      </p>
-                    )}
-
-                    <div className="equipment-info">
-                      <p>👤 {item.owner_name}</p>
-                      <p>📍 {item.location}</p>
-                    </div>
-
-                    <div className="equipment-price">
-                      <strong>₹{item.price_per_day}</strong>
-                      <span>/ day</span>
-                    </div>
-
-
-                    {item.availability === "Available" && (
-                      <button
-                        className="rent-btn"
-                        onClick={() => {
-                          setSelectedEquipment(item);
-                          setRenterName("");
-                          setRenterPhone("");
-                          setRentalStartDate("");
-                          setRentalEndDate("");
-                        }}
-                      >
-                        Rent Equipment
-                      </button>
-                    )}
-
-                  </div>
-
-                </div>
-
-              ))}
-
-          </div>
-        </div>
-      )}
-
-
-      {/* RENTAL MODAL */}
-
-      {selectedEquipment && (
-        <div className="rental-overlay">
-
-          <div className="rental-modal">
-
-            {/* HEADER */}
-
-            <div className="modal-header">
-
-              <button
-                type="button"
-                className="modal-back-btn"
-                onClick={() => {
-                  if (showCheckout) {
-                    setShowCheckout(false);
-                  } else {
-                    setSelectedEquipment(null);
-                  }
-                }}
-              >
-                ← Back
-              </button>
-
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => {
-                  setSelectedEquipment(null);
-                  setShowCheckout(false);
-                }}
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            {/* ============================= */}
-            {/* RENTAL DETAILS */}
-            {/* ============================= */}
-
-            {!showCheckout && (
-              <>
-
-                <h2>Rent Equipment</h2>
-
-                <div className="checkout-equipment-preview">
-
-                  {selectedEquipment.image_url ? (
-                    <img
-                      src={selectedEquipment.image_url}
-                      alt={selectedEquipment.equipment_name}
-                    />
-                  ) : (
-                    <div className="checkout-equipment-placeholder">
-                      🚜
-                    </div>
-                  )}
-
-                  <div>
-                    <h3>
-                      {selectedEquipment.equipment_name}
-                    </h3>
-
-                    <p>
-                      📍 {selectedEquipment.location}
-                    </p>
-
-                    <strong>
-                      ₹{selectedEquipment.price_per_day} / day
-                    </strong>
-                  </div>
-
-                </div>
-
-
-                {/* RENTER INFORMATION */}
-
-                <div className="rental-section">
-
-                  <h3>Renter Information</h3>
-
-                  <input
-                    type="text"
-                    placeholder="Your Name *"
-                    value={renterName}
-                    onChange={(e) =>
-                      setRenterName(e.target.value)
-                    }
-                  />
-
-                  <input
-                    type="tel"
-                    placeholder="Your Phone Number *"
-                    value={renterPhone}
-                    onChange={(e) =>
-                      setRenterPhone(e.target.value)
-                    }
-                  />
-
-                </div>
-
-
-                {/* RENTAL DATES */}
-
-                <div className="rental-section">
-
-                  <h3>Rental Period</h3>
-
-                  <label>Start Date</label>
-
-                  <input
-                    type="date"
-                    value={rentalStartDate}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) =>
-                      setRentalStartDate(e.target.value)
-                    }
-                  />
-
-                  <label>End Date</label>
-
-                  <input
-                    type="date"
-                    value={rentalEndDate}
-                    min={
-                      rentalStartDate ||
-                      new Date().toISOString().split("T")[0]
-                    }
-                    onChange={(e) =>
-                      setRentalEndDate(e.target.value)
-                    }
-                  />
-
-                </div>
-
-
-                {/* BOOKING SUMMARY */}
-
-                {rentalDays > 0 && (
-                  <div className="rental-summary">
-
-                    <h3>Booking Summary</h3>
-
-                    <div className="summary-row">
-                      <span>Equipment</span>
-
-                      <strong>
-                        {selectedEquipment.equipment_name}
-                      </strong>
-                    </div>
-
-                    <div className="summary-row">
-                      <span>Price per day</span>
-
-                      <strong>
-                        ₹{selectedEquipment.price_per_day}
-                      </strong>
-                    </div>
-
-                    <div className="summary-row">
-                      <span>Rental days</span>
-
-                      <strong>
-                        {rentalDays} day
-                        {rentalDays > 1 ? "s" : ""}
-                      </strong>
-                    </div>
-
-                    <div className="summary-row total-row">
-                      <span>Total Amount</span>
-
-                      <strong>
-                        ₹{rentalTotal.toLocaleString("en-IN")}
-                      </strong>
-                    </div>
-
-                  </div>
-                )}
-
-
-                {/* CONTINUE TO CHECKOUT */}
-
-                <button
-                  type="button"
-                  className="confirm-rental-btn"
-                  onClick={() => {
-
-                    if (!renterName.trim()) {
-                      alert("Please enter your name");
-                      return;
-                    }
-
-                    if (!renterPhone.trim()) {
-                      alert("Please enter your phone number");
-                      return;
-                    }
-
-                    if (!rentalStartDate || !rentalEndDate) {
-                      alert("Please select rental dates");
-                      return;
-                    }
-
-                    if (rentalDays <= 0) {
-                      alert("Please select a valid rental period");
-                      return;
-                    }
-
-                    setShowCheckout(true);
-
-                  }}
-                >
-                  Continue to Checkout
-                </button>
-
-              </>
-            )}
-
-
-            {/* ============================= */}
-            {/* CHECKOUT */}
-            {/* ============================= */}
-
-            {showCheckout && (
-              <>
-
-                <h2>Review & Checkout</h2>
-
-                <div className="checkout-card">
-
-                  <div className="checkout-title">
-                    <h3>
-                      {selectedEquipment.equipment_name}
-                    </h3>
-
-                    <span className="checkout-location">
-                      📍 {selectedEquipment.location}
-                    </span>
-                  </div>
-
-
-                  {/* RENTER */}
-
-                  <div className="checkout-section">
-
-                    <h4>Renter</h4>
-
-                    <p>
-                      👤 {renterName}
-                    </p>
-
-                    <p>
-                      📞 {renterPhone}
-                    </p>
-
-                  </div>
-
-
-                  {/* OWNER */}
-
-                  <div className="checkout-section">
-
-                    <h4>Equipment Owner</h4>
-
-                    <p>
-                      👤 {selectedEquipment.owner_name}
-                    </p>
-
-                    <p>
-                      📍 {selectedEquipment.location}
-                    </p>
-                    <p>
-                      📞 {selectedEquipment.contact_number}
-
-                    </p>
-
-                  </div>
-
-
-                  {/* DATES */}
-
-                  <div className="checkout-section">
-
-                    <h4>Rental Period</h4>
-
-                    <p>
-                      📅 {rentalStartDate}
-                    </p>
-
-                    <p>
-                      📅 {rentalEndDate}
-                    </p>
-
-                    <p>
-                      {rentalDays} day
-                      {rentalDays > 1 ? "s" : ""}
-                    </p>
-
-                  </div>
-
-
-                  {/* PAYMENT SUMMARY */}
-
-                  <div className="payment-summary">
-
-                    <div className="summary-row">
-                      <span>Price per day</span>
-
-                      <strong>
-                        ₹{selectedEquipment.price_per_day}
-                      </strong>
-                    </div>
-
-                    <div className="summary-row">
-                      <span>
-                        {rentalDays} × daily rate
-                      </span>
-
-                      <strong>
-                        ₹{rentalTotal.toLocaleString("en-IN")}
-                      </strong>
-                    </div>
-
-                    <div className="summary-row total-row">
-                      <span>Total to Pay</span>
-
-                      <strong>
-                        ₹{rentalTotal.toLocaleString("en-IN")}
-                      </strong>
-                    </div>
-
-                  </div>
-
-
-                  {/* PAYMENT BUTTON */}
-
-                  <button
-                    type="button"
-                    className="payment-btn"
-                    onClick={rentEquipment}
-                  >
-                    💳 Proceed to Payment
-                  </button>
-
-
-                  <p className="secure-payment-note">
-                    🔒 Secure payment
-                  </p>
-
-                </div>
-
-              </>
-            )}
-
-          </div>
-
-        </div>
-      )}
-      {/* History */}
-      {page === "history" && (
-        <div>
-          <h2>Prediction History</h2>
-
-          <button onClick={fetchHistory}>
-            Show History
-          </button>
-
-          <button
-            onClick={clearHistory}
-            style={{
-              marginLeft: "10px",
-            }}
-          >
-            Clear History
-          </button>
-
-          {history.length > 0 && (
-            <div>
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  className="history-card"
-                >
-                  <p>
-                    {item.disease}
-                  </p>
-
-                  <p>
-                    {item.confidence}
-                  </p>
-
-                  <p>
-                    {item.treatment}
-                  </p>
-
-                  <hr />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {page === "assistant" && (
-        <div className="chat-page">
-
-          <h2>AI Agriculture Assistant</h2>
-          <button
-            onClick={() => setChatMessages([])}
-            style={{ marginBottom: "15px" }}
-          >
-            Clear Chat
-          </button>
-
-          <div className="chat-box">
-            <div ref={chatEndRef}></div>
-
-            {chatMessages.length === 0 && (
-              <div className="welcome-chat">
-                <h2>AgriPulse AI</h2>
-                <p>
-                  Ask anything about your crop,
-                  disease,weather,price or equipment.
-                </p>
-              </div>
-            )}
-            {chatMessages.map((msg, index) => (
-              <div
-                key={index}
-                className={
-                  msg.sender === "user"
-                    ? "chat-row user-row"
-                    : "chat-row ai-row"
-                }
-              >
-                <div
-                  className={
-                    msg.sender === "user"
-                      ? "user-message"
-                      : "ai-message"
-                  }
-                >
-
-                </div>
-                {msg.text}
-              </div>
-            ))}
-
-
-
-            {loadingChat && (
-              <div className="ai-message">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            )}
-
-          </div>
-
-          <div className="chat-input-area">
-
-            <input
-              value={chatInput}
-              onChange={(e) =>
-                setChatInput(e.target.value)
-              }
-              placeholder="Ask anything about your crop..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-            />
-
-            <button onClick={sendMessage}>
-              Send
-            </button>
-
-          </div>
-
-        </div>
-      )}
-
-      <footer className="footer">
-        <h3>AgriPulse</h3>
-        <p>
-          AI-Powered Smart Agriculture Platform
-        </p>
-        <p>
-          Disease Detection | Weather Advisory | Price Prediction | Equipment Rental
-        </p>
-        <p>
-          &copy; 2026 AgriPulse. All rights reserved.
-        </p>
-      </footer>
-      <div
-        className="ai-floating-button"
-        onClick={() => setPage("assistant")}
-      >
-        🤖
-      </div>
-    </div>
+              {views[page]}
+            </Site>
+
+            {/* Speak a command from any page */}
+            {signedIn && page !== "landing" && <VoiceCommandButton lang={lang} t={t} onCommand={handleVoiceCommand} />}
+          </>
+        )}
+
+        {curtain && <Curtain curtain={curtain} />}
+
+        {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
+      </UIProvider>
+    </MotionConfig>
   );
 }
 
