@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# AgriPulse web app (kisanmitra-frontend)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The React front end of **AgriPulse (KisanMitra AI)**: an AI farming companion with leaf disease detection,
+mandi price forecasts, weather advice, an equipment marketplace, a loan advisor, an assistant and voice
+in 14 languages. It talks to the FastAPI backend in the parent folder. The full project description is in the
+[root README](../README.md).
 
-## Available Scripts
+Built with Create React App, React 19, Framer Motion (animation) and Lucide (icons). There is no router
+library and no CSS framework: the design system is plain CSS with tokens for light and dark themes.
 
-In the project directory, you can run:
+## Run it
 
-### `npm start`
+```powershell
+npm install
+npm start          # http://localhost:5555  (the port comes from .env)
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The backend must be running for anything except the splash and the story page
+(`python -m uvicorn app.main:app --reload --port 5556` from the project root).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+| Script | What it does |
+|---|---|
+| `npm start` | dev server with reload |
+| `npm test -- --watchAll=false` | 35 tests (React Testing Library, fake backend) |
+| `npm run build` | production build into `build/` |
 
-### `npm test`
+## Configuration
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Variable | Purpose | Default |
+|---|---|---|
+| `REACT_APP_API_URL` | URL of the backend, no trailing slash | `http://127.0.0.1:5556` |
+| `PORT` | dev server port | `5555` |
 
-### `npm run build`
+Copy `.env.example` to `.env` to change them. `REACT_APP_*` values are baked in at **build time**: after
+changing one on a host such as Vercel, redeploy. The backend must list this app's address in its
+`CORS_ORIGINS`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## How the app flows
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Splash** (`Splash.js`): the AgriPulse lockup animation in the app's green palette.
+2. **Story page** (`Landing.js`): a public, scrollable page (hero, about, six tools, how it works, languages)
+   with scroll-driven text, counters, card reveals and marquees.
+3. **Frame** (`Site.js`): a hidden menu (three lines, top left) that drops as a curtain, and a profile panel
+   (top right) that opens as a circular reveal.
+4. **Login** (`AuthFlow.js`): phone + OTP, then a 3-step onboarding for new farmers. Opening a tool as a
+   guest plays a colour transition into the login and returns to that tool afterwards.
+5. **Tools** (`pages/` and `LoanAdvisor.js`): dashboard, disease scan, price forecast, weather,
+   marketplace, assistant, history, loan advisor, profile.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`App.js` owns the session (token, user), the language, the theme, the assistant chat and the current page,
+and decides which screen to show. Pages keep their own state.
 
-### `npm run eject`
+## Folder guide
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+src/
+  App.js            session, language, page switching, page transitions
+  Splash.js         opening animation
+  Landing.js        story page
+  Site.js           header, menu panel, profile panel, footer
+  AuthFlow.js       login, onboarding, profile editing
+  LoanAdvisor.js    Kisan Credit Card advisor (4-step form and report)
+  TrackingPanel.js  owners share equipment GPS position or create a tracker key
+  voice.js          microphone input, spoken answers, voice commands, API_URL
+  pages/            Home (dashboard), Disease, Price, Weather, Marketplace, Assistant, History, Profile
+  ui/               kit.js (buttons, fields, modal, toasts, motion helpers), art.js (SVG scenes),
+                    icons.js, notify.js (toast / confirm callable from anywhere)
+  i18n/             14 label files and the t() helper
+  styles/           base (tokens, components), art, auth, shell, pages, site
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Languages
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+English, Hindi, Kannada, Telugu, Tamil, Malayalam, Marathi, Bengali, Gujarati, Punjabi, Odia, Urdu
+(right to left), Assamese, Bhojpuri.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- `src/i18n/<code>.json` holds the interface labels (menu, main buttons, placeholders, voice messages, page
+  titles). All languages except Malayalam are hand-written, so please have a native speaker review them.
+- A label missing from a language falls back to English, or is translated once by the server
+  (`POST /i18n/translate`) and cached in the browser.
+- To add a label, add it to `en.json`, use `t("key")` in the component, then add the translations.
+- Text outside these labels (most page copy) is still English; answers, advice and spoken replies from the
+  backend follow the chosen language.
 
-## Learn More
+## Voice and browser features
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The microphone (voice input), camera (leaf photos) and geolocation (nearby equipment) need **HTTPS** or
+`localhost`. Razorpay Checkout is loaded from `public/index.html`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Design notes
 
-### Code Splitting
+- Colours, radii and shadows are CSS variables in `styles/base.css`; the dark theme overrides them under
+  `:root[data-theme="dark"]`, and the choice is stored in `localStorage`.
+- Animation uses Framer Motion; users who prefer reduced motion get near-instant transitions.
+- Layout is mobile first; the header is the same on every screen size.
+- Toasts and confirm dialogs come from `ui/notify.js` (`notify(...)`, `confirmDialog(...)`): there are no
+  browser `alert` popups.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Tests
 
-### Analyzing the Bundle Size
+`src/App.test.js` renders the whole app against a small fake `fetch` backend. It covers the splash, the story
+page, the menu and profile panels, login and onboarding, guest redirects, the language switch (including
+Urdu direction), and each tool page. `setupTests.js` provides the browser features jsdom lacks
+(`IntersectionObserver`, `matchMedia`) and a longer time limit for the page transitions.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Deploy (Vercel)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Import the repository, set **Root Directory** to `kisanmitra-frontend`, keep the Create React App defaults
+(`npm run build`, output `build`), and add `REACT_APP_API_URL`. Full steps are in
+[`../docs/DEPLOY.md`](../docs/DEPLOY.md).
