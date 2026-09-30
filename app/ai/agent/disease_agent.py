@@ -1,19 +1,15 @@
 import os
 import json
 from dotenv import load_dotenv
-import google.generativeai as genai
+from app.ai.gemini_client import generate_content
 from json import JSONDecodeError
 from app.schemas.disease_report import Analysis
-from app.ai.agent.medicine_database import MEDICINE_DB
+from app.ai.agent.medicine_database import get_medicine_info
 from pydantic import ValidationError
 load_dotenv()
 
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
 
 
-model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 def generate_disease_report(
@@ -22,13 +18,7 @@ def generate_disease_report(
     temperature,
     humidity
 ):
-    medicine_info = MEDICINE_DB.get(
-        disease,
-        {
-            "medicine": "Consult Expert",
-            "cost": "Unknown"
-        }
-    )
+    medicine_info = get_medicine_info(disease)
 
     prompt = f"""
 You are an agricultural expert.
@@ -66,7 +56,7 @@ Return exactly in this format:
 Keep the answer practical and concise.
 """
 
-    response = model.generate_content(prompt)
+    response = generate_content(prompt)
     text=response.text.strip()
     text=text.replace("```json","")
     text=text.replace("```","").strip()
