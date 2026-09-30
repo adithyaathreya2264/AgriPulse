@@ -1,6 +1,11 @@
-import requests
+import os
 
-API_KEY='7f0d4ec8c576cc741c6e16f4000e8a25'
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv("WEATHER_API_KEY")
 
 
 def get_weather(city):
@@ -9,7 +14,13 @@ def get_weather(city):
         f"?q={city}&appid={API_KEY}&units=metric"
     )
 
-    response = requests.get(url)
+    if not API_KEY:
+        return {"error": "Weather API key is not configured"}
+
+    try:
+        response = requests.get(url, timeout=15)
+    except requests.RequestException:
+        return {"error": "Weather service unavailable"}
 
     if response.status_code != 200:
         return {"error": "City not found"}

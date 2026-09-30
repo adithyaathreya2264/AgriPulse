@@ -45,6 +45,7 @@ def analyze_crop(image_path, city):
     return {
         "disease": disease,
         "confidence": confidence,
+        "model": result.get("model"),
 
         "weather": weather,
 

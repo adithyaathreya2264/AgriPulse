@@ -13,6 +13,9 @@ load_dotenv()
 
 API_KEY = os.getenv("AGMARKNET_API_KEY")
 
+# curl.exe on Windows, plain curl on Linux (Render / Docker)
+CURL = "curl.exe" if os.name == "nt" else "curl"
+
 
 CURRENT_API = (
     "https://api.data.gov.in/resource/"
@@ -29,6 +32,15 @@ HISTORY_API = (
 # API CALL
 # =========================================================
 
+class MarketDataUnavailable(RuntimeError):
+    """The government price service did not answer (network / service down)."""
+
+
+def _hide_key(text):
+    """Logs must never contain the API key."""
+    return text.replace(API_KEY, "<api-key>") if API_KEY else text
+
+
 def call_api(url, params):
 
     query = urlencode(params)
@@ -36,14 +48,14 @@ def call_api(url, params):
     full_url = f"{url}?{query}"
 
     print("\n========== MARKET API ==========")
-    print("URL:", full_url)
+    print("URL:", _hide_key(full_url))
 
     try:
 
         result = subprocess.run(
             [
-                "curl.exe",
-                "-s",
+                CURL,
+                "-sS",
                 "--max-time",
                 "60",
                 full_url
@@ -60,7 +72,7 @@ def call_api(url, params):
 
     if result.returncode != 0:
 
-        print("Curl error:", result.stderr)
+        print("Curl error:", _hide_key(result.stderr.strip()))
         return None
 
     print("Return code:", result.returncode)
@@ -73,7 +85,7 @@ def call_api(url, params):
     except json.JSONDecodeError:
 
         print("Invalid JSON response")
-        print(result.stdout[:500])
+        print(_hide_key(result.stdout[:500]))
 
         return None
 
@@ -503,6 +515,12 @@ def search_markets(crop):
         first_params
     )
 
+    # Both services silent: the price service is down, not "no markets"
+    if current_data is None and first_data is None:
+        raise MarketDataUnavailable(
+            "The government market price service is not responding"
+        )
+
     if first_data:
 
         total = int(
@@ -629,9 +647,15 @@ def predict_price(
 
     if not district or not market:
 
-        markets = search_markets(
-            crop
-        )
+        try:
+            markets = search_markets(
+                crop
+            )
+        except MarketDataUnavailable as e:
+            return {
+                "crop": crop,
+                "error": str(e) + ". Please try again later."
+            }
 
         if not markets:
 
@@ -665,11 +689,14 @@ def predict_price(
     # Get historical data
     # -----------------------------------------------------
 
-    history = get_historical_data(
-        crop,
-        district,
-        market
-    )
+    # 5+ years of history, cached in MongoDB (refreshed daily)
+    from app.services.price_history_service import get_history
+
+    try:
+        history = get_history(crop, district, market)
+    except Exception as e:
+        print("Price history error:", e)
+        history = get_historical_data(crop, district, market)
 
     # -----------------------------------------------------
     # If no historical data
@@ -885,70 +912,30 @@ def predict_price(
         }
 
     # -----------------------------------------------------
-    # Convert dates to numbers
+    # Forecast the next 4 weeks
     # -----------------------------------------------------
 
-    first_date = df[
-        "date"
-    ].min()
-
-    df["days"] = (
-        df["date"] - first_date
-    ).dt.days
-
-    X = df[
-        ["days"]
-    ]
-
-    y = df[
-        "price"
-    ]
-
-    # -----------------------------------------------------
-    # Train Linear Regression
-    # -----------------------------------------------------
-
-    model = LinearRegression()
-
-    model.fit(
-        X,
-        y
+    from app.services.price_forecast import (
+        best_time_to_sell,
+        forecast_prices
     )
+    from app.services.weather_history_service import get_weather_history
 
-    # -----------------------------------------------------
-    # Predict 7 days after latest historical date
-    # -----------------------------------------------------
+    weather = None
 
-    future_day = (
-        df["days"].max()
-        + 7
+    try:
+        weather = get_weather_history(
+            district,
+            df["date"].min(),
+            df["date"].max()
+        )
+    except Exception as e:
+        print("Weather history error:", e)
+
+    forecast, model_metrics, features_used = forecast_prices(
+        df[["date", "price"]].to_dict("records"),
+        weather
     )
-
-    future_data = pd.DataFrame({
-        "days": [future_day]
-    })
-
-    predicted_price = model.predict(
-        future_data
-    )[0]
-
-    predicted_price = round(
-        max(
-            0,
-            float(predicted_price)
-        ),
-        2
-    )
-
-    # -----------------------------------------------------
-    # Compare prediction
-    #
-    # If today's price exists:
-    # compare against today's price.
-    #
-    # Otherwise:
-    # compare against latest historical price.
-    # -----------------------------------------------------
 
     comparison_price = (
         current_price
@@ -956,18 +943,15 @@ def predict_price(
         else latest_price
     )
 
-    difference = (
-        predicted_price
-        - comparison_price
-    )
+    predicted_price = forecast[-1]["price"]
+
+    difference = predicted_price - comparison_price
 
     # -----------------------------------------------------
     # Trend
     # -----------------------------------------------------
 
-    if difference > (
-        comparison_price * 0.03
-    ):
+    if difference > comparison_price * 0.03:
 
         trend = "Rising"
 
@@ -976,9 +960,7 @@ def predict_price(
             "Consider waiting before selling."
         )
 
-    elif difference < (
-        -comparison_price * 0.03
-    ):
+    elif difference < -comparison_price * 0.03:
 
         trend = "Falling"
 
@@ -995,6 +977,8 @@ def predict_price(
             "Prices appear relatively stable. "
             "Sell according to market conditions."
         )
+
+    sell_advice = best_time_to_sell(forecast, comparison_price)
 
     # -----------------------------------------------------
     # Final response
@@ -1036,7 +1020,7 @@ def predict_price(
             predicted_price,
 
         "prediction_period":
-            "Next 7 days",
+            "Next 4 weeks",
 
         "unit":
             "₹ per quintal",
@@ -1048,5 +1032,17 @@ def predict_price(
             trend,
 
         "recommendation":
-            recommendation
+            recommendation,
+
+        "forecast":
+            forecast,
+
+        "best_time_to_sell":
+            sell_advice,
+
+        "model_metrics":
+            model_metrics,
+
+        "features_used":
+            features_used
     }

@@ -6,13 +6,33 @@ load_dotenv()
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET")
 
-if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
-    raise RuntimeError("Razorpay credentials are missing from .env")
+_client = None
 
-client = razorpay.Client(
-    auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
-)
+
+class PaymentConfigError(RuntimeError):
+    """Razorpay credentials are missing from .env"""
+
+
+def get_client():
+    """
+    Create the Razorpay client on first use, so the rest of the
+    backend still starts when payment credentials are not configured.
+    """
+    global _client
+
+    if _client is None:
+        if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
+            raise PaymentConfigError(
+                "Razorpay credentials are missing from .env"
+            )
+
+        _client = razorpay.Client(
+            auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+        )
+
+    return _client
 
 
 def create_payment_order(amount, rental_id):
@@ -34,9 +54,7 @@ def create_payment_order(amount, rental_id):
         }
     }
 
-    order = client.order.create(data=order_data)
-
-    return order
+    return get_client().order.create(data=order_data)
 
 
 def verify_payment(
@@ -46,6 +64,7 @@ def verify_payment(
 ):
     """
     Verify that the payment response came from Razorpay.
+    Raises an error when the signature is invalid.
     """
 
     payment_data = {
@@ -54,6 +73,31 @@ def verify_payment(
         "razorpay_signature": razorpay_signature
     }
 
-    client.utility.verify_payment_signature(payment_data)
+    get_client().utility.verify_payment_signature(payment_data)
+
+    return True
+
+
+def fetch_payment(razorpay_payment_id):
+    """Ask Razorpay directly for the payment (server-side state)."""
+    return get_client().payment.fetch(razorpay_payment_id)
+
+
+def verify_webhook(body, signature):
+    """
+    Verify a Razorpay webhook. `body` is the raw request body (str).
+    Raises an error when the signature is invalid.
+    """
+
+    if not RAZORPAY_WEBHOOK_SECRET:
+        raise PaymentConfigError(
+            "RAZORPAY_WEBHOOK_SECRET is missing from .env"
+        )
+
+    get_client().utility.verify_webhook_signature(
+        body,
+        signature,
+        RAZORPAY_WEBHOOK_SECRET
+    )
 
     return True
