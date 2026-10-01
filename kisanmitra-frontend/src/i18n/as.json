@@ -628,5 +628,8 @@
   "kit.light_mode": "লাইট মোড",
   "kit.dark_mode": "ডাৰ্ক মোড",
   "kit.cancel": "বাতিল কৰক",
-  "kit.yes_continue": "হয়, আগবাঢ়ক"
+  "kit.yes_continue": "হয়, আগবাঢ়ক",
+  "landing.whatsapp_aria": "WhatsApp ত AgriPulse",
+  "landing.whatsapp_title": "WhatsApp ত চেট কৰক",
+  "landing.whatsapp_text": "চেট খুলিবলৈ এই কোডটো আপোনাৰ ফোনেৰে স্কেন কৰক। পাতৰ ফটো বা ভইচ নোট পঠিয়াওক, AgriPulse এ আপোনাৰ ভাষাত উত্তৰ দিব।"
 }

@@ -628,5 +628,8 @@
   "kit.light_mode": "لائٹ موڈ",
   "kit.dark_mode": "ڈارک موڈ",
   "kit.cancel": "منسوخ کریں",
-  "kit.yes_continue": "ہاں، جاری رکھیں"
+  "kit.yes_continue": "ہاں، جاری رکھیں",
+  "landing.whatsapp_aria": "WhatsApp پر AgriPulse",
+  "landing.whatsapp_title": "WhatsApp پر چیٹ کریں",
+  "landing.whatsapp_text": "چیٹ کھولنے کے لیے اس کوڈ کو اپنے فون سے اسکین کریں۔ پتے کی تصویر یا وائس نوٹ بھیجیں، AgriPulse آپ کی زبان میں جواب دے گا۔"
 }

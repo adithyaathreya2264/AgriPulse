@@ -628,5 +628,8 @@
   "kit.light_mode": "Light mode",
   "kit.dark_mode": "Dark mode",
   "kit.cancel": "Cancel",
-  "kit.yes_continue": "Yes, continue"
+  "kit.yes_continue": "Yes, continue",
+  "landing.whatsapp_aria": "AgriPulse on WhatsApp",
+  "landing.whatsapp_title": "Chat on WhatsApp",
+  "landing.whatsapp_text": "Scan this code with your phone to open the chat. Send a leaf photo or a voice note and AgriPulse answers in your language."
 }

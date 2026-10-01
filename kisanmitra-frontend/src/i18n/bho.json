@@ -628,5 +628,8 @@
   "kit.light_mode": "लाइट मोड",
   "kit.dark_mode": "डार्क मोड",
   "kit.cancel": "रद्द करीं",
-  "kit.yes_continue": "हँ, आगे बढ़ीं"
+  "kit.yes_continue": "हँ, आगे बढ़ीं",
+  "landing.whatsapp_aria": "WhatsApp पर AgriPulse",
+  "landing.whatsapp_title": "WhatsApp पर चैट करीं",
+  "landing.whatsapp_text": "चैट खोले खातिर ई कोड आपन फोन से स्कैन करीं। पत्ता के फोटो भा आवाज के संदेश भेजीं, AgriPulse रउरा भाषा में जवाब दी।"
 }

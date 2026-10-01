@@ -677,3 +677,45 @@ test("the history page shows an empty state", async () => {
 
   expect(await screen.findByText("No scans yet")).toBeInTheDocument();
 });
+
+// ------------------------------------------------------- WhatsApp bot
+describe("the WhatsApp logo", () => {
+  let agent;
+
+  beforeEach(() => {
+    agent = jest.spyOn(window.navigator, "userAgent", "get");
+  });
+
+  afterEach(() => {
+    agent.mockRestore();
+  });
+
+  test("shows the QR code on a computer", async () => {
+    agent.mockReturnValue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120 Safari/537.36");
+    window.open = jest.fn();
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByLabelText("AgriPulse on WhatsApp", {}, { timeout: 8000 }));
+
+    expect(await screen.findByRole("dialog", { name: "Chat on WhatsApp" })).toBeInTheDocument();
+    expect(screen.getAllByAltText("AgriPulse on WhatsApp").length).toBeGreaterThan(0);
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  test("opens WhatsApp itself on a phone", async () => {
+    agent.mockReturnValue("Mozilla/5.0 (Linux; Android 14; Pixel 8) Mobile Safari/537.36");
+    window.open = jest.fn();
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByLabelText("AgriPulse on WhatsApp", {}, { timeout: 8000 }));
+
+    expect(window.open).toHaveBeenCalledWith(
+      "https://wa.me/14155238886?text=join%20could-carry",
+      "_blank",
+      "noopener"
+    );
+    expect(screen.queryByRole("dialog", { name: "Chat on WhatsApp" })).not.toBeInTheDocument();
+  });
+});

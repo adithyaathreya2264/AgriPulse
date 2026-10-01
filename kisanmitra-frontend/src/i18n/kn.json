@@ -628,5 +628,8 @@
   "kit.light_mode": "ಲೈಟ್ ಮೋಡ್",
   "kit.dark_mode": "ಡಾರ್ಕ್ ಮೋಡ್",
   "kit.cancel": "ರದ್ದುಮಾಡಿ",
-  "kit.yes_continue": "ಹೌದು, ಮುಂದುವರಿಸಿ"
+  "kit.yes_continue": "ಹೌದು, ಮುಂದುವರಿಸಿ",
+  "landing.whatsapp_aria": "WhatsApp ನಲ್ಲಿ AgriPulse",
+  "landing.whatsapp_title": "WhatsApp ನಲ್ಲಿ ಚಾಟ್ ಮಾಡಿ",
+  "landing.whatsapp_text": "ಚಾಟ್ ತೆರೆಯಲು ಈ ಕೋಡ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ. ಎಲೆಯ ಫೋಟೋ ಅಥವಾ ಧ್ವನಿ ಸಂದೇಶ ಕಳುಹಿಸಿ, AgriPulse ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ."
 }

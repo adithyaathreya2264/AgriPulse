@@ -628,5 +628,8 @@
   "kit.light_mode": "ലൈറ്റ് മോഡ്",
   "kit.dark_mode": "ഡാർക്ക് മോഡ്",
   "kit.cancel": "റദ്ദാക്കുക",
-  "kit.yes_continue": "അതെ, തുടരുക"
+  "kit.yes_continue": "അതെ, തുടരുക",
+  "landing.whatsapp_aria": "WhatsApp ലെ AgriPulse",
+  "landing.whatsapp_title": "WhatsApp ൽ ചാറ്റ് ചെയ്യുക",
+  "landing.whatsapp_text": "ചാറ്റ് തുറക്കാൻ ഈ കോഡ് നിങ്ങളുടെ ഫോണിൽ സ്കാൻ ചെയ്യുക. ഇലയുടെ ഫോട്ടോയോ വോയ്സ് നോട്ടോ അയയ്ക്കൂ, AgriPulse നിങ്ങളുടെ ഭാഷയിൽ മറുപടി നൽകും."
 }

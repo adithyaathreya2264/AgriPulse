@@ -1,9 +1,9 @@
 // The scrollable "what can AgriPulse do" page shown after the splash.
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { LANGUAGES, useT } from "./i18n";
 import { Logo, WheatField } from "./ui/art";
-import { CountUp } from "./ui/kit";
+import { CountUp, Modal, ModalHead } from "./ui/kit";
 import {
   ArrowRight,
   Bot,
@@ -16,6 +16,16 @@ import {
   Tractor,
   TrendingUp,
 } from "./ui/icons";
+
+// The AgriPulse WhatsApp bot (Twilio sandbox: the join phrase is already typed in the message)
+const WHATSAPP_LINK = "https://wa.me/14155238886?text=join%20could-carry";
+
+// A phone or tablet cannot scan its own screen, so there the logo opens WhatsApp itself
+function isPhone() {
+  if (typeof navigator === "undefined") return false;
+
+  return /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent || "");
+}
 
 const SERVICES = [
   ["disease", ScanLine, "nav_disease", "landing.svc_disease_text"],
@@ -113,6 +123,31 @@ function HeroCard({ label, onClick, children }) {
   );
 }
 
+// The WhatsApp logo; clicking it shows the QR code of the AgriPulse bot
+function WhatsAppButton({ onClick, label }) {
+  return (
+    <motion.button
+      type="button"
+      className="hero-wa"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -6, scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path
+          fill="#fff"
+          d="M16.02 4C9.4 4 4.04 9.35 4.04 15.95c0 2.1.55 4.15 1.6 5.96L4 28l6.27-1.6a11.93 11.93 0 0 0 5.75 1.46h.01c6.61 0 11.98-5.35 11.98-11.95A11.9 11.9 0 0 0 16.02 4zm0 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.72.95.99-3.62-.24-.37a9.85 9.85 0 0 1-1.51-5.2c0-5.45 4.46-9.88 9.94-9.88 2.65 0 5.14 1.03 7.01 2.9a9.78 9.78 0 0 1 2.9 6.99c0 5.45-4.46 9.82-9.96 9.82zm5.46-7.38c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.48.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"
+        />
+      </svg>
+    </motion.button>
+  );
+}
+
 function Marquee({ items, reverse = false }) {
   const row = [...items, ...items];
 
@@ -133,6 +168,8 @@ export default function Landing({ ready, go, signedIn }) {
   const t = useT();
   const headline = t("landing.headline").split(" ");
 
+  const [showQr, setShowQr] = useState(false);
+
   const heroRef = useRef(null);
   const stepsRef = useRef(null);
 
@@ -145,6 +182,14 @@ export default function Landing({ ready, go, signedIn }) {
   const lineScale = useTransform(stepsScroll, [0, 1], [0, 1]);
 
   const start = () => go(signedIn ? "home" : "home");
+
+  const openWhatsApp = () => {
+    if (isPhone()) {
+      window.open(WHATSAPP_LINK, "_blank", "noopener");
+    } else {
+      setShowQr(true);
+    }
+  };
 
   return (
     <div className="lp">
@@ -202,6 +247,8 @@ export default function Landing({ ready, go, signedIn }) {
               <circle cx="190" cy="22" r="6" fill="#fde68a" />
             </svg>
           </HeroCard>
+
+          <WhatsAppButton label={t("landing.whatsapp_aria")} onClick={openWhatsApp} />
         </div>
 
         <motion.div className="hero-scroll" style={{ opacity: fade }}>
@@ -390,6 +437,14 @@ export default function Landing({ ready, go, signedIn }) {
           <span className="lp-mono">{t("landing.2026_agripulse_kisanmitra_ai")}</span>
         </div>
       </section>
+
+      <Modal open={showQr} onClose={() => setShowQr(false)} title={t("landing.whatsapp_title")} size="sm">
+        <ModalHead title={t("landing.whatsapp_title")} subtitle={t("landing.whatsapp_text")} onClose={() => setShowQr(false)} />
+
+        <div className="wa-qr">
+          <img src="/whatsapp-qr.png" alt={t("landing.whatsapp_aria")} width="240" height="240" />
+        </div>
+      </Modal>
     </div>
   );
 }

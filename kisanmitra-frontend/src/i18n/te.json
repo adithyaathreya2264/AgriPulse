@@ -628,5 +628,8 @@
   "kit.light_mode": "లైట్ మోడ్",
   "kit.dark_mode": "డార్క్ మోడ్",
   "kit.cancel": "రద్దు చేయండి",
-  "kit.yes_continue": "అవును, కొనసాగండి"
+  "kit.yes_continue": "అవును, కొనసాగండి",
+  "landing.whatsapp_aria": "WhatsApp లో AgriPulse",
+  "landing.whatsapp_title": "WhatsApp లో చాట్ చేయండి",
+  "landing.whatsapp_text": "చాట్ తెరవడానికి ఈ కోడ్‌ను మీ ఫోన్‌తో స్కాన్ చేయండి. ఆకు ఫోటో లేదా వాయిస్ నోట్ పంపండి, AgriPulse మీ భాషలో సమాధానం ఇస్తుంది."
 }

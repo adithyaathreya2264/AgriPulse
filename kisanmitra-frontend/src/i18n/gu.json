@@ -628,5 +628,8 @@
   "kit.light_mode": "લાઇટ મોડ",
   "kit.dark_mode": "ડાર્ક મોડ",
   "kit.cancel": "રદ કરો",
-  "kit.yes_continue": "હા, આગળ વધો"
+  "kit.yes_continue": "હા, આગળ વધો",
+  "landing.whatsapp_aria": "WhatsApp પર AgriPulse",
+  "landing.whatsapp_title": "WhatsApp પર ચેટ કરો",
+  "landing.whatsapp_text": "ચેટ ખોલવા આ કોડ તમારા ફોનથી સ્કેન કરો. પાંદડાનો ફોટો અથવા વૉઇસ નોટ મોકલો, AgriPulse તમારી ભાષામાં જવાબ આપશે."
 }

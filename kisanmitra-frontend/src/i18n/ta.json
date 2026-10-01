@@ -628,5 +628,8 @@
   "kit.light_mode": "ஒளி பயன்முறை",
   "kit.dark_mode": "இருள் பயன்முறை",
   "kit.cancel": "ரத்துசெய்",
-  "kit.yes_continue": "ஆம், தொடர்"
+  "kit.yes_continue": "ஆம், தொடர்",
+  "landing.whatsapp_aria": "WhatsApp இல் AgriPulse",
+  "landing.whatsapp_title": "WhatsApp இல் அரட்டையடிக்கவும்",
+  "landing.whatsapp_text": "அரட்டையைத் திறக்க இந்தக் குறியீட்டை உங்கள் தொலைபேசியில் ஸ்கேன் செய்யுங்கள். இலைப் புகைப்படம் அல்லது குரல் செய்தியை அனுப்புங்கள், AgriPulse உங்கள் மொழியில் பதில் சொல்லும்."
 }
