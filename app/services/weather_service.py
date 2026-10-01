@@ -43,5 +43,7 @@ def get_weather(city):
         "temperature": temp,
         "humidity": humidity,
         "condition": condition,
+        # the untranslated group ("Rain", "Clouds"...): the app picks the weather picture from it
+        "sky": data["weather"][0].get("main", ""),
         "advice": advice,
     }

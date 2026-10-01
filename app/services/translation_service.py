@@ -43,7 +43,8 @@ TEXT_KEYS = {
     "disease", "medicine", "cause", "severity", "weather_risk",
     "medicine_usage", "precautions", "recommendation", "condition",
     "advice", "trend", "price_message", "error", "message",
-    "verdict", "explanation", "improvement_tips", "missing_documents"
+    "verdict", "explanation", "improvement_tips", "missing_documents",
+    "interest_note", "disclaimer", "blockers", "notes", "prediction_period"
 }
 
 

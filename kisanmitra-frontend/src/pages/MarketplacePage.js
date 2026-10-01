@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { API_URL, VoiceMic } from "../voice";
+import { enumText, serverText } from "../i18n";
 import { notify } from "../ui/notify";
 import TrackingPanel from "../TrackingPanel";
 import {
@@ -79,13 +80,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
   const getPosition = (onFound) => {
     if (!navigator.geolocation) {
-      notify("Location is not supported by this browser", "error");
+      notify(t("common.location_is_not_supported_by_this"), "error");
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       (position) => onFound({ lat: position.coords.latitude, lng: position.coords.longitude }),
-      () => notify("Could not get your location. Please allow location access.", "error"),
+      () => notify(t("common.could_not_get_your_location_please"), "error"),
       { enableHighAccuracy: true, timeout: 15000 }
     );
   };
@@ -146,7 +147,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
   // ------------------------------------------------------------- add machine
   const addEquipment = async () => {
     if (!addForm.name.trim() || !addForm.owner.trim() || !addForm.location.trim() || !addForm.perDay || !addForm.contact.trim()) {
-      notify("Please fill all required fields", "error");
+      notify(t("market.please_fill_all_required_fields"), "error");
       return;
     }
 
@@ -179,11 +180,11 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       const data = await res.json();
 
       if (!res.ok) {
-        notify(typeof data.detail === "string" ? data.detail : "Failed to add equipment", "error");
+        notify(typeof data.detail === "string" ? serverText(t, data.detail) : t("market.err_add"), "error");
         return;
       }
 
-      notify("Equipment added successfully!", "success");
+      notify(t("market.equipment_added_successfully"), "success");
 
       setAddForm(blankEquipment(user));
       setAddCoords(null);
@@ -191,7 +192,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       fetchEquipment();
     } catch (error) {
       console.error(error);
-      notify("Failed to add equipment", "error");
+      notify(t("market.failed_to_add_equipment"), "error");
     } finally {
       setAdding(false);
     }
@@ -217,10 +218,14 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
   })();
 
   const rentalUnits = isHourly ? rentalHours : rentalDays;
-  const unitName = isHourly ? "hour" : "day";
 
   const rentalRate = selected ? Number(isHourly ? selected.price_per_hour : selected.price_per_day) : 0;
   const rentalTotal = rentalUnits > 0 && selected ? rentalUnits * rentalRate : 0;
+
+  // "3 days" / "1 hour" in the farmer's language
+  const count = (n) => t((isHourly ? "market.n_hour" : "market.n_day") + (n === 1 ? "_one" : "_other"), { n });
+
+  const cat = (name) => enumText(t, "cat.", name);
 
   const openRental = (item) => {
     setSelected(item);
@@ -241,10 +246,10 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
   };
 
   const continueToCheckout = () => {
-    if (!renterName.trim()) return notify("Please enter your name", "error");
-    if (!renterPhone.trim()) return notify("Please enter your phone number", "error");
-    if (isHourly ? !startTime || !endTime : !startDate || !endDate) return notify("Please select the rental period", "error");
-    if (rentalUnits <= 0) return notify("Please select a valid rental period", "error");
+    if (!renterName.trim()) return notify(t("market.please_enter_your_name"), "error");
+    if (!renterPhone.trim()) return notify(t("market.please_enter_your_phone_number"), "error");
+    if (isHourly ? !startTime || !endTime : !startDate || !endDate) return notify(t("market.please_select_the_rental_period"), "error");
+    if (rentalUnits <= 0) return notify(t("market.please_select_a_valid_rental_period"), "error");
 
     setShowCheckout(true);
   };
@@ -254,7 +259,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
     if (!selected) return;
 
     if (!token) {
-      notify("Please login to rent equipment", "error");
+      notify(t("market.please_login_to_rent_equipment"), "error");
       goLogin();
       return;
     }
@@ -283,7 +288,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       const rentalData = await rentalResponse.json();
 
       if (!rentalResponse.ok) {
-        notify(typeof rentalData.detail === "string" ? rentalData.detail : "Failed to create rental", "error");
+        notify(typeof rentalData.detail === "string" ? serverText(t, rentalData.detail) : t("market.err_rental"), "error");
         return;
       }
 
@@ -297,13 +302,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       const paymentData = await paymentResponse.json();
 
       if (!paymentResponse.ok) {
-        notify(typeof paymentData.detail === "string" ? paymentData.detail : "Failed to create payment order", "error");
+        notify(typeof paymentData.detail === "string" ? serverText(t, paymentData.detail) : t("market.err_order"), "error");
         return;
       }
 
       // 3. open Razorpay checkout
       if (!window.Razorpay) {
-        notify("Razorpay Checkout failed to load. Please refresh the page.", "error");
+        notify(t("market.razorpay_checkout_failed_to_load_pleas"), "error");
         return;
       }
 
@@ -312,7 +317,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         amount: paymentData.amount,
         currency: paymentData.currency,
         name: "AgriPulse",
-        description: `Equipment Rental - ${selected.equipment_name}`,
+        description: t("market.rzp_description", { equipment: selected.equipment_name }),
         order_id: paymentData.order_id,
         prefill: { name: renterName, contact: renterPhone },
         notes: { rental_id: String(rentalData.rental_id), equipment: selected.equipment_name },
@@ -344,12 +349,16 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
             const verifyData = await verifyResponse.json();
 
             if (!verifyResponse.ok) {
-              notify(verifyData.detail || "Payment verification failed", "error");
+              notify(serverText(t, verifyData.detail) || t("market.err_verify"), "error");
               return;
             }
 
             notify(
-              `Payment successful!\n${selected.equipment_name} · Rental #${rentalData.rental_id} · ₹${rentalData.total_amount} paid. Your rental is confirmed.`,
+              t("market.payment_success", {
+                equipment: selected.equipment_name,
+                id: rentalData.rental_id,
+                amount: rentalData.total_amount,
+              }),
               "success"
             );
 
@@ -358,7 +367,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
             fetchMyRentals();
           } catch (error) {
             console.error("Payment verification error:", error);
-            notify("Payment was completed, but verification failed. Please contact the administrator.", "error");
+            notify(t("market.payment_was_completed_but_verification"), "error");
           }
         },
 
@@ -375,7 +384,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       razorpay.open();
     } catch (error) {
       console.error("Rental/payment error:", error);
-      notify("Something went wrong while processing the rental.", "error");
+      notify(t("market.something_went_wrong_while_processing_"), "error");
     } finally {
       setPaying(false);
     }
@@ -401,7 +410,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         icon={Tractor}
         tone="forest"
         title={t("title_marketplace")}
-        subtitle="Rent agricultural equipment from nearby owners."
+        subtitle={t("market.rent_agricultural_equipment_from_nearb")}
         actions={
           <Button icon={Plus} onClick={() => setShowAdd(true)}>
             {String(t("btn_list_equipment")).replace(/^\+\s*/, "")}
@@ -417,7 +426,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       {user && myRentals.length > 0 && (
         <Reveal className="card">
           <h3 className="card-title">
-            <Calendar size={20} /> My rentals &amp; bookings
+            <Calendar size={20} />{" "}{t("market.my_rentals_bookings")}
           </h3>
 
           <div className="rental-list">
@@ -426,7 +435,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                 <span className="rental-id">#{rental.id}</span>
 
                 <span className="rental-what">
-                  Equipment {rental.equipment_id}
+                  {t("market.equipment_n", { id: rental.equipment_id })}
                   <small>
                     {rental.start_date} → {rental.end_date}
                   </small>
@@ -437,8 +446,8 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                 <span
                   className={`rental-status status-${String(rental.status).toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  {rental.status}
-                  {rental.payment_status === "Paid" ? " · Paid" : ""}
+                  {enumText(t, "status.", rental.status)}
+                  {rental.payment_status === "Paid" ? " · " + enumText(t, "status.", "Paid") : ""}
                 </span>
               </div>
             ))}
@@ -453,8 +462,8 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
             id="market-search"
             className="grow"
             icon={Search}
-            placeholder="Search equipment, owner or location..."
-            aria-label="Search equipment"
+            placeholder={t("market.search_equipment_owner_or_location")}
+            aria-label={t("market.search_equipment")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -466,7 +475,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
             icon={Navigation}
             onClick={() => (nearMe ? setNearMe(null) : getPosition(setNearMe))}
           >
-            {nearMe ? `${radiusKm} km · Clear` : t("btn_near_me")}
+            {nearMe ? t("market.radius_clear", { km: radiusKm }) : t("btn_near_me")}
           </Button>
         </div>
 
@@ -478,22 +487,22 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
             >
-              <span className="note">Search radius</span>
+              <span className="note">{t("market.search_radius")}</span>
 
               <Segmented
                 ariaLabel="radius"
                 value={radiusKm}
                 onChange={setRadiusKm}
-                options={[5, 10, 25, 50].map((km) => [km, `${km} km`])}
+                options={[5, 10, 25, 50].map((km) => [km, t("common.km_value", { n: km })])}
               />
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="chip-scroll" role="group" aria-label="Category">
+        <div className="chip-scroll" role="group" aria-label={t("market.category")}>
           {["All", ...CATEGORIES].map((name) => (
             <Chip key={name} active={category === name} onClick={() => setCategory(name)}>
-              {name === "All" ? "All Categories" : name}
+              {name === "All" ? t("cat.all") : cat(name)}
             </Chip>
           ))}
         </div>
@@ -513,15 +522,15 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
               <Tractor size={34} />
             </EmptyArt>
           }
-          title={nearMe ? `No equipment within ${radiusKm} km` : "No equipment found"}
+          title={nearMe ? t("market.none_within", { km: radiusKm }) : t("market.none_found")}
           text={
             nearMe
-              ? "Try a wider radius, or clear the location filter."
-              : "Try a different search, or list your own machine for others to rent."
+              ? t("market.try_wider")
+              : t("market.try_different")
           }
           action={
             <Button icon={Plus} onClick={() => setShowAdd(true)}>
-              List equipment
+              {t("market.list_equipment_2")}
             </Button>
           }
         />
@@ -546,13 +555,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
                   {item.location_live && (
                     <span className="live-badge">
-                      <span className="live-dot" /> Live
+                      <span className="live-dot" />{" "}{t("market.live")}
                     </span>
                   )}
                 </div>
 
                 <div className="equipment-body">
-                  <span className="equipment-category">{item.category || "Other"}</span>
+                  <span className="equipment-category">{cat(item.category || "Other")}</span>
 
                   <h3>{item.equipment_name}</h3>
 
@@ -569,7 +578,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
                     {item.distance_km !== undefined && (
                       <li className="fact-accent">
-                        <Navigation size={14} /> {item.distance_km} km away
+                        <Navigation size={14} /> {t("market.km_away", { n: item.distance_km })}
                       </li>
                     )}
 
@@ -577,16 +586,16 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                       <li>
                         <Radio size={14} />
                         {item.location_live ? (
-                          " Live location "
+                          ` ${t("market.live_location")} `
                         ) : (
-                          <> GPS seen {(item.location_updated_at || "").slice(0, 16).replace("T", " ")} </>
+                          ` ${t("market.gps_seen", { time: (item.location_updated_at || "").slice(0, 16).replace("T", " ") })} `
                         )}
                         <a
                           href={`https://www.google.com/maps?q=${item.location_geo.lat},${item.location_geo.lng}`}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Map
+                          {t("market.map")}
                         </a>
                       </li>
                     )}
@@ -595,13 +604,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                   <div className="equipment-foot">
                     <div className="equipment-price">
                       <strong>₹{item.price_per_day}</strong>
-                      <small>/ day</small>
-                      {item.price_per_hour && <span className="hourly">or ₹{item.price_per_hour} / hour</span>}
+                      <small>{t("common.day")}</small>
+                      {item.price_per_hour && <span className="hourly">{t("market.or_per_hour", { price: item.price_per_hour })}</span>}
                     </div>
 
                     {available && (
                       <Button size="sm" onClick={() => openRental(item)}>
-                        Rent Equipment
+                        {t("btn_rent")}
                       </Button>
                     )}
                   </div>
@@ -613,42 +622,42 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       )}
 
       {/* --------------------------------------------------- add equipment */}
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title="List your equipment" size="md">
-        <ModalHead title="List Your Equipment" subtitle="Farmers near you will be able to rent it." onClose={() => setShowAdd(false)} />
+      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t("market.list_your_equipment_2")} size="md">
+        <ModalHead title={t("market.list_your_equipment")} subtitle={t("market.farmers_near_you_will_be_able")} onClose={() => setShowAdd(false)} />
 
         <div className="form-grid">
-          <Input id="eq-name" label="Equipment name *" placeholder="Equipment Name *" value={addForm.name} onChange={(e) => setAdd("name", e.target.value)} />
+          <Input id="eq-name" label={t("market.equipment_name_2")} placeholder={t("market.equipment_name")} value={addForm.name} onChange={(e) => setAdd("name", e.target.value)} />
 
           <Select
             id="eq-category"
-            label="Category"
+            label={t("market.category")}
             value={addForm.category}
             onChange={(e) => setAdd("category", e.target.value)}
           >
-            <option value="">Select Category</option>
+            <option value="">{t("market.select_category")}</option>
             {CATEGORIES.map((name) => (
               <option key={name} value={name}>
-                {name}
+                {cat(name)}
               </option>
             ))}
           </Select>
 
           <div className="two-col">
-            <Input id="eq-owner" label="Owner name *" icon={User} placeholder="Owner Name *" value={addForm.owner} onChange={(e) => setAdd("owner", e.target.value)} />
+            <Input id="eq-owner" label={t("market.owner_name_2")} icon={User} placeholder={t("market.owner_name")} value={addForm.owner} onChange={(e) => setAdd("owner", e.target.value)} />
 
-            <Input id="eq-contact" label="Contact number *" icon={Phone} placeholder="Contact Number *" value={addForm.contact} onChange={(e) => setAdd("contact", e.target.value)} />
+            <Input id="eq-contact" label={t("market.contact_number_2")} icon={Phone} placeholder={t("market.contact_number")} value={addForm.contact} onChange={(e) => setAdd("contact", e.target.value)} />
           </div>
 
-          <Input id="eq-location" label="Location *" icon={MapPin} placeholder="Location *" value={addForm.location} onChange={(e) => setAdd("location", e.target.value)} />
+          <Input id="eq-location" label={t("market.location")} icon={MapPin} placeholder={t("market.location")} value={addForm.location} onChange={(e) => setAdd("location", e.target.value)} />
 
           <div className="two-col">
-            <Input id="eq-day" label="Price per day (₹) *" type="number" placeholder="Price Per Day ₹ *" value={addForm.perDay} onChange={(e) => setAdd("perDay", e.target.value)} />
+            <Input id="eq-day" label={t("market.price_per_day_2")} type="number" placeholder={t("market.price_per_day")} value={addForm.perDay} onChange={(e) => setAdd("perDay", e.target.value)} />
 
             <Input
               id="eq-hour"
-              label="Price per hour (₹)"
+              label={t("market.price_per_hour")}
               type="number"
-              placeholder="Optional, enables hourly booking"
+              placeholder={t("market.optional_enables_hourly_booking")}
               value={addForm.perHour}
               onChange={(e) => setAdd("perHour", e.target.value)}
             />
@@ -656,39 +665,39 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
           <div className="gps-box">
             <Button variant={addCoords ? "soft" : "ghost"} icon={Navigation} onClick={() => getPosition(setAddCoords)}>
-              {addCoords ? "Location captured" : "Use my current location"}
+              {addCoords ? t("market.location_captured") : t("market.use_current_location")}
             </Button>
 
             <span className="note">
               {addCoords
-                ? `GPS set: ${addCoords.lat.toFixed(4)}, ${addCoords.lng.toFixed(4)}`
-                : "Needed so nearby farmers can find your equipment"}
+                ? t("market.gps_set", { lat: addCoords.lat.toFixed(4), lng: addCoords.lng.toFixed(4) })
+                : t("market.needed_for_search")}
             </span>
           </div>
 
-          <Input id="eq-image" label="Photo link (optional)" placeholder="Equipment Image URL" value={addForm.image} onChange={(e) => setAdd("image", e.target.value)} />
+          <Input id="eq-image" label={t("market.photo_link_optional")} placeholder={t("market.equipment_image_url")} value={addForm.image} onChange={(e) => setAdd("image", e.target.value)} />
 
-          <TextArea id="eq-desc" label="Description" placeholder="Equipment description" rows="3" value={addForm.description} onChange={(e) => setAdd("description", e.target.value)} />
+          <TextArea id="eq-desc" label={t("market.description")} placeholder={t("market.equipment_description")} rows="3" value={addForm.description} onChange={(e) => setAdd("description", e.target.value)} />
         </div>
 
         <div className="modal-actions">
           <Button variant="ghost" onClick={() => setShowAdd(false)}>
-            Cancel
+            {t("market.cancel")}
           </Button>
 
           <Button loading={adding} icon={Plus} onClick={addEquipment}>
-            List Equipment
+            {t("market.list_equipment")}
           </Button>
         </div>
       </Modal>
 
       {/* ------------------------------------------------------ rent + pay */}
-      <Modal open={Boolean(selected)} onClose={closeRental} title="Rent equipment" size="md">
+      <Modal open={Boolean(selected)} onClose={closeRental} title={t("market.rent_equipment")} size="md">
         {selected && (
           <>
             <ModalHead
-              title={showCheckout ? "Review & Checkout" : "Rent Equipment"}
-              subtitle={showCheckout ? "Check everything, then pay securely." : "Choose when you need it."}
+              title={showCheckout ? t("market.review_checkout") : t("market.rent_equipment_title")}
+              subtitle={showCheckout ? t("market.check_pay") : t("market.choose_when")}
               onClose={closeRental}
               onBack={showCheckout ? () => setShowCheckout(false) : undefined}
             />
@@ -728,13 +737,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                   transition={{ duration: 0.2 }}
                 >
                   <div className="two-col">
-                    <Input id="rent-name" label="Your name *" icon={User} placeholder="Your Name *" value={renterName} onChange={(e) => setRenterName(e.target.value)} />
+                    <Input id="rent-name" label={t("market.your_name_2")} icon={User} placeholder={t("market.your_name")} value={renterName} onChange={(e) => setRenterName(e.target.value)} />
 
-                    <Input id="rent-phone" label="Your phone *" icon={Phone} type="tel" placeholder="Your Phone Number *" value={renterPhone} onChange={(e) => setRenterPhone(e.target.value)} />
+                    <Input id="rent-phone" label={t("market.your_phone")} icon={Phone} type="tel" placeholder={t("market.your_phone_number")} value={renterPhone} onChange={(e) => setRenterPhone(e.target.value)} />
                   </div>
 
                   <div className="field">
-                    <span className="field-label">Rental period</span>
+                    <span className="field-label">{t("market.rental_period_2")}</span>
 
                     {selected.price_per_hour && (
                       <Segmented
@@ -742,8 +751,8 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                         value={bookingType}
                         onChange={setBookingType}
                         options={[
-                          ["day", "By the day"],
-                          ["hour", "By the hour"],
+                          ["day", t("market.by_day")],
+                          ["hour", t("market.by_hour")],
                         ]}
                       />
                     )}
@@ -753,7 +762,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                     <div className="two-col">
                       <Input
                         id="rent-start"
-                        label="Start Date"
+                        label={t("market.start_date")}
                         type="date"
                         value={startDate}
                         min={today()}
@@ -762,7 +771,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
                       <Input
                         id="rent-end"
-                        label="End Date"
+                        label={t("market.end_date")}
                         type="date"
                         value={endDate}
                         min={startDate || today()}
@@ -771,16 +780,16 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                     </div>
                   ) : (
                     <div className="two-col">
-                      <Input id="rent-start-t" label="Start time" type="datetime-local" step="900" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                      <Input id="rent-start-t" label={t("market.start_time")} type="datetime-local" step="900" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
 
-                      <Input id="rent-end-t" label="End time" type="datetime-local" step="900" value={endTime} min={startTime} onChange={(e) => setEndTime(e.target.value)} />
+                      <Input id="rent-end-t" label={t("market.end_time")} type="datetime-local" step="900" value={endTime} min={startTime} onChange={(e) => setEndTime(e.target.value)} />
                     </div>
                   )}
 
                   {bookedSlots.length > 0 && (
                     <div className="booked">
                       <strong>
-                        <Clock size={14} /> Already booked
+                        <Clock size={14} />{" "}{t("market.already_booked")}
                       </strong>
 
                       {bookedSlots.map((slot, index) => (
@@ -799,29 +808,28 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                       >
-                        <h4>Booking Summary</h4>
+                        <h4>{t("market.booking_summary")}</h4>
 
                         <div className="summary-row">
-                          <span>Equipment</span>
+                          <span>{t("market.equipment")}</span>
                           <strong>{selected.equipment_name}</strong>
                         </div>
 
                         <div className="summary-row">
-                          <span>Price per {unitName}</span>
+                          <span>{t(isHourly ? "market.price_per_hour_row" : "market.price_per_day_row")}</span>
                           <strong>₹{rentalRate}</strong>
                         </div>
 
                         <div className="summary-row">
-                          <span>Rental {unitName}s</span>
+                          <span>{t(isHourly ? "market.rental_hours" : "market.rental_days")}</span>
 
                           <strong>
-                            {rentalUnits} {unitName}
-                            {rentalUnits > 1 ? "s" : ""}
+                            {count(rentalUnits)}
                           </strong>
                         </div>
 
                         <div className="summary-row total">
-                          <span>Total Amount</span>
+                          <span>{t("market.total_amount")}</span>
                           <strong>₹{rentalTotal.toLocaleString("en-IN")}</strong>
                         </div>
                       </motion.div>
@@ -829,7 +837,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                   </AnimatePresence>
 
                   <Button size="lg" block onClick={continueToCheckout}>
-                    Continue to Checkout
+                    {t("market.continue_to_checkout")}
                   </Button>
                 </motion.div>
               ) : (
@@ -843,7 +851,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                 >
                   <div className="review-grid">
                     <div className="review-box">
-                      <h4>Renter</h4>
+                      <h4>{t("market.renter")}</h4>
                       <p>
                         <User size={14} /> {renterName}
                       </p>
@@ -853,7 +861,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                     </div>
 
                     <div className="review-box">
-                      <h4>Equipment Owner</h4>
+                      <h4>{t("market.equipment_owner")}</h4>
                       <p>
                         <User size={14} /> {selected.owner_name}
                       </p>
@@ -866,42 +874,41 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                     </div>
 
                     <div className="review-box wide">
-                      <h4>Rental Period</h4>
+                      <h4>{t("market.rental_period")}</h4>
                       <p>
                         <Calendar size={14} /> {isHourly ? startTime.replace("T", " ") : startDate} → {isHourly ? endTime.replace("T", " ") : endDate}
                       </p>
                       <p>
-                        {rentalUnits} {unitName}
-                        {rentalUnits > 1 ? "s" : ""}
+                        {count(rentalUnits)}
                       </p>
                     </div>
                   </div>
 
                   <div className="summary">
                     <div className="summary-row">
-                      <span>Price per {unitName}</span>
+                      <span>{t(isHourly ? "market.price_per_hour_row" : "market.price_per_day_row")}</span>
                       <strong>₹{rentalRate}</strong>
                     </div>
 
                     <div className="summary-row">
                       <span>
-                        {rentalUnits} × {unitName}ly rate
+                        {t(isHourly ? "market.rate_hourly" : "market.rate_daily", { n: rentalUnits })}
                       </span>
                       <strong>₹{rentalTotal.toLocaleString("en-IN")}</strong>
                     </div>
 
                     <div className="summary-row total">
-                      <span>Total to Pay</span>
+                      <span>{t("market.total_to_pay")}</span>
                       <strong>₹{rentalTotal.toLocaleString("en-IN")}</strong>
                     </div>
                   </div>
 
                   <Button size="lg" block loading={paying} icon={CreditCard} onClick={rentEquipment}>
-                    Proceed to Payment
+                    {t("market.proceed_to_payment")}
                   </Button>
 
                   <p className="secure-note">
-                    <Lock size={14} /> Secure payment
+                    <Lock size={14} />{" "}{t("market.secure_payment")}
                   </p>
                 </motion.div>
               )}

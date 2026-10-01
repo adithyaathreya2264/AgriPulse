@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import AuthFlow from "../AuthFlow";
 import { Avatar, Pill } from "../ui/kit";
+import { useT } from "../i18n";
 import { BadgeCheck, Cake, MapPin, Phone, Sprout, Tractor } from "../ui/icons";
 
 export default function ProfilePage({ apiUrl, token, user, onProfileSaved }) {
+  const t = useT();
+
   const facts = [
-    [Phone, "Mobile", `+91 ${user.phone}`],
-    [Cake, "Age", user.age ? `${user.age} years` : "-"],
-    [MapPin, "Location", [user.village, user.district, user.state].filter(Boolean).join(", ") || "-"],
+    [Phone, t("profile.mobile"), `+91 ${user.phone}`],
+    [Cake, t("profile.age"), user.age ? t("profile.years", { n: user.age }) : "-"],
+    [MapPin, t("profile.location"), [user.village, user.district, user.state].filter(Boolean).join(", ") || "-"],
   ];
 
   return (
@@ -25,11 +28,11 @@ export default function ProfilePage({ apiUrl, token, user, onProfileSaved }) {
 
           <div className="chip-row">
             <Pill tone="good" icon={BadgeCheck}>
-              ID #{user.user_code}
+              {t("common.id_number", { code: user.user_code })}
             </Pill>
 
             <Pill tone="info" icon={user.role === "owner" ? Tractor : Sprout}>
-              {user.role === "owner" ? "Equipment owner" : "Farmer"}
+              {user.role === "owner" ? t("common.role_owner") : t("common.role_farmer")}
             </Pill>
           </div>
         </div>

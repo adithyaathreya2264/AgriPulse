@@ -2,6 +2,7 @@
 // letter, settles into an outlined lockup, then the curtain lifts.
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useT } from "./i18n";
 
 const WORD = "AGRIPULSE".split("");
 
@@ -12,6 +13,8 @@ const reduced = () =>
 
 // phase: 0 tile · 1 name opens · 2 outlined · 3 curtain up
 export default function Splash({ onDone }) {
+  const t = useT();
+
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export default function Splash({ onDone }) {
     <motion.div
       className="splash"
       role="status"
-      aria-label="AgriPulse is loading"
+      aria-label={t("splash.agripulse_is_loading")}
       initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
       animate={{ clipPath: phase === 3 ? "inset(0% 0% 100% 0%)" : "inset(0% 0% 0% 0%)" }}
       transition={{ duration: 0.85, ease: [0.76, 0, 0.24, 1] }}
@@ -83,7 +86,7 @@ export default function Splash({ onDone }) {
           animate={{ opacity: phase >= 1 && phase < 3 ? 0.7 : 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          KISANMITRA AI · SMART FARMING
+          {t("splash.kisanmitra_ai_smart_farming")}
         </motion.span>
       </span>
     </motion.div>

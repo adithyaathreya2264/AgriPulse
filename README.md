@@ -124,7 +124,8 @@ flowchart LR
   text-to-speech voices; **Gemini** and the browser's own voices are the fallbacks (Bhojpuri goes through Gemini).
 - Microphone button on every input, a global **"speak a command"** button ("show weather in Mysuru"),
   and a **Listen** button on answers.
-- The interface labels are hand-translated for all 14 languages; other text is translated on demand by the server.
+- Every interface text (630 labels across the landing story, menu, pages, forms, errors and statuses) is written
+  by hand in all 14 languages, with Urdu laid out right to left.
 
 ### WhatsApp bot
 Diagnose a leaf photo, weather, prices with forecast and alerts, equipment near a shared location, the loan
@@ -304,7 +305,8 @@ npm test -- --watchAll=false                 # frontend: 35 tests
 - Price forecasts are statistical estimates, not guarantees; the KCC report is advisory only, not a bank decision.
 - The Twilio sandbox only reaches phones that joined it and only within 24 hours of their last message.
 - Live GPS tracker hardware is not bundled: the owner's phone (or a device with a key) posts the position.
-- Most page text outside the navigation is English; the assistant, advice and voice replies follow the chosen language.
+- The interface translations are written by hand but have not been reviewed by native speakers; names such as
+  AgriPulse, KCC, UPI and OTP stay in Latin letters on purpose.
 - Rental times use server-local wall-clock time.
 
 ---

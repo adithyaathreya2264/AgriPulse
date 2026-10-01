@@ -74,13 +74,16 @@ src/
 English, Hindi, Kannada, Telugu, Tamil, Malayalam, Marathi, Bengali, Gujarati, Punjabi, Odia, Urdu
 (right to left), Assamese, Bhojpuri.
 
-- `src/i18n/<code>.json` holds the interface labels (menu, main buttons, placeholders, voice messages, page
-  titles). All languages except Malayalam are hand-written, so please have a native speaker review them.
-- A label missing from a language falls back to English, or is translated once by the server
-  (`POST /i18n/translate`) and cached in the browser.
-- To add a label, add it to `en.json`, use `t("key")` in the component, then add the translations.
-- Text outside these labels (most page copy) is still English; answers, advice and spoken replies from the
-  backend follow the chosen language.
+- Every piece of interface text goes through `t("key")`: menu, pages, forms, buttons, placeholders, errors,
+  statuses, categories and the landing story. `src/i18n/en.json` is the source (630 labels) and each
+  `src/i18n/<code>.json` holds the same 630 labels, written by hand, with `{placeholders}` such as `{n}` or
+  `{district}` kept as they are. Have a native speaker review them before a public release.
+- Server error messages are mapped to labels (`serverText`), and statuses and equipment categories to
+  `status.*` and `cat.*` labels, so they are translated too. Answers, advice and spoken replies from the backend
+  follow the chosen language.
+- `src/i18n/i18n.test.js` fails if a language is missing a label or changes a `{placeholder}`.
+- To add a label: add it to `en.json`, use `t("key")` in the component, then add it to all 13 other files
+  (a label missing from a language falls back to English, then to the key).
 
 ## Voice and browser features
 

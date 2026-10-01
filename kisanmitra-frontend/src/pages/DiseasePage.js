@@ -22,8 +22,11 @@ import {
   UploadCloud,
   X,
 } from "../ui/icons";
+import { serverText, useT } from "../i18n";
 
 function ConfidenceRing({ value }) {
+  const t = useT();
+
   const radius = 46;
   const circumference = 2 * Math.PI * radius;
   const pct = Math.min(Math.max(Number(value) || 0, 0), 100);
@@ -31,7 +34,7 @@ function ConfidenceRing({ value }) {
 
   return (
     <div className="ring-wrap">
-      <svg viewBox="0 0 110 110" className="ring" role="img" aria-label={`Confidence ${pct} percent`}>
+      <svg viewBox="0 0 110 110" className="ring" role="img" aria-label={t("disease.confidence_aria", { pct })}>
         <circle cx="55" cy="55" r={radius} fill="none" stroke="var(--surface-3)" strokeWidth="10" />
 
         <motion.circle
@@ -54,7 +57,7 @@ function ConfidenceRing({ value }) {
         <strong>
           <CountUp value={pct} decimals={pct % 1 ? 1 : 0} suffix="%" />
         </strong>
-        <small>confident</small>
+        <small>{t("disease.confident")}</small>
       </div>
     </div>
   );
@@ -84,7 +87,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
     if (!picked) return;
 
     if (!picked.type.startsWith("image/")) {
-      notify("Please choose a photo (JPG or PNG).", "error");
+      notify(t("disease.please_choose_a_photo_jpg_or"), "error");
       return;
     }
 
@@ -101,12 +104,12 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
 
   const handleUpload = async () => {
     if (!file) {
-      notify("Please select an image", "error");
+      notify(t("disease.please_select_an_image"), "error");
       return;
     }
 
     if (!city.trim()) {
-      notify("Please enter your city", "error");
+      notify(t("disease.please_enter_your_city"), "error");
       return;
     }
 
@@ -122,7 +125,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
       const data = await res.json();
 
       if (!data.report) {
-        notify(typeof data.detail === "string" ? data.detail : data.error || "Could not read this photo.", "error");
+        notify(serverText(t, typeof data.detail === "string" ? data.detail : data.error) || t("disease.read_failed"), "error");
         return;
       }
 
@@ -130,7 +133,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
       onDiagnosed && onDiagnosed(data);
     } catch (err) {
       console.error(err);
-      notify("Upload failed. Please check your connection.", "error");
+      notify(t("disease.upload_failed_please_check_your_connec"), "error");
     } finally {
       setLoading(false);
     }
@@ -145,7 +148,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
       <PageHeader
         icon={ScanLine}
         title={t("nav_disease")}
-        subtitle="Take a clear photo of one leaf. We tell you what is wrong and what to spray."
+        subtitle={t("disease.take_a_clear_photo_of_one")}
       />
 
       <div className={`split ${report ? "split-result" : ""}`}>
@@ -173,11 +176,11 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <img src={preview} alt="Selected leaf" />
+                  <img src={preview} alt={t("disease.selected_leaf")} />
                   {loading && <ScannerOverlay />}
 
                   {!loading && (
-                    <button type="button" className="preview-clear" onClick={clear} aria-label="Remove photo">
+                    <button type="button" className="preview-clear" onClick={clear} aria-label={t("disease.remove_photo")}>
                       <X size={16} />
                     </button>
                   )}
@@ -194,16 +197,16 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
                     <UploadCloud size={34} />
                   </span>
 
-                  <h3>Drop a leaf photo here</h3>
-                  <p>or pick one from your phone</p>
+                  <h3>{t("disease.drop_a_leaf_photo_here")}</h3>
+                  <p>{t("disease.or_pick_one_from_your_phone")}</p>
 
                   <div className="drop-buttons">
                     <Button icon={Camera} onClick={() => cameraRef.current && cameraRef.current.click()}>
-                      Take photo
+                      {t("disease.take_photo")}
                     </Button>
 
                     <Button variant="ghost" icon={UploadCloud} onClick={() => pickerRef.current && pickerRef.current.click()}>
-                      Choose file
+                      {t("disease.choose_file")}
                     </Button>
                   </div>
                 </motion.div>
@@ -215,7 +218,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
               type="file"
               accept="image/*"
               hidden
-              aria-label="Choose a leaf photo"
+              aria-label={t("disease.choose_a_leaf_photo")}
               onChange={(e) => choose(e.target.files[0])}
             />
 
@@ -225,34 +228,34 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
               accept="image/*"
               capture="environment"
               hidden
-              aria-label="Take a leaf photo"
+              aria-label={t("disease.take_a_leaf_photo")}
               onChange={(e) => choose(e.target.files[0])}
             />
           </div>
 
           <Input
             id="disease-city"
-            label="Your city or district"
+            label={t("disease.your_city_or_district")}
             icon={MapPin}
-            placeholder="Enter your city"
-            hint="We use today's weather to judge how risky the disease is."
+            placeholder={t("disease.enter_your_city")}
+            hint={t("disease.we_use_today_s_weather_to")}
             value={city}
             onChange={(e) => setCity(e.target.value)}
           />
 
           <Button size="lg" block loading={loading} icon={ScanLine} onClick={handleUpload} disabled={!file}>
-            {loading ? "Scanning the leaf..." : "Diagnose"}
+            {loading ? t("disease.scanning") : t("disease.diagnose")}
           </Button>
 
           <ul className="tips">
             <li>
-              <CheckCircle2 size={15} /> One leaf, filling most of the frame
+              <CheckCircle2 size={15} />{" "}{t("disease.one_leaf_filling_most_of_the")}
             </li>
             <li>
-              <CheckCircle2 size={15} /> Daylight, no flash, sharp focus
+              <CheckCircle2 size={15} />{" "}{t("disease.daylight_no_flash_sharp_focus")}
             </li>
             <li>
-              <CheckCircle2 size={15} /> Show both healthy and damaged parts
+              <CheckCircle2 size={15} />{" "}{t("disease.show_both_healthy_and_damaged_parts")}
             </li>
           </ul>
         </div>
@@ -274,14 +277,14 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
 
                   <div className="diagnosis-text">
                     <Pill tone={uncertain ? "warn" : "good"} icon={uncertain ? AlertTriangle : Leaf}>
-                      {uncertain ? "Not sure" : "Diagnosis"}
+                      {uncertain ? t("disease.not_sure") : t("disease.diagnosis")}
                     </Pill>
 
                     <h2>{report.disease}</h2>
 
                     {uncertain && (
                       <p className="note">
-                        The photo was not clear enough for a confident answer. Try again in daylight, closer to the leaf.
+                        {t("disease.the_photo_was_not_clear_enough")}
                       </p>
                     )}
 
@@ -293,7 +296,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
                       />
 
                       <Button size="sm" variant="soft" icon={Bot} onClick={() => go("assistant")}>
-                        Ask the AI about this
+                        {t("disease.ask_the_ai_about_this")}
                       </Button>
                     </div>
                   </div>
@@ -325,7 +328,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
                       <PillIcon size={20} />
                     </span>
 
-                    <h4>Medicine</h4>
+                    <h4>{t("disease.medicine")}</h4>
                     <p>{report.medicine}</p>
                   </div>
 
@@ -334,50 +337,50 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
                       <IndianRupee size={20} />
                     </span>
 
-                    <h4>Estimated cost</h4>
+                    <h4>{t("disease.estimated_cost")}</h4>
                     <p>{report.estimated_cost}</p>
                   </div>
                 </Rise>
 
                 <Rise className="card">
                   <h3 className="card-title">
-                    <ShieldCheck size={20} /> AI recommendation
+                    <ShieldCheck size={20} />{" "}{t("disease.ai_recommendation")}
                   </h3>
 
                   {analysis ? (
                     <div className="analysis">
                       <dl>
                         <div>
-                          <dt>Cause</dt>
+                          <dt>{t("disease.cause")}</dt>
                           <dd>{analysis.cause}</dd>
                         </div>
 
                         <div>
-                          <dt>Severity</dt>
+                          <dt>{t("disease.severity")}</dt>
                           <dd>
                             <Pill tone={SEVERITY_TONE(String(analysis.severity))}>{analysis.severity}</Pill>
                           </dd>
                         </div>
 
                         <div>
-                          <dt>Weather risk</dt>
+                          <dt>{t("disease.weather_risk")}</dt>
                           <dd>{analysis.weather_risk}</dd>
                         </div>
 
                         <div>
-                          <dt>How to use the medicine</dt>
+                          <dt>{t("disease.how_to_use_the_medicine")}</dt>
                           <dd>{analysis.medicine_usage}</dd>
                         </div>
                       </dl>
 
                       <div className="callout">
-                        <strong>Recommendation</strong>
+                        <strong>{t("disease.recommendation")}</strong>
                         <p>{analysis.recommendation}</p>
                       </div>
 
                       {analysis.precautions && analysis.precautions.length > 0 && (
                         <>
-                          <h4 className="sub-title">Precautions</h4>
+                          <h4 className="sub-title">{t("disease.precautions")}</h4>
 
                           <ul className="checklist">
                             {analysis.precautions.map((item, index) => (
@@ -402,7 +405,7 @@ export default function DiseasePage({ user, lang, t, onDiagnosed, go }) {
 
                 <Rise>
                   <Button variant="ghost" icon={RefreshCw} onClick={clear}>
-                    Scan another leaf
+                    {t("disease.scan_another_leaf")}
                   </Button>
                 </Rise>
               </Stagger>

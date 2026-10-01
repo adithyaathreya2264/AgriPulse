@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { notify, confirmDialog } from "./ui/notify";
 import { Button } from "./ui/kit";
 import { Copy, KeyRound, MapPin, Radio, Square } from "./ui/icons";
+import { useT } from "./i18n";
 
 // A new position is sent when 30 s passed or the phone moved 50 m
 const SEND_EVERY_MS = 30000;
@@ -21,6 +22,8 @@ const distanceMeters = (a, b) => {
 };
 
 export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
+  const t = useT();
+
   const [items, setItems] = useState([]);
   const [sharingId, setSharingId] = useState(null);
   const [status, setStatus] = useState("");
@@ -69,16 +72,17 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
 
       if (res.ok) {
         setStatus(
-          `Location sent at ${new Date().toLocaleTimeString()} (accuracy ~${Math.round(
-            coords.accuracy || 0
-          )} m)`
+          t("track.location_sent", {
+            time: new Date().toLocaleTimeString(),
+            meters: Math.round(coords.accuracy || 0),
+          })
         );
         onChanged && onChanged();
       } else {
-        setStatus("Could not send the location. Are you still logged in?");
+        setStatus(t("track.send_failed"));
       }
     } catch (error) {
-      setStatus("No connection. Will retry with the next position.");
+      setStatus(t("track.no_connection"));
     }
   };
 
@@ -98,13 +102,13 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
 
   const startSharing = async (equipmentId) => {
     if (!navigator.geolocation) {
-      notify("This browser cannot share location", "error");
+      notify(t("track.this_browser_cannot_share_location"), "error");
       return;
     }
 
     stopSharing();
     setSharingId(equipmentId);
-    setStatus("Waiting for GPS...");
+    setStatus(t("track.waiting_gps"));
     lastSentRef.current = { time: 0, position: null };
 
     // Keep the screen on: web pages stop tracking when the phone sleeps
@@ -137,8 +141,8 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
       (error) => {
         setStatus(
           error.code === 1
-            ? "Location permission was denied. Allow location for this site."
-            : "Could not get the GPS position."
+            ? t("track.permission_denied")
+            : t("track.gps_failed")
         );
         stopSharing();
       },
@@ -147,9 +151,8 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
   };
 
   const createKey = async (equipmentId) => {
-    const yes = await confirmDialog(
-      "Create a new tracker key? An existing key for this equipment stops working.",
-      { confirmLabel: "Create key" }
+    const yes = await confirmDialog(t("track.create_a_new_tracker_key_an"),
+      { confirmLabel: t("track.create_key") }
     );
 
     if (!yes) return;
@@ -161,7 +164,7 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
       });
 
       if (!res.ok) {
-        notify("Could not create the key", "error");
+        notify(t("track.could_not_create_the_key"), "error");
         return;
       }
 
@@ -169,7 +172,7 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
 
       setTrackerKey({ equipmentId, key: data.tracker_key });
     } catch (error) {
-      notify("Could not reach the server", "error");
+      notify(t("common.could_not_reach_the_server"), "error");
     }
   };
 
@@ -178,7 +181,7 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
   return (
     <div className="card tracking-panel">
       <h3 className="card-title">
-        <Radio size={20} /> My equipment — live location
+        <Radio size={20} />{" "}{t("track.my_equipment_live_location")}
       </h3>
 
       <p className="note">
@@ -196,13 +199,13 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
               {item.location_geo ? (
                 item.location_live ? (
                   <span className="live-badge live-inline">
-                    <span className="live-dot" /> live
+                    <span className="live-dot" />{" "}{t("track.live")}
                   </span>
                 ) : (
-                  ` last seen ${item.location_updated_at.slice(0, 16).replace("T", " ")}`
+                  t("track.last_seen", { time: item.location_updated_at.slice(0, 16).replace("T", " ") })
                 )
               ) : (
-                " no location yet"
+                t("track.no_location")
               )}
               {item.location_source ? ` (${item.location_source})` : ""}
             </span>
@@ -211,16 +214,16 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
           <div className="tracking-actions">
             {sharingId === item.id ? (
               <Button size="sm" variant="danger" icon={Square} onClick={stopSharing}>
-                Stop sharing
+                {t("track.stop_sharing")}
               </Button>
             ) : (
               <Button size="sm" variant="soft" icon={MapPin} onClick={() => startSharing(item.id)}>
-                Share from this phone
+                {t("track.share_from_this_phone")}
               </Button>
             )}
 
             <Button size="sm" variant="ghost" icon={KeyRound} onClick={() => createKey(item.id)}>
-              GPS tracker key
+              {t("track.gps_tracker_key")}
             </Button>
           </div>
         </div>
@@ -231,8 +234,7 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
       {trackerKey && (
         <div className="tracker-key-box">
           <p>
-            <strong>Tracker key for equipment #{trackerKey.equipmentId}</strong> — shown only
-            once, save it now:
+            <strong>{t("track.key_title", { id: trackerKey.equipmentId })}</strong> {t("track.shown_only_once_save_it_now")}
           </p>
 
           <code>{trackerKey.key}</code>
@@ -243,17 +245,17 @@ export default function TrackingPanel({ apiUrl, token, user, onChanged }) {
             icon={Copy}
             onClick={() => navigator.clipboard && navigator.clipboard.writeText(trackerKey.key)}
           >
-            Copy
+            {t("track.copy")}
           </Button>
 
-          <p className="note">
-            The device sends <code>POST {apiUrl}/tracker/update</code> with header{" "}
-            <code>X-Tracker-Key</code> and JSON <code>{'{"latitude": 12.29, "longitude": 76.63}'}</code>,
-            at most once every 5 seconds.
-          </p>
+          <p className="note">{t("track.device_instructions")}</p>
+
+          <code>POST {apiUrl}/tracker/update</code>
+          <code>X-Tracker-Key: {trackerKey.key}</code>
+          <code>{'{"latitude": 12.29, "longitude": 76.63}'}</code>
 
           <Button size="sm" onClick={() => setTrackerKey(null)}>
-            I saved it
+            {t("track.i_saved_it")}
           </Button>
         </div>
       )}

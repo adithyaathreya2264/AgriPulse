@@ -4,12 +4,7 @@ import { API_URL, SpeakButton, VoiceMic } from "../voice";
 import { Avatar, Button, PageHeader } from "../ui/kit";
 import { Bot, Send, Sparkles, Trash2 } from "../ui/icons";
 
-const SUGGESTIONS = [
-  "How do I control aphids on chilli?",
-  "Which fertilizer suits tomato?",
-  "When should I sow ragi?",
-  "How much water does paddy need?",
-];
+const SUGGESTIONS = ["assistant.q_aphids", "assistant.q_fertilizer", "assistant.q_ragi", "assistant.q_paddy"];
 
 export default function AssistantPage({ user, lang, t, messages, setMessages, intent }) {
   const [input, setInput] = useState("");
@@ -37,11 +32,11 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
 
       setMessages((prev) => [
         ...prev,
-        { sender: "assistant", text: data.answer || data.Message || "Sorry, I could not answer that." },
+        { sender: "assistant", text: data.answer || data.Message || t("assistant.no_answer") },
       ]);
     } catch (err) {
       console.error(err);
-      setMessages((prev) => [...prev, { sender: "assistant", text: "I could not reach the server. Please try again." }]);
+      setMessages((prev) => [...prev, { sender: "assistant", text: t("assistant.no_server") }]);
     } finally {
       setLoading(false);
     }
@@ -66,12 +61,12 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
       <PageHeader
         icon={Bot}
         tone="forest"
-        title="AI Agriculture Assistant"
-        subtitle="Ask about crops, disease, weather, prices or equipment."
+        title={t("assistant.ai_agriculture_assistant")}
+        subtitle={t("assistant.ask_about_crops_disease_weather_prices")}
         actions={
           messages.length > 0 && (
             <Button variant="ghost" icon={Trash2} onClick={() => setMessages([])}>
-              Clear Chat
+              {t("assistant.clear_chat")}
             </Button>
           )
         }
@@ -84,23 +79,23 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
               <Sparkles size={34} />
             </motion.span>
 
-            <h2>AgriPulse AI</h2>
+            <h2>{t("assistant.agripulse_ai")}</h2>
 
-            <p>Ask anything about your crop, disease, weather, price or equipment.</p>
+            <p>{t("assistant.ask_anything_about_your_crop_disease")}</p>
 
             <div className="suggestions">
-              {SUGGESTIONS.map((text, i) => (
+              {SUGGESTIONS.map((key, i) => (
                 <motion.button
-                  key={text}
+                  key={key}
                   type="button"
                   className="suggestion"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + i * 0.08 }}
                   whileHover={{ y: -2 }}
-                  onClick={() => send(text)}
+                  onClick={() => send(t(key))}
                 >
-                  {text}
+                  {t(key)}
                 </motion.button>
               ))}
             </div>
@@ -143,7 +138,7 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
                   <Bot size={18} />
                 </span>
 
-                <div className="bubble bubble-ai typing" aria-label="The assistant is typing">
+                <div className="bubble bubble-ai typing" aria-label={t("assistant.the_assistant_is_typing")}>
                   <i />
                   <i />
                   <i />
@@ -161,7 +156,7 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
 
         <input
           value={input}
-          aria-label="Your question"
+          aria-label={t("assistant.your_question")}
           onChange={(e) => setInput(e.target.value)}
           placeholder={t("ph_ask")}
           onKeyDown={(e) => e.key === "Enter" && send()}

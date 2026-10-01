@@ -6,7 +6,7 @@ import "./styles/auth.css";
 import "./styles/shell.css";
 import "./styles/site.css";
 import "./styles/pages.css";
-import { makeT, missingLabels } from "./i18n";
+import { I18nProvider, makeT, missingLabels } from "./i18n";
 import { API_URL, VoiceCommandButton } from "./voice";
 import { notify } from "./ui/notify";
 import { UIProvider, useTheme } from "./ui/kit";
@@ -38,17 +38,17 @@ const readSaved = (key, fallback) => {
 const GROUP = (page) => (page === "landing" ? "landing" : page === "auth" ? "auth" : "app");
 
 const CURTAIN_LABEL = {
-  disease: "DETECT DISEASE",
-  price: "PRICE FORECAST",
-  weather: "WEATHER ADVISORY",
-  marketplace: "EQUIPMENT MARKETPLACE",
-  assistant: "AI ASSISTANT",
-  loan: "LOAN ADVISOR",
-  home: "DASHBOARD",
-  history: "HISTORY",
-  profile: "PROFILE",
-  landing: "AGRIPULSE",
-  auth: "SIGN IN",
+  disease: "app.curtain_disease",
+  price: "app.curtain_price",
+  weather: "app.curtain_weather",
+  marketplace: "app.curtain_market",
+  assistant: "app.curtain_assistant",
+  loan: "app.curtain_loan",
+  home: "app.curtain_home",
+  history: "app.curtain_history",
+  profile: "app.curtain_profile",
+  landing: "app.curtain_landing",
+  auth: "app.curtain_auth",
 };
 
 // The colour sheet that sweeps over the screen while the page changes
@@ -113,7 +113,7 @@ function App() {
   // A protected request came back 401: the session is over
   const sessionExpired = () => {
     logout();
-    notify("Your session has expired. Please login again.", "error");
+    notify(t("app.your_session_has_expired_please_login"), "error");
   };
 
   const saveSession = (newToken, newUser) => {
@@ -139,7 +139,7 @@ function App() {
 
     if (newUser.language) setLang(newUser.language);
 
-    notify("Profile saved", "success");
+    notify(t("app.profile_saved"), "success");
     switchPage(authTarget || "home");
     setAuthTarget(null);
   };
@@ -157,7 +157,7 @@ function App() {
     }
 
     busy.current = true;
-    setCurtain({ phase: "in", label: label || CURTAIN_LABEL[target] });
+    setCurtain({ phase: "in", label: t(label || CURTAIN_LABEL[target]) });
 
     setTimeout(() => {
       window.scrollTo({ top: 0 });
@@ -237,25 +237,31 @@ function App() {
     let cancelled = false;
 
     (async () => {
+      const entries = Object.entries(missing);
+      const received = {};
+
       try {
-        const res = await fetch(`${API_URL}/i18n/translate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang, labels: missing }),
-        });
+        for (let from = 0; from < entries.length; from += 150) {
+          const res = await fetch(`${API_URL}/i18n/translate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lang, labels: Object.fromEntries(entries.slice(from, from + 150)) }),
+          });
 
-        if (!res.ok) return;
+          if (!res.ok) break;
 
-        const data = await res.json();
+          const data = await res.json();
 
-        if (cancelled || !data.labels) return;
+          if (cancelled || !data.labels) return;
 
-        setExtraLabels(data.labels);
+          Object.assign(received, data.labels);
+          setExtraLabels({ ...received });
+        }
 
         // Only keep a complete result, so missing labels are asked again later
-        if (Object.keys(data.labels).length === Object.keys(missing).length) {
+        if (Object.keys(received).length === entries.length) {
           try {
-            localStorage.setItem(cacheKey, JSON.stringify(data.labels));
+            localStorage.setItem(cacheKey, JSON.stringify(received));
           } catch (error) {
             // storage full or blocked: not a problem
           }
@@ -312,11 +318,11 @@ function App() {
       {
         sender: "assistant",
         text:
-          `Disease: ${report.disease}\n\n` +
-          `Confidence: ${report.confidence}%\n\n` +
-          `Medicine: ${report.medicine}\n\n` +
-          `Estimated Cost: ${report.estimated_cost}\n\n` +
-          `You can now ask me anything about this disease.`,
+          t("app.diag_disease", { disease: report.disease }) + "\n\n" +
+          t("app.diag_confidence", { confidence: report.confidence }) + "\n\n" +
+          t("app.diag_medicine", { medicine: report.medicine }) + "\n\n" +
+          t("app.diag_cost", { cost: report.estimated_cost }) + "\n\n" +
+          t("app.diag_ask"),
       },
     ]);
   };
@@ -369,6 +375,7 @@ function App() {
   };
 
   return (
+    <I18nProvider lang={lang} t={t}>
     <MotionConfig reducedMotion="user">
       <UIProvider>
         {page === "auth" ? (
@@ -410,6 +417,7 @@ function App() {
         {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
       </UIProvider>
     </MotionConfig>
+    </I18nProvider>
   );
 }
 

@@ -6,7 +6,7 @@
 //   mode="profile"                 -> all the questions on one page
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LANGUAGES } from "./i18n";
+import { LANGUAGES, serverText, useT } from "./i18n";
 import { Logo, WheatField } from "./ui/art";
 import { Button, ChoiceCard, Input, Select, ThemeToggle, Pill } from "./ui/kit";
 import {
@@ -57,18 +57,18 @@ const ageFrom = (dob) => {
 };
 
 // FastAPI validation errors -> one readable sentence
-const readableError = (detail) => {
-  if (typeof detail === "string") return detail;
+const readableError = (detail, t) => {
+  if (typeof detail === "string") return serverText(t, detail);
 
   if (Array.isArray(detail) && detail.length > 0) {
     const first = detail[0];
     const field = first.loc && first.loc[first.loc.length - 1];
-    const message = String(first.msg || "Invalid value").replace(/^Value error, /, "");
+    const message = String(first.msg || t("auth.invalid_value")).replace(/^Value error, /, "");
 
     return field ? `${field}: ${message}` : message;
   }
 
-  return "Something went wrong. Please try again.";
+  return t("auth.something_went_wrong");
 };
 
 const GREETINGS = [
@@ -82,10 +82,10 @@ const GREETINGS = [
 ];
 
 const FEATURES = [
-  [ScanLine, "Scan a sick leaf", "Photo in, disease and medicine out"],
-  [TrendingUp, "4-week mandi forecast", "Know the best week to sell"],
-  [Tractor, "Rent tractors and drones", "From owners within 10 km"],
-  [Mic, "Speak in your language", "14 languages, voice first"],
+  [ScanLine, "auth.feat_leaf_title", "auth.feat_leaf_text"],
+  [TrendingUp, "auth.feat_forecast_title", "auth.feat_forecast_text"],
+  [Tractor, "auth.feat_rent_title", "auth.feat_rent_text"],
+  [Mic, "auth.feat_voice_title", "auth.feat_voice_text"],
 ];
 
 function Greeting() {
@@ -116,6 +116,8 @@ function Greeting() {
 }
 
 function AuthHero() {
+  const t = useT();
+
   return (
     <aside className="auth-hero">
       <div className="auth-hero-glow" />
@@ -136,7 +138,7 @@ function AuthHero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <Sprout size={16} /> KisanMitra AI
+          <Sprout size={16} />{" "}{t("auth.kisanmitra_ai")}
         </motion.p>
 
         <motion.h1
@@ -145,7 +147,7 @@ function AuthHero() {
           transition={{ delay: 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <Greeting />
-          <span className="auth-headline">Smarter farming, in your own language.</span>
+          <span className="auth-headline">{t("auth.smarter_farming_in_your_own_language")}</span>
         </motion.h1>
 
         <ul className="auth-features">
@@ -161,8 +163,8 @@ function AuthHero() {
               </span>
 
               <span>
-                <strong>{title}</strong>
-                <small>{text}</small>
+                <strong>{t(title)}</strong>
+                <small>{t(text)}</small>
               </span>
             </motion.li>
           ))}
@@ -174,19 +176,21 @@ function AuthHero() {
       </div>
 
       <div className="auth-float auth-float-1">
-        <Globe size={15} /> 14 languages
+        <Globe size={15} />{" "}{t("auth.14_languages")}
       </div>
 
       <div className="auth-float auth-float-2">
-        <ShieldCheck size={15} /> Your data stays private
+        <ShieldCheck size={15} />{" "}{t("auth.your_data_stays_private")}
       </div>
     </aside>
   );
 }
 
 function Stepper({ steps, current }) {
+  const t = useT();
+
   return (
-    <ol className="stepper" aria-label="Progress">
+    <ol className="stepper" aria-label={t("common.progress")}>
       {steps.map((name, index) => {
         const done = index < current;
         const active = index === current;
@@ -194,7 +198,7 @@ function Stepper({ steps, current }) {
         return (
           <li key={name} className={`${done ? "step-done" : ""} ${active ? "step-active" : ""}`}>
             <span className="step-dot">{done ? <Check size={14} /> : index + 1}</span>
-            <span className="step-name">{name}</span>
+            <span className="step-name">{t(name)}</span>
           </li>
         );
       })}
@@ -204,12 +208,14 @@ function Stepper({ steps, current }) {
 
 // Six boxes, one real input: paste, autofill and SMS codes all keep working
 function OtpBoxes({ value, onChange, onEnter, inputRef }) {
+  const t = useT();
+
   return (
     <div className="otp" onClick={() => inputRef.current && inputRef.current.focus()}>
       <input
         ref={inputRef}
         id="login-otp"
-        aria-label="6 digit OTP"
+        aria-label={t("auth.6_digit_otp")}
         type="tel"
         inputMode="numeric"
         autoComplete="one-time-code"
@@ -233,6 +239,8 @@ function OtpBoxes({ value, onChange, onEnter, inputRef }) {
 
 // The questions themselves; `parts` picks which groups to show
 function ProfileFields({ form, setField, regions, parts }) {
+  const t = useT();
+
   const districtHints = regions.districts[form.state] || [];
 
   return (
@@ -241,16 +249,16 @@ function ProfileFields({ form, setField, regions, parts }) {
         <div className="form-grid">
           <Input
             id="ob-name"
-            label="Full name *"
+            label={t("auth.full_name")}
             icon={User}
-            placeholder="Your name"
+            placeholder={t("common.your_name")}
             value={form.name}
             onChange={(e) => setField("name", e.target.value)}
           />
 
           <Input
             id="ob-dob"
-            label="Date of birth *"
+            label={t("auth.date_of_birth")}
             icon={Cake}
             type="date"
             max={minAdultDate()}
@@ -260,11 +268,11 @@ function ProfileFields({ form, setField, regions, parts }) {
 
           <Input
             id="ob-age"
-            label="Age"
+            label={t("common.age")}
             icon={BadgeCheck}
             value={ageFrom(form.dob)}
             readOnly
-            placeholder="Filled in from your date of birth"
+            placeholder={t("auth.filled_in_from_your_date_of")}
           />
         </div>
       )}
@@ -273,12 +281,12 @@ function ProfileFields({ form, setField, regions, parts }) {
         <div className="form-grid">
           <Select
             id="ob-state"
-            label="State *"
+            label={t("auth.state")}
             icon={MapPin}
             value={form.state}
             onChange={(e) => setField("state", e.target.value)}
           >
-            <option value="">Choose your state</option>
+            <option value="">{t("auth.choose_your_state")}</option>
             {regions.states.map((state) => (
               <option key={state} value={state}>
                 {state}
@@ -288,10 +296,10 @@ function ProfileFields({ form, setField, regions, parts }) {
 
           <Input
             id="ob-district"
-            label="District *"
+            label={t("common.district")}
             icon={MapPin}
             list="district-hints"
-            placeholder="Your district"
+            placeholder={t("auth.your_district")}
             value={form.district}
             onChange={(e) => setField("district", e.target.value)}
           />
@@ -304,9 +312,9 @@ function ProfileFields({ form, setField, regions, parts }) {
 
           <Input
             id="ob-village"
-            label="Village / town (optional)"
+            label={t("auth.village_town_optional")}
             icon={Wheat}
-            placeholder="Village or town"
+            placeholder={t("auth.village_or_town")}
             value={form.village}
             onChange={(e) => setField("village", e.target.value)}
           />
@@ -317,7 +325,7 @@ function ProfileFields({ form, setField, regions, parts }) {
         <>
           <Select
             id="ob-language"
-            label="Language"
+            label={t("common.language")}
             icon={Languages}
             value={form.language}
             onChange={(e) => setField("language", e.target.value)}
@@ -331,23 +339,23 @@ function ProfileFields({ form, setField, regions, parts }) {
 
           <div className="field">
             <span className="field-label" id="ob-role-label">
-              How will you use AgriPulse?
+              {t("auth.how_will_you_use_agripulse")}
             </span>
 
             <div className="choice-list" role="group" aria-labelledby="ob-role-label">
               <ChoiceCard
                 active={form.role === "renter"}
                 icon={Sprout}
-                title="I am a farmer"
-                text="I may rent equipment"
+                title={t("auth.i_am_a_farmer")}
+                text={t("auth.i_may_rent_equipment")}
                 onClick={() => setField("role", "renter")}
               />
 
               <ChoiceCard
                 active={form.role === "owner"}
                 icon={Tractor}
-                title="I own equipment"
-                text="I want to rent it out"
+                title={t("auth.i_own_equipment")}
+                text={t("auth.i_want_to_rent_it_out")}
                 onClick={() => setField("role", "owner")}
               />
             </div>
@@ -359,7 +367,7 @@ function ProfileFields({ form, setField, regions, parts }) {
 }
 
 const STEP_PARTS = [["who"], ["where"], ["prefs"]];
-const STEP_NAMES = ["About you", "Your farm", "Preferences"];
+const STEP_NAMES = ["auth.step_about", "auth.step_farm", "auth.step_prefs"];
 
 export default function AuthFlow({
   apiUrl,
@@ -372,6 +380,8 @@ export default function AuthFlow({
   theme,
   onToggleTheme,
 }) {
+  const t = useT();
+
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -429,7 +439,7 @@ export default function AuthFlow({
     setError("");
 
     if (digitsOnly(phone).length < 10) {
-      setError("Enter your 10 digit mobile number");
+      setError(t("auth.err_phone"));
       return;
     }
 
@@ -445,7 +455,7 @@ export default function AuthFlow({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(readableError(data.detail));
+        setError(readableError(data.detail, t));
         return;
       }
 
@@ -453,7 +463,7 @@ export default function AuthFlow({
       setOtpSent(true);
       setCooldown(30);
     } catch (fetchError) {
-      setError("Could not reach the server");
+      setError(t("auth.err_server"));
     } finally {
       setBusy(false);
     }
@@ -463,7 +473,7 @@ export default function AuthFlow({
     setError("");
 
     if (otp.trim().length !== 6) {
-      setError("Enter the 6 digit OTP");
+      setError(t("auth.err_otp"));
       return;
     }
 
@@ -479,14 +489,14 @@ export default function AuthFlow({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(readableError(data.detail));
+        setError(readableError(data.detail, t));
         return;
       }
 
       setOtp("");
       onLoggedIn(data.token, data.user, data);
     } catch (fetchError) {
-      setError("Could not reach the server");
+      setError(t("auth.err_server"));
     } finally {
       setBusy(false);
     }
@@ -495,13 +505,13 @@ export default function AuthFlow({
   // ------------------------------------------------------------ onboarding
   const validate = (which) => {
     if (which === 0) {
-      if (form.name.trim().length < 2) return "Please enter your name";
-      if (!form.dob) return "Please enter your date of birth";
+      if (form.name.trim().length < 2) return t("auth.err_name");
+      if (!form.dob) return t("auth.err_dob");
     }
 
     if (which === 1) {
-      if (!form.state) return "Please choose your state";
-      if (form.district.trim().length < 2) return "Please enter your district";
+      if (!form.state) return t("auth.err_state");
+      if (form.district.trim().length < 2) return t("auth.err_district");
     }
 
     return "";
@@ -544,13 +554,13 @@ export default function AuthFlow({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(readableError(data.detail));
+        setError(readableError(data.detail, t));
         return;
       }
 
       onProfileSaved(data);
     } catch (fetchError) {
-      setError("Could not reach the server");
+      setError(t("auth.err_server"));
     } finally {
       setBusy(false);
     }
@@ -573,7 +583,7 @@ export default function AuthFlow({
     return (
       <div className="card profile-card">
         <h2 className="card-title">
-          <User size={20} /> Your profile
+          <User size={20} />{" "}{t("common.your_profile")}
         </h2>
 
         <div className="profile-form">
@@ -589,7 +599,7 @@ export default function AuthFlow({
 
         <div className="profile-actions">
           <Button loading={busy} icon={Check} onClick={saveProfile}>
-            {busy ? "Saving..." : "Save"}
+            {busy ? t("auth.saving") : t("auth.save")}
           </Button>
         </div>
       </div>
@@ -605,7 +615,7 @@ export default function AuthFlow({
         <div className="auth-topbar">
           {onBack ? (
             <button type="button" className="auth-back" onClick={onBack}>
-              <ArrowLeft size={16} /> Back to AgriPulse
+              <ArrowLeft size={16} />{" "}{t("auth.back_to_agripulse")}
             </button>
           ) : (
             <span />
@@ -630,13 +640,13 @@ export default function AuthFlow({
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
                 <Pill tone="good" icon={Sprout}>
-                  One-time setup
+                  {t("auth.one_time_setup")}
                 </Pill>
 
-                <h2>Tell us about yourself</h2>
+                <h2>{t("auth.tell_us_about_yourself")}</h2>
 
                 <p className="auth-sub">
-                  A few quick questions so we can give you advice for your area. You only do this once.
+                  {t("auth.a_few_quick_questions_so_we")}
                 </p>
 
                 <Stepper steps={STEP_NAMES} current={step} />
@@ -671,17 +681,17 @@ export default function AuthFlow({
                         setStep(step - 1);
                       }}
                     >
-                      Back
+                      {t("common.back")}
                     </Button>
                   )}
 
                   {step < STEP_PARTS.length - 1 ? (
                     <Button block iconRight={ArrowRight} onClick={next}>
-                      Continue
+                      {t("auth.continue")}
                     </Button>
                   ) : (
                     <Button block loading={busy} icon={Check} onClick={saveProfile}>
-                      {busy ? "Saving..." : "Finish"}
+                      {busy ? t("auth.saving") : t("auth.finish")}
                     </Button>
                   )}
                 </div>
@@ -706,12 +716,12 @@ export default function AuthFlow({
                   </motion.span>
                 </span>
 
-                <h2>{otpSent ? "Verify your number" : "Login"}</h2>
+                <h2>{otpSent ? t("auth.verify_title") : t("auth.login")}</h2>
 
                 <p className="auth-sub">
                   {otpSent
-                    ? `We sent a 6 digit code to +91 ${phone}.`
-                    : "Enter your mobile number to continue. New here? We will set you up in a minute."}
+                    ? t("auth.sent_code", { phone })
+                    : t("auth.login_intro")}
                 </p>
 
                 <AnimatePresence mode="wait" initial={false}>
@@ -726,7 +736,7 @@ export default function AuthFlow({
                     >
                       <div className="field">
                         <label htmlFor="login-phone" className="field-label">
-                          Mobile number
+                          {t("auth.mobile_number")}
                         </label>
 
                         <div className="phone-box">
@@ -740,7 +750,7 @@ export default function AuthFlow({
                             inputMode="numeric"
                             autoComplete="tel-national"
                             maxLength={14}
-                            placeholder="10 digit mobile number"
+                            placeholder={t("auth.10_digit_mobile_number")}
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && sendOtp()}
@@ -752,7 +762,7 @@ export default function AuthFlow({
                       {errorLine}
 
                       <Button size="lg" block loading={busy} iconRight={ArrowRight} onClick={sendOtp}>
-                        {busy ? "Sending..." : "Send OTP"}
+                        {busy ? t("auth.sending") : t("auth.send_otp")}
                       </Button>
                     </motion.div>
                   ) : (
@@ -767,11 +777,11 @@ export default function AuthFlow({
                       {demoOtp && (
                         <div className="demo-otp-box">
                           <span>
-                            Demo mode: the OTP is <strong>{demoOtp}</strong>
+                            {t("auth.demo_mode_the_otp_is")}{" "}<strong>{demoOtp}</strong>
                           </span>
 
                           <button type="button" onClick={() => setOtp(demoOtp)}>
-                            Fill it
+                            {t("auth.fill_it")}
                           </button>
                         </div>
                       )}
@@ -781,7 +791,7 @@ export default function AuthFlow({
                       {errorLine}
 
                       <Button size="lg" block loading={busy} icon={ShieldCheck} onClick={verifyOtp}>
-                        {busy ? "Checking..." : "Verify & continue"}
+                        {busy ? t("auth.checking") : t("auth.verify_continue")}
                       </Button>
 
                       <div className="auth-links">
@@ -793,11 +803,11 @@ export default function AuthFlow({
                             setError("");
                           }}
                         >
-                          Change mobile number
+                          {t("auth.change_mobile_number")}
                         </button>
 
                         <button type="button" disabled={cooldown > 0 || busy} onClick={sendOtp}>
-                          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend OTP"}
+                          {cooldown > 0 ? t("auth.resend_in", { seconds: cooldown }) : t("auth.resend_otp")}
                         </button>
                       </div>
                     </motion.div>
@@ -805,7 +815,7 @@ export default function AuthFlow({
                 </AnimatePresence>
 
                 <p className="auth-legal">
-                  <ShieldCheck size={14} /> We only use your number to sign you in.
+                  <ShieldCheck size={14} />{" "}{t("auth.we_only_use_your_number_to")}
                 </p>
               </motion.section>
             )}

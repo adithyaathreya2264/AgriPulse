@@ -15,6 +15,7 @@ import {
   Sun,
   X,
 } from "./icons";
+import { useT } from "../i18n";
 
 // ---------------------------------------------------------------------------
 // Theme
@@ -51,13 +52,15 @@ export function useTheme() {
 }
 
 export function ThemeToggle({ theme, onToggle }) {
+  const t = useT();
+
   return (
     <button
       type="button"
       className="icon-btn"
       onClick={onToggle}
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      title={theme === "dark" ? "Light mode" : "Dark mode"}
+      aria-label={theme === "dark" ? t("kit.to_light") : t("kit.to_dark")}
+      title={theme === "dark" ? t("kit.light_mode") : t("kit.dark_mode")}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
@@ -82,6 +85,8 @@ export function ThemeToggle({ theme, onToggle }) {
 const TOAST_ICON = { success: CheckCircle2, error: AlertTriangle, info: Info };
 
 export function UIProvider({ children }) {
+  const t = useT();
+
   const [toasts, setToasts] = useState([]);
   const [asking, setAsking] = useState(null);
   const counter = useRef(0);
@@ -140,7 +145,7 @@ export function UIProvider({ children }) {
                 <button
                   type="button"
                   className="toast-close"
-                  aria-label="Dismiss"
+                  aria-label={t("kit.dismiss")}
                   onClick={() => setToasts((old) => old.filter((t) => t.id !== item.id))}
                 >
                   <X size={15} />
@@ -151,17 +156,17 @@ export function UIProvider({ children }) {
         </AnimatePresence>
       </div>
 
-      <Modal open={Boolean(asking)} onClose={() => answer(false)} size="sm" title="Please confirm">
+      <Modal open={Boolean(asking)} onClose={() => answer(false)} size="sm" title={t("kit.please_confirm")}>
         {asking && (
           <>
             <p className="confirm-text">{asking.message}</p>
 
             <div className="modal-actions">
               <Button variant="ghost" onClick={() => answer(false)}>
-                {asking.options.cancelLabel || "Cancel"}
+                {asking.options.cancelLabel || t("kit.cancel")}
               </Button>
 
-              <Button onClick={() => answer(true)}>{asking.options.confirmLabel || "Yes, continue"}</Button>
+              <Button onClick={() => answer(true)}>{asking.options.confirmLabel || t("kit.yes_continue")}</Button>
             </div>
           </>
         )}
@@ -580,10 +585,12 @@ export function Modal({ open, onClose, title, children, size = "md", className =
 }
 
 export function ModalHead({ title, subtitle, onClose, onBack }) {
+  const t = useT();
+
   return (
     <div className="modal-head">
       {onBack && (
-        <button type="button" className="icon-btn" onClick={onBack} aria-label="Back">
+        <button type="button" className="icon-btn" onClick={onBack} aria-label={t("common.back")}>
           <ChevronDown size={18} className="rot-90" />
         </button>
       )}
@@ -593,7 +600,7 @@ export function ModalHead({ title, subtitle, onClose, onBack }) {
         {subtitle && <p>{subtitle}</p>}
       </div>
 
-      <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+      <button type="button" className="icon-btn" onClick={onClose} aria-label={t("kit.close")}>
         <X size={18} />
       </button>
     </div>
@@ -605,6 +612,8 @@ export function ModalHead({ title, subtitle, onClose, onBack }) {
 // ---------------------------------------------------------------------------
 
 export function LanguagePicker({ lang, languages, onChange, variant = "bar" }) {
+  const t = useT();
+
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const current = languages.find((item) => item.code === lang) || languages[0];
@@ -629,7 +638,7 @@ export function LanguagePicker({ lang, languages, onChange, variant = "bar" }) {
       <button
         type="button"
         className="lang-trigger"
-        title="Language of the answers"
+        title={t("common.language_of_the_answers")}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((old) => !old)}
@@ -644,7 +653,7 @@ export function LanguagePicker({ lang, languages, onChange, variant = "bar" }) {
           <motion.ul
             className="lang-menu"
             role="listbox"
-            aria-label="Languages"
+            aria-label={t("kit.languages")}
             initial={{ opacity: 0, y: -8, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}

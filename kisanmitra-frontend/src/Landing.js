@@ -1,7 +1,7 @@
 // The scrollable "what can AgriPulse do" page shown after the splash.
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { LANGUAGES } from "./i18n";
+import { LANGUAGES, useT } from "./i18n";
 import { Logo, WheatField } from "./ui/art";
 import { CountUp } from "./ui/kit";
 import {
@@ -17,28 +17,26 @@ import {
   TrendingUp,
 } from "./ui/icons";
 
-const HEADLINE = ["Your", "trusted", "partner", "in", "every", "season"];
-
 const SERVICES = [
-  ["disease", ScanLine, "Disease Detection", "Photograph a sick leaf. A vision model names the disease, suggests the medicine and estimates the cost, in your language."],
-  ["price", TrendingUp, "Price Forecast", "Today's mandi price and a four-week forecast, with the best week to sell and alerts on WhatsApp."],
-  ["weather", CloudSun, "Weather Advisory", "Live weather for your district, turned into plain advice for spraying, sowing and irrigation."],
-  ["marketplace", Tractor, "Equipment Marketplace", "Rent tractors, harvesters and drones from owners within 10 km, by the day or the hour, paid by UPI."],
-  ["loan", Landmark, "Loan Advisor", "Check Kisan Credit Card eligibility, see your estimated limit and the documents still missing."],
-  ["assistant", Bot, "AI Assistant", "Ask any farming question by typing or speaking. Answers come back in your language, with a voice."],
+  ["disease", ScanLine, "nav_disease", "landing.svc_disease_text"],
+  ["price", TrendingUp, "landing.svc_price_title", "landing.svc_price_text"],
+  ["weather", CloudSun, "title_weather", "landing.svc_weather_text"],
+  ["marketplace", Tractor, "title_marketplace", "landing.svc_market_text"],
+  ["loan", Landmark, "nav_loan", "landing.svc_loan_text"],
+  ["assistant", Bot, "nav_assistant", "landing.svc_assistant_text"],
 ];
 
 const FACTS = [
-  [14, "", "Languages"],
-  [4, " wk", "Price forecast"],
-  [10, " km", "Rental search radius"],
-  [8, "", "Loan documents checked"],
+  [14, "", "landing.fact_languages"],
+  [4, "landing.unit_wk", "landing.fact_forecast"],
+  [10, "landing.unit_km", "landing.fact_radius"],
+  [8, "", "landing.fact_documents"],
 ];
 
 const STEPS = [
-  ["01", "Sign in with your phone", "Enter your mobile number and the OTP. No password to remember."],
-  ["02", "Tell us about your farm", "Name, district and language, once. Every answer after that is tuned to your area."],
-  ["03", "Use every tool", "Scan leaves, check prices, rent a machine or ask the assistant, by text or by voice."],
+  ["01", "landing.step1_title", "landing.step1_text"],
+  ["02", "landing.step2_title", "landing.step2_text"],
+  ["03", "landing.step3_title", "landing.step3_text"],
 ];
 
 // Words go from faint to solid as the section scrolls past
@@ -132,6 +130,9 @@ function Marquee({ items, reverse = false }) {
 }
 
 export default function Landing({ ready, go, signedIn }) {
+  const t = useT();
+  const headline = t("landing.headline").split(" ");
+
   const heroRef = useRef(null);
   const stepsRef = useRef(null);
 
@@ -155,8 +156,8 @@ export default function Landing({ ready, go, signedIn }) {
         </motion.div>
 
         <motion.div className="lp-hero-body" style={{ y: textY, opacity: fade }}>
-          <h1 aria-label={HEADLINE.join(" ")}>
-            {HEADLINE.map((word, i) => (
+          <h1 aria-label={headline.join(" ")}>
+            {headline.map((word, i) => (
               <span key={i} className="rise-mask hero-word">
                 <motion.span
                   className="rise-inner"
@@ -176,13 +177,13 @@ export default function Landing({ ready, go, signedIn }) {
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ delay: 1.1, duration: 0.8 }}
           >
-            <span>AI FOR THE FIELD</span>
-            <span>+ 14 LANGUAGES · VOICE FIRST</span>
+            <span>{t("landing.ai_for_the_field")}</span>
+            <span>{t("landing.14_languages_voice_first")}</span>
           </motion.p>
         </motion.div>
 
         <div className="hero-cards">
-          <HeroCard label="DETECT DISEASE" onClick={() => go("disease")}>
+          <HeroCard label={t("landing.detect_disease")} onClick={() => go("disease")}>
             <svg viewBox="0 0 200 110" aria-hidden="true">
               <path d="M40 92C36 50 70 14 150 8c4 50-26 84-110 84z" fill="#2fae63" />
               <path d="M40 92L120 30" stroke="#0b7a47" strokeWidth="3" />
@@ -193,7 +194,7 @@ export default function Landing({ ready, go, signedIn }) {
             <span className="hero-scan" />
           </HeroCard>
 
-          <HeroCard label="PRICE FORECAST" onClick={() => go("price")}>
+          <HeroCard label={t("landing.price_forecast")} onClick={() => go("price")}>
             <svg viewBox="0 0 200 110" aria-hidden="true">
               <rect width="200" height="110" fill="#0d3b2e" />
               <path d="M10 88L50 70L90 76L130 44L190 22" fill="none" stroke="#f5b83d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
@@ -204,18 +205,18 @@ export default function Landing({ ready, go, signedIn }) {
         </div>
 
         <motion.div className="hero-scroll" style={{ opacity: fade }}>
-          <span>SCROLL</span>
+          <span>{t("landing.scroll")}</span>
           <i />
         </motion.div>
       </section>
 
       {/* ------------------------------------------------------------- about */}
       <section className="lp-section lp-light" id="about">
-        <Tag index="S.01">ABOUT US</Tag>
+        <Tag index="S.01">{t("landing.about_us")}</Tag>
 
         <ScrubText
           className="lp-big"
-          text="AgriPulse is an AI companion for Indian farmers. It reads your crops, watches the market and the sky, and answers in the language you think in."
+          text={t("landing.agripulse_is_an_ai_companion_for")}
         />
 
         <div className="lp-facts">
@@ -229,10 +230,10 @@ export default function Landing({ ready, go, signedIn }) {
               transition={{ delay: i * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
               <strong>
-                <CountUp value={value} suffix={suffix} />
+                <CountUp value={value} suffix={suffix ? " " + t(suffix) : ""} />
               </strong>
 
-              <span className="lp-mono">{label.toUpperCase()}</span>
+              <span className="lp-mono">{t(label).toUpperCase()}</span>
             </motion.div>
           ))}
         </div>
@@ -250,22 +251,21 @@ export default function Landing({ ready, go, signedIn }) {
 
           <div className="lp-about-copy">
             <p>
-              Built for the way farming really works: a phone in one hand, a field in front of you, and little time to
-              read. Every screen can be used by voice, and the same assistant is available on WhatsApp.
+              {t("landing.built_for_the_way_farming_really")}
             </p>
 
-            <ArrowButton onClick={() => go("assistant")}>TRY THE ASSISTANT</ArrowButton>
+            <ArrowButton onClick={() => go("assistant")}>{t("landing.try_the_assistant")}</ArrowButton>
           </div>
         </div>
       </section>
 
       {/* ---------------------------------------------------------- services */}
       <section className="lp-section lp-light lp-alt" id="services">
-        <Tag index="S.02">WHAT YOU CAN DO</Tag>
+        <Tag index="S.02">{t("landing.what_you_can_do")}</Tag>
 
         <ScrubText
           className="lp-big"
-          text="Six tools that cover the season, from the first seed to the last sale, and the loan in between."
+          text={t("landing.six_tools_that_cover_the_season")}
         />
 
         <div className="service-grid">
@@ -288,11 +288,11 @@ export default function Landing({ ready, go, signedIn }) {
                 </span>
               </span>
 
-              <h3>{title}</h3>
-              <p>{text}</p>
+              <h3>{t(title)}</h3>
+              <p>{t(text)}</p>
 
               <span className="service-go">
-                OPEN <ArrowRight size={14} />
+                {t("landing.open")}{" "}<ArrowRight size={14} />
               </span>
             </motion.button>
           ))}
@@ -301,9 +301,9 @@ export default function Landing({ ready, go, signedIn }) {
 
       {/* ------------------------------------------------------------- steps */}
       <section className="lp-section lp-dark" id="how" ref={stepsRef}>
-        <Tag index="S.03">HOW IT WORKS</Tag>
+        <Tag index="S.03">{t("landing.how_it_works")}</Tag>
 
-        <ScrubText className="lp-big lp-big-dark" text="Three steps, one minute, and it remembers you next time." />
+        <ScrubText className="lp-big lp-big-dark" text={t("landing.three_steps_one_minute_and_it")} />
 
         <div className="steps">
           <div className="steps-rail">
@@ -322,8 +322,8 @@ export default function Landing({ ready, go, signedIn }) {
               <span className="step-num">{n}</span>
 
               <div>
-                <h3>{title}</h3>
-                <p>{text}</p>
+                <h3>{t(title)}</h3>
+                <p>{t(text)}</p>
               </div>
             </motion.div>
           ))}
@@ -332,11 +332,11 @@ export default function Landing({ ready, go, signedIn }) {
 
       {/* --------------------------------------------------------- languages */}
       <section className="lp-section lp-light" id="languages">
-        <Tag index="S.04">EVERY LANGUAGE</Tag>
+        <Tag index="S.04">{t("landing.every_language")}</Tag>
 
         <ScrubText
           className="lp-big"
-          text="Speak, listen or type. AgriPulse understands fourteen Indian languages and talks back."
+          text={t("landing.speak_listen_or_type_agripulse_underst")}
         />
 
         <div className="marquees">
@@ -346,9 +346,9 @@ export default function Landing({ ready, go, signedIn }) {
 
         <div className="channel-row">
           {[
-            [Mic, "Voice first", "Tap the microphone on any screen and just say what you need."],
-            [Smartphone, "On WhatsApp too", "Send a leaf photo or a voice note to the AgriPulse WhatsApp number."],
-            [Globe, "Your language", "Answers, advice and spoken replies follow the language you choose."],
+            [Mic, "landing.ch_voice_title", "landing.ch_voice_text"],
+            [Smartphone, "landing.ch_whatsapp_title", "landing.ch_whatsapp_text"],
+            [Globe, "landing.ch_language_title", "landing.ch_language_text"],
           ].map(([Icon, title, text], i) => (
             <motion.div
               key={title}
@@ -362,8 +362,8 @@ export default function Landing({ ready, go, signedIn }) {
                 <Icon size={22} />
               </span>
 
-              <h4>{title}</h4>
-              <p>{text}</p>
+              <h4>{t(title)}</h4>
+              <p>{t(text)}</p>
             </motion.div>
           ))}
         </div>
@@ -377,17 +377,17 @@ export default function Landing({ ready, go, signedIn }) {
           viewport={{ once: true }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          Ready to grow smarter?
+          {t("landing.ready_to_grow_smarter")}
         </motion.h2>
 
         <ArrowButton dark onClick={start}>
-          {signedIn ? "OPEN YOUR DASHBOARD" : "GET STARTED"}
+          {signedIn ? t("landing.open_dashboard") : t("landing.get_started")}
         </ArrowButton>
 
         <div className="lp-cta-foot">
           <Logo light size={30} />
 
-          <span className="lp-mono">© 2026 AGRIPULSE · KISANMITRA AI</span>
+          <span className="lp-mono">{t("landing.2026_agripulse_kisanmitra_ai")}</span>
         </div>
       </section>
     </div>

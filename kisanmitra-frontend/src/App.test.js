@@ -87,8 +87,8 @@ beforeEach(() => {
 });
 
 // ---------------------------------------------------------------- helpers
-const openMenu = async () => {
-  fireEvent.click(screen.getByLabelText("Open menu"));
+const openMenu = async (label = "Open menu") => {
+  fireEvent.click(screen.getByLabelText(label));
 
   return screen.findByRole("navigation", { name: "Main" });
 };
@@ -443,9 +443,11 @@ test("the language saved in the profile is applied after login", async () => {
   await openLogin();
   await enterPhoneAndOtp();
 
-  await screen.findByText(/Namaste,/);
+  // the whole dashboard is already in Kannada, not just the menu
+  await screen.findByText(/ನಮಸ್ಕಾರ,/);
 
-  const nav = await openMenu();
+  // the button label is Kannada too
+  const nav = await openMenu("ಮೆನು ತೆರೆಯಿರಿ");
 
   expect(within(nav).getByText("ಹವಾಮಾನ")).toBeInTheDocument();
   expect(localStorage.getItem("lang")).toBe("kn");
@@ -524,7 +526,7 @@ test("Bengali, Gujarati, Punjabi, Odia, Urdu, Assamese and Bhojpuri are translat
     ["বাংলা", "আবহাওয়া"],
     ["ગુજરાતી", "હવામાન"],
     ["ਪੰਜਾਬੀ", "ਮੌਸਮ"],
-    ["ଓଡ଼ିଆ", "ପାଣିପାଗ"],
+    ["ଓଡ଼ିଆ", "ପାଗ"],
     ["اردو", "موسم"],
     ["অসমীয়া", "বতৰ"],
     ["भोजपुरी", "मौसम"],
@@ -547,10 +549,8 @@ test("Bengali, Gujarati, Punjabi, Odia, Urdu, Assamese and Bhojpuri are translat
   expect(document.documentElement.getAttribute("dir")).toBe("ltr");
 });
 
-test("languages without a label file are translated by the server", async () => {
-  mockBackend({
-    "/i18n/translate POST": { status: 200, body: { labels: { nav_weather: "കാലാവസ്ഥ" } } },
-  });
+test("every language is translated from its own file, with no call to the server", async () => {
+  mockBackend({});
 
   render(<App />);
 
@@ -560,9 +560,9 @@ test("languages without a label file are translated by the server", async () => 
 
   expect(await within(nav).findByText("കാലാവസ്ഥ")).toBeInTheDocument();
 
-  const call = global.fetch.mock.calls.find(([url]) => String(url).includes("/i18n/translate"));
+  const asked = global.fetch.mock.calls.some(([url]) => String(url).includes("/i18n/translate"));
 
-  expect(JSON.parse(call[1].body).lang).toBe("ml");
+  expect(asked).toBe(false);
 });
 
 test("a voice command button is available inside the tools once signed in", async () => {

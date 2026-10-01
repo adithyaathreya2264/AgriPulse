@@ -5,6 +5,7 @@ import { notify, confirmDialog } from "../ui/notify";
 import { Button, EmptyState, PageHeader, Pill, Skeleton } from "../ui/kit";
 import { EmptyArt } from "../ui/art";
 import { History, Leaf, Pill as PillIcon, RefreshCw, ScanLine, Trash2 } from "../ui/icons";
+import { useT } from "../i18n";
 
 const confidenceOf = (value) => {
   const number = parseFloat(String(value));
@@ -13,6 +14,8 @@ const confidenceOf = (value) => {
 };
 
 export default function HistoryPage({ go }) {
+  const t = useT();
+
   const [history, setHistory] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -27,7 +30,7 @@ export default function HistoryPage({ go }) {
     } catch (error) {
       console.warn("Could not load the history:", error.message);
       setHistory((old) => old || []);
-      notify("Could not load your history", "error");
+      notify(t("history.could_not_load_your_history"), "error");
     } finally {
       setBusy(false);
     }
@@ -35,11 +38,12 @@ export default function HistoryPage({ go }) {
 
   useEffect(() => {
     fetchHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const clearHistory = async () => {
-    const yes = await confirmDialog("Delete all saved scans? This cannot be undone.", {
-      confirmLabel: "Delete all",
+    const yes = await confirmDialog(t("history.delete_all_saved_scans_this_cannot"), {
+      confirmLabel: t("history.delete_all"),
     });
 
     if (!yes) return;
@@ -47,9 +51,9 @@ export default function HistoryPage({ go }) {
     try {
       await fetch(`${API_URL}/predictions`, { method: "DELETE" });
       setHistory([]);
-      notify("History cleared", "success");
+      notify(t("history.history_cleared"), "success");
     } catch (error) {
-      notify("Could not clear the history", "error");
+      notify(t("history.could_not_clear_the_history"), "error");
     }
   };
 
@@ -58,17 +62,17 @@ export default function HistoryPage({ go }) {
       <PageHeader
         icon={History}
         tone="forest"
-        title="Prediction History"
-        subtitle="Every leaf you have scanned, with the treatment we suggested."
+        title={t("history.prediction_history")}
+        subtitle={t("history.every_leaf_you_have_scanned_with")}
         actions={
           <>
             <Button variant="ghost" icon={RefreshCw} loading={busy} onClick={fetchHistory}>
-              Refresh
+              {t("history.refresh")}
             </Button>
 
             {history && history.length > 0 && (
               <Button variant="danger" icon={Trash2} onClick={clearHistory}>
-                Clear History
+                {t("history.clear_history")}
               </Button>
             )}
           </>
@@ -88,11 +92,11 @@ export default function HistoryPage({ go }) {
               <Leaf size={34} />
             </EmptyArt>
           }
-          title="No scans yet"
-          text="Scan your first leaf and it will show up here."
+          title={t("history.no_scans_yet")}
+          text={t("history.scan_your_first_leaf_and_it")}
           action={
             <Button icon={ScanLine} onClick={() => go("disease")}>
-              Scan a leaf
+              {t("common.scan_a_leaf")}
             </Button>
           }
         />

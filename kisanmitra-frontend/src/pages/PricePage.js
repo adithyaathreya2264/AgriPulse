@@ -16,11 +16,14 @@ import {
   X,
   Zap,
 } from "../ui/icons";
+import { serverText, useT } from "../i18n";
 
 const rupees = (value) => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 
 // Today's price + 4 weekly forecasts with a confidence band, drawn on load
 function ForecastChart({ current, forecast }) {
+  const t = useT();
+
   if (!forecast || forecast.length === 0) return null;
 
   const width = 560;
@@ -48,7 +51,7 @@ function ForecastChart({ current, forecast }) {
   const best = points.reduce((a, b) => (b.price > a.price ? b : a), points[0]);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="forecast-chart" role="img" aria-label="Price forecast for the next 4 weeks">
+    <svg viewBox={`0 0 ${width} ${height}`} className="forecast-chart" role="img" aria-label={t("price.price_forecast_for_the_next_4")}>
       <defs>
         <linearGradient id="fc-area" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#0f9d58" stopOpacity=".28" />
@@ -102,7 +105,7 @@ function ForecastChart({ current, forecast }) {
           />
 
           <text x={x(p.days)} y={height - 14} textAnchor="middle" fontSize="11.5" fill="var(--ink-3)">
-            {p.days === 0 ? "Today" : `+${p.days}d`}
+            {p.days === 0 ? t("price.today") : t("price.days_short", { n: p.days })}
           </text>
         </g>
       ))}
@@ -114,6 +117,8 @@ const trendTone = (text = "") =>
   /up|rise|increas|bull/i.test(text) ? "good" : /down|fall|decreas|bear/i.test(text) ? "bad" : "info";
 
 function MarketList({ title, tone, markets, onPick }) {
+  const t = useT();
+
   if (markets.length === 0) return null;
 
   return (
@@ -143,7 +148,7 @@ function MarketList({ title, tone, markets, onPick }) {
 
             <span className="market-price">
               {rupees(item.current_price_available ? item.current_price : item.latest_price)}
-              <small> / quintal</small>
+              <small>{" "}{t("price.quintal")}</small>
             </span>
 
             <span className="market-date">{item.current_price_available ? item.date : item.latest_price_date}</span>
@@ -172,7 +177,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
     const cropName = typeof cropOverride === "string" ? cropOverride : crop;
 
     if (!cropName.trim()) {
-      setPriceResult({ error: "Please enter a crop name" });
+      setPriceResult({ error: t("price.err_crop") });
       return;
     }
 
@@ -196,7 +201,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
       setPriceResult(null);
     } catch (error) {
       console.error(error);
-      setPriceResult({ error: "Failed to fetch market data" });
+      setPriceResult({ error: t("price.err_markets") });
     } finally {
       setSearching(false);
     }
@@ -241,7 +246,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
 
       setPriceResult(await response.json());
     } catch (error) {
-      setPriceResult({ error: "Failed to fetch price prediction" });
+      setPriceResult({ error: t("price.err_prediction") });
     } finally {
       setPredicting(false);
     }
@@ -249,7 +254,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
 
   const createPriceAlert = async () => {
     if (!token) {
-      notify("Please login to get price alerts", "error");
+      notify(t("price.please_login_to_get_price_alerts"), "error");
       goLogin();
       return;
     }
@@ -274,15 +279,15 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
       }
 
       if (!res.ok) {
-        notify("Could not create the alert", "error");
+        notify(t("price.could_not_create_the_alert"), "error");
         return;
       }
 
-      notify("Alert created. We will notify you here and on WhatsApp.", "success");
+      notify(t("price.alert_created_we_will_notify_you"), "success");
       fetchNotifications();
     } catch (error) {
       console.error(error);
-      notify("Could not reach the server", "error");
+      notify(t("common.could_not_reach_the_server"), "error");
     }
   };
 
@@ -309,14 +314,14 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
         icon={TrendingUp}
         tone="gold"
         title={t("title_price")}
-        subtitle="Pick a crop and a mandi. We forecast the next four weeks and tell you when to sell."
+        subtitle={t("price.pick_a_crop_and_a_mandi")}
       />
 
       <ol className="mini-steps">
-        {["Choose crop", "Choose market", "See forecast"].map((name, index) => (
+        {["price.step_crop", "price.step_market", "price.step_forecast"].map((name, index) => (
           <li key={name} className={step > index + 1 ? "ms-done" : step === index + 1 ? "ms-on" : ""}>
             <span>{step > index + 1 ? <Check size={13} /> : index + 1}</span>
-            {name}
+            {t(name)}
           </li>
         ))}
       </ol>
@@ -329,7 +334,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
             className="grow"
             icon={Wheat}
             placeholder={t("ph_search_crop")}
-            aria-label="Crop"
+            aria-label={t("common.crop")}
             value={crop}
             onChange={(e) => {
               setCrop(e.target.value);
@@ -360,7 +365,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
                 searchMarkets(name);
               }}
             >
-              {name}
+              {t("price.crop_" + name.toLowerCase())}
             </button>
           ))}
         </div>
@@ -380,21 +385,21 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
           <Input
             id="market-filter"
             icon={Search}
-            placeholder="Search district or market..."
-            aria-label="Search district or market"
+            placeholder={t("price.search_district_or_market_2")}
+            aria-label={t("price.search_district_or_market")}
             value={marketSearch}
             onChange={(e) => setMarketSearch(e.target.value)}
           />
 
-          <MarketList title="Today's price available" tone="good" markets={today} onPick={pick} />
-          <MarketList title="Latest available price" tone="warn" markets={latest} onPick={pick} />
+          <MarketList title={t("price.today_s_price_available")} tone="good" markets={today} onPick={pick} />
+          <MarketList title={t("price.latest_available_price")} tone="warn" markets={latest} onPick={pick} />
 
-          {matching.length === 0 && <p className="note center-note">No market matches "{marketSearch}".</p>}
+          {matching.length === 0 && <p className="note center-note">{t("price.no_market_matches", { query: marketSearch })}</p>}
         </div>
       )}
 
       {!searching && searched && marketOptions.length === 0 && !market && !priceResult && (
-        <EmptyState icon={Search} title="No markets found" text="Check the spelling of the crop, or try a more common name." />
+        <EmptyState icon={Search} title={t("price.no_markets_found")} text={t("price.check_the_spelling_of_the_crop")} />
       )}
 
       {/* ----------------------------------------------------- selected market */}
@@ -411,13 +416,13 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
             </span>
 
             <div className="selected-text">
-              <small>Selected market</small>
+              <small>{t("price.selected_market")}</small>
               <strong>{market}</strong>
               <span>{district}</span>
             </div>
 
             <Button size="lg" loading={predicting} disabled={!crop || !market || !district} iconRight={ArrowRight} onClick={predictPrice}>
-              Get Price &amp; Prediction
+              {t("price.get_price_prediction")}
             </Button>
           </motion.div>
         )}
@@ -427,7 +432,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
       {priceResult && priceResult.error && (
         <motion.div className="card error-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <X size={20} />
-          <p>{priceResult.error}</p>
+          <p>{serverText(t, priceResult.error)}</p>
         </motion.div>
       )}
 
@@ -448,7 +453,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
                 <>
                   <p className="ph-price">
                     <CountUp value={priceResult.current_price} prefix="₹" />
-                    <small> / quintal</small>
+                    <small>{" "}{t("price.quintal")}</small>
                   </p>
 
                   <p className="ph-date">
@@ -459,11 +464,11 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
                 <>
                   <p className="ph-price">
                     <CountUp value={priceResult.latest_price} prefix="₹" />
-                    <small> / quintal</small>
+                    <small>{" "}{t("price.quintal")}</small>
                   </p>
 
                   <p className="ph-date">
-                    <Calendar size={14} /> Latest price, {priceResult.latest_price_date} (today's is not published yet)
+                    <Calendar size={14} /> {t("price.latest_price_note", { date: priceResult.latest_price_date })}
                   </p>
                 </>
               )}
@@ -473,19 +478,19 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
               {priceResult.current_price_available && (
                 <div className="ph-range">
                   <span>
-                    <small>Min</small>
+                    <small>{t("price.min")}</small>
                     <strong>{rupees(priceResult.min_price)}</strong>
                   </span>
 
                   <span>
-                    <small>Max</small>
+                    <small>{t("price.max")}</small>
                     <strong>{rupees(priceResult.max_price)}</strong>
                   </span>
                 </div>
               )}
 
               <div className="ph-predicted">
-                <small>Predicted ({priceResult.prediction_period})</small>
+                <small>{t("price.predicted_period", { period: priceResult.prediction_period })}</small>
                 <strong>{rupees(priceResult.predicted_price)}</strong>
                 <Pill tone={trendTone(priceResult.trend)} icon={TrendingUp}>
                   {priceResult.trend}
@@ -497,7 +502,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
           {priceResult.forecast && (
             <Rise className="card">
               <h3 className="card-title">
-                <Sparkles size={20} /> 4-week price forecast <small className="unit">₹ per quintal</small>
+                <Sparkles size={20} />{" "}{t("price.4_week_price_forecast")}{" "}<small className="unit">{t("price.per_quintal")}</small>
               </h3>
 
               <ForecastChart current={priceResult.current_price ?? priceResult.latest_price} forecast={priceResult.forecast} />
@@ -516,27 +521,30 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
 
               {priceResult.model_metrics && priceResult.model_metrics.mae !== undefined && (
                 <p className="note model-line">
-                  Model: {priceResult.model_metrics.model} · trained on {priceResult.model_metrics.history_years} years · average error ₹
-                  {priceResult.model_metrics.mae}
-                  {priceResult.model_metrics.beats_linear_baseline ? " (better than a straight-line trend)" : ""}
+                  {t("price.model_line", {
+                    model: priceResult.model_metrics.model,
+                    years: priceResult.model_metrics.history_years,
+                    error: priceResult.model_metrics.mae,
+                  })}
+                  {priceResult.model_metrics.beats_linear_baseline ? " " + t("price.better_than_linear") : ""}
                 </p>
               )}
 
               <div className="alert-row">
                 <Select
                   id="alert-kind"
-                  aria-label="Alert type"
+                  aria-label={t("price.alert_type")}
                   value={alertKind}
                   onChange={(e) => setAlertKind(e.target.value)}
                   options={[
-                    ["best_time", "Tell me the best time to sell"],
-                    ["rise", "Alert me if the price rises 5%"],
-                    ["fall", "Alert me if the price falls 5%"],
+                    ["best_time", t("price.alert_best_time")],
+                    ["rise", t("price.alert_rise")],
+                    ["fall", t("price.alert_fall")],
                   ]}
                 />
 
                 <Button variant="gold" icon={Bell} onClick={createPriceAlert}>
-                  Alert me
+                  {t("price.alert_me")}
                 </Button>
               </div>
             </Rise>
@@ -544,7 +552,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
 
           {priceResult.recommendation && (
             <Rise className="callout callout-tip">
-              <strong>Advice</strong>
+              <strong>{t("price.advice")}</strong>
               <p>{priceResult.recommendation}</p>
             </Rise>
           )}
@@ -555,7 +563,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
       {notifications.length > 0 && (
         <div className="card">
           <h3 className="card-title">
-            <Bell size={20} /> Your price notifications
+            <Bell size={20} />{" "}{t("price.your_price_notifications")}
           </h3>
 
           <ul className="timeline">

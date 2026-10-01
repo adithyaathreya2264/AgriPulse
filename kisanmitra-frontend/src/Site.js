@@ -9,15 +9,15 @@ import { ArrowRight, Edit3, LogIn, LogOut, MapPin, Phone, Sprout, Tractor, User,
 
 // [page, label key or text, short description]
 export const MENU = [
-  ["disease", "nav_disease", "Photo in, disease out"],
-  ["price", "nav_price", "Four-week mandi forecast"],
-  ["weather", "nav_weather", "Advice for today's sky"],
-  ["marketplace", "nav_marketplace", "Rent machines nearby"],
-  ["assistant", "nav_assistant", "Ask in your language"],
-  ["loan", "nav_loan", "Kisan Credit Card check"],
-  ["home", "nav_dashboard", "Your farm at a glance"],
-  ["history", "nav_history", "Every scan you made"],
-  ["landing", "nav_about", "What AgriPulse can do"],
+  ["disease", "nav_disease", "site.desc_disease"],
+  ["price", "nav_price", "site.desc_price"],
+  ["weather", "nav_weather", "site.desc_weather"],
+  ["marketplace", "nav_marketplace", "site.desc_market"],
+  ["assistant", "nav_assistant", "site.desc_assistant"],
+  ["loan", "nav_loan", "site.desc_loan"],
+  ["home", "nav_dashboard", "site.desc_dashboard"],
+  ["history", "nav_history", "site.desc_history"],
+  ["landing", "nav_about", "site.desc_about"],
 ];
 
 const EASE = [0.76, 0, 0.24, 1];
@@ -99,11 +99,7 @@ export default function Site({
   };
 
   const solid = page !== "landing" || scrolled || panel;
-  const label = (key) => {
-    const value = t(key);
-
-    return value === key ? { nav_dashboard: "Dashboard", nav_about: "About AgriPulse" }[key] || key : value;
-  };
+  const label = (key) => t(key);
 
   return (
     <div className={`site ${page === "landing" ? "site-landing" : "site-app"}`}>
@@ -114,7 +110,7 @@ export default function Site({
           className="hdr-btn hdr-left"
           onClick={() => toggle("menu")}
           aria-expanded={panel === "menu"}
-          aria-label={panel === "menu" ? "Close menu" : "Open menu"}
+          aria-label={panel === "menu" ? t("site.close_menu") : t("site.open_menu")}
         >
           <span className={`hdr-circle ${panel === "menu" ? "circle-on" : ""}`}>
             <Burger open={panel === "menu"} />
@@ -129,13 +125,13 @@ export default function Site({
                 exit={{ y: -12, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {panel === "menu" ? "Close" : "Menu"}
+                {panel === "menu" ? t("site.close") : t("site.menu")}
               </motion.span>
             </AnimatePresence>
           </span>
         </button>
 
-        <button type="button" className="hdr-logo" onClick={() => open("landing")} aria-label="AgriPulse home">
+        <button type="button" className="hdr-logo" onClick={() => open("landing")} aria-label={t("site.agripulse_home")}>
           <Logo size={34} light={!solid || panel === "menu" || panel === "profile"} />
         </button>
 
@@ -144,8 +140,8 @@ export default function Site({
           className="hdr-btn hdr-right"
           onClick={() => toggle("profile")}
           aria-expanded={panel === "profile"}
-          aria-label={panel === "profile" ? "Close profile" : "Open profile"}
-          title="Your profile"
+          aria-label={panel === "profile" ? t("site.close_profile") : t("site.open_profile")}
+          title={t("common.your_profile")}
         >
           <span className="hdr-label">
             <AnimatePresence mode="wait" initial={false}>
@@ -156,7 +152,7 @@ export default function Site({
                 exit={{ y: -12, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                {panel === "profile" ? "Close" : signedIn ? (user.name || "").split(" ")[0] || "Profile" : "Login"}
+                {panel === "profile" ? t("site.close") : signedIn ? (user.name || "").split(" ")[0] || t("nav_profile") : t("nav_login")}
               </motion.span>
             </AnimatePresence>
           </span>
@@ -218,16 +214,16 @@ export default function Site({
                     exit={{ opacity: 0 }}
                     transition={{ delay: 0.6 + index * 0.05 }}
                   >
-                    {text}
+                    {t(text)}
                   </motion.small>
                 </button>
               ))}
             </div>
 
             <div className="menu-foot">
-              <span className="menu-foot-label">Language</span>
+              <span className="menu-foot-label">{t("common.language")}</span>
 
-              <div className="menu-langs" role="group" aria-label="Language of the answers">
+              <div className="menu-langs" role="group" aria-label={t("common.language_of_the_answers")}>
                 {LANGUAGES.map((item, i) => (
                   <motion.button
                     key={item.code}
@@ -251,7 +247,7 @@ export default function Site({
           <motion.aside
             key="profile"
             className="profile-panel"
-            aria-label="Profile"
+            aria-label={t("nav_profile")}
             initial={{ clipPath: "circle(0px at calc(100% - 34px) 34px)" }}
             animate={{ clipPath: "circle(150% at calc(100% - 34px) 34px)" }}
             exit={{ clipPath: "circle(0px at calc(100% - 34px) 34px)" }}
@@ -271,10 +267,10 @@ export default function Site({
                     <h3>{user.name || user.phone}</h3>
 
                     <div className="pp-pills">
-                      <Pill tone="good">ID #{user.user_code}</Pill>
+                      <Pill tone="good">{t("common.id_number", { code: user.user_code })}</Pill>
 
                       <Pill tone="info" icon={user.role === "owner" ? Tractor : Sprout}>
-                        {user.role === "owner" ? "Equipment owner" : "Farmer"}
+                        {user.role === "owner" ? t("common.role_owner") : t("common.role_farmer")}
                       </Pill>
                     </div>
                   </div>
@@ -287,17 +283,17 @@ export default function Site({
 
                   <motion.li initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
                     <MapPin size={16} />
-                    {[user.village, user.district, user.state].filter(Boolean).join(", ") || "Location not set"}
+                    {[user.village, user.district, user.state].filter(Boolean).join(", ") || t("site.location_not_set")}
                   </motion.li>
                 </ul>
 
                 <div className="pp-actions">
                   <button type="button" className="pp-link" onClick={() => open("profile")}>
-                    <Edit3 size={18} /> <RiseText delay={0.5}>Edit profile</RiseText> <ArrowRight size={16} />
+                    <Edit3 size={18} /> <RiseText delay={0.5}>{t("site.edit_profile")}</RiseText> <ArrowRight size={16} />
                   </button>
 
                   <button type="button" className="pp-link" onClick={() => open("home")}>
-                    <LayoutDashboard size={18} /> <RiseText delay={0.56}>Dashboard</RiseText> <ArrowRight size={16} />
+                    <LayoutDashboard size={18} /> <RiseText delay={0.56}>{t("nav_dashboard")}</RiseText> <ArrowRight size={16} />
                   </button>
 
                   <button type="button" className="pp-link pp-danger" onClick={() => { close(); onLogout(); }}>
@@ -318,8 +314,8 @@ export default function Site({
                   </span>
 
                   <div>
-                    <h3>Welcome, farmer</h3>
-                    <p>Sign in with your mobile number to use every tool.</p>
+                    <h3>{t("site.welcome_farmer")}</h3>
+                    <p>{t("site.sign_in_with_your_mobile_number")}</p>
                   </div>
                 </motion.div>
 
@@ -332,7 +328,7 @@ export default function Site({
             )}
 
             <div className="pp-theme">
-              <span>Theme</span>
+              <span>{t("site.theme")}</span>
               <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             </div>
           </motion.aside>
@@ -357,9 +353,9 @@ export default function Site({
         <footer className="footer">
           <Logo size={26} />
 
-          <p>AgriPulse (KisanMitra AI) · Disease detection · Price forecasts · Weather · Equipment rental · Loan guidance</p>
+          <p>{t("site.agripulse_kisanmitra_ai_disease_detect")}</p>
 
-          <small>&copy; 2026 AgriPulse</small>
+          <small>{t("site.2026_agripulse")}</small>
         </footer>
       )}
     </div>

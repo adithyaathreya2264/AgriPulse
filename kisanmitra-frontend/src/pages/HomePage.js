@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { API_URL } from "../voice";
+import { enumText } from "../i18n";
 import { WeatherArt, WheatField } from "../ui/art";
 import { Button, CountUp, Pill, Reveal, Skeleton, Stagger, Rise } from "../ui/kit";
 import {
@@ -19,25 +20,25 @@ import {
 import { categoryIcon } from "./marketplaceParts";
 
 const ACTIONS = [
-  ["disease", ScanLine, "nav_disease", "Photograph a leaf, get the disease and the medicine.", "grad-green"],
-  ["price", TrendingUp, "nav_price", "Four-week mandi forecast and the best week to sell.", "grad-gold"],
-  ["weather", CloudSun, "nav_weather", "Weather and what it means for your crop today.", "grad-sky"],
-  ["marketplace", Tractor, "nav_marketplace", "Rent tractors and drones from owners nearby.", "grad-earth"],
-  ["loan", Landmark, "nav_loan", "Kisan Credit Card eligibility in three minutes.", "grad-plum"],
-  ["assistant", Bot, "nav_assistant", "Ask anything about your farm, in your language.", "grad-forest"],
+  ["disease", ScanLine, "nav_disease", "home.act_disease", "grad-green"],
+  ["price", TrendingUp, "nav_price", "home.act_price", "grad-gold"],
+  ["weather", CloudSun, "nav_weather", "home.act_weather", "grad-sky"],
+  ["marketplace", Tractor, "nav_marketplace", "home.act_market", "grad-earth"],
+  ["loan", Landmark, "nav_loan", "home.act_loan", "grad-plum"],
+  ["assistant", Bot, "nav_assistant", "home.act_assistant", "grad-forest"],
 ];
 
 const STAT_ITEMS = [
-  ["total_predictions", "Leaf scans", ScanLine],
-  ["total_equipment", "Machines listed", Tractor],
-  ["total_rentals", "Rentals booked", Wheat],
-  ["total_users", "Farmers", MapPin],
+  ["total_predictions", "home.stat_scans", ScanLine],
+  ["total_equipment", "home.stat_machines", Tractor],
+  ["total_rentals", "home.stat_rentals", Wheat],
+  ["total_users", "home.stat_farmers", MapPin],
 ];
 
-const greetingFor = () => {
+const greetingFor = (t) => {
   const hour = new Date().getHours();
 
-  return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  return t(hour < 12 ? "home.good_morning" : hour < 17 ? "home.good_afternoon" : "home.good_evening");
 };
 
 export default function HomePage({ user, lang, t, go }) {
@@ -95,7 +96,7 @@ export default function HomePage({ user, lang, t, go }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            {greetingFor()}
+            {greetingFor(t)}
           </motion.p>
 
           <motion.h1
@@ -103,7 +104,7 @@ export default function HomePage({ user, lang, t, go }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            Namaste, <span className="hero-name">{firstName}</span>
+            {t("home.namaste")}{" "}<span className="hero-name">{firstName}</span>
           </motion.h1>
 
           <motion.p
@@ -113,8 +114,8 @@ export default function HomePage({ user, lang, t, go }) {
             transition={{ delay: 0.35, duration: 0.6 }}
           >
             {user.district
-              ? `Here is what is worth your attention in ${user.district} today.`
-              : "Here is what is worth your attention today."}
+              ? t("home.attention_in", { district: user.district })
+              : t("home.attention")}
           </motion.p>
 
           <motion.div
@@ -124,16 +125,16 @@ export default function HomePage({ user, lang, t, go }) {
             transition={{ delay: 0.5, duration: 0.6 }}
           >
             <Button variant="gold" size="lg" icon={ScanLine} onClick={() => go("disease")}>
-              Scan a leaf
+              {t("common.scan_a_leaf")}
             </Button>
 
             <Button variant="light" size="lg" icon={Bot} onClick={() => go("assistant")}>
-              Ask the AI
+              {t("home.ask_the_ai")}
             </Button>
           </motion.div>
 
           <p className="hero-voice">
-            <Mic size={15} /> Tip: tap the microphone and just say what you need, in your language.
+            <Mic size={15} />{" "}{t("home.tip_tap_the_microphone_and_just")}
           </p>
         </div>
 
@@ -146,11 +147,11 @@ export default function HomePage({ user, lang, t, go }) {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && go("weather")}
-          aria-label="Open weather"
+          aria-label={t("home.open_weather")}
         >
           {weather ? (
             <>
-              <WeatherArt condition={weather.condition} size={104} />
+              <WeatherArt condition={weather.sky || weather.condition} size={104} />
 
               <div>
                 <p className="hw-place">
@@ -172,7 +173,7 @@ export default function HomePage({ user, lang, t, go }) {
             <div className="hw-empty">
               <CloudSun size={34} />
 
-              <p>{user.district ? "Weather loading..." : "Add your district to see local weather"}</p>
+              <p>{user.district ? t("home.weather_loading") : t("home.add_district")}</p>
             </div>
           )}
         </motion.aside>
@@ -181,7 +182,7 @@ export default function HomePage({ user, lang, t, go }) {
       {/* ---------------------------------------------------- quick actions */}
       <section className="section">
         <div className="section-head">
-          <h2>What would you like to do?</h2>
+          <h2>{t("home.what_would_you_like_to_do")}</h2>
         </div>
 
         <Stagger className="action-grid">
@@ -199,7 +200,7 @@ export default function HomePage({ user, lang, t, go }) {
                 </span>
 
                 <span className="action-title">{t(key)}</span>
-                <span className="action-text">{text}</span>
+                <span className="action-text">{t(text)}</span>
 
                 <span className="action-go">
                   <ArrowRight size={18} />
@@ -225,7 +226,7 @@ export default function HomePage({ user, lang, t, go }) {
                 {stats ? <CountUp value={stats[key] || 0} /> : <Skeleton width={70} height={32} />}
               </strong>
 
-              <span className="stat-label">{label}</span>
+              <span className="stat-label">{t(label)}</span>
             </Reveal>
           ))}
         </div>
@@ -234,10 +235,10 @@ export default function HomePage({ user, lang, t, go }) {
       {/* ---------------------------------------------------- featured rent */}
       <section className="section">
         <div className="section-head">
-          <h2>Machines near you</h2>
+          <h2>{t("home.machines_near_you")}</h2>
 
           <button type="button" className="link-btn" onClick={() => go("marketplace")}>
-            See all <ArrowRight size={15} />
+            {t("home.see_all")}{" "}<ArrowRight size={15} />
           </button>
         </div>
 
@@ -250,10 +251,10 @@ export default function HomePage({ user, lang, t, go }) {
         ) : featured.length === 0 ? (
           <div className="card rail-empty">
             <Tractor size={28} />
-            <p>No equipment is listed yet. Be the first to list a machine.</p>
+            <p>{t("home.no_equipment_is_listed_yet_be")}</p>
 
             <Button size="sm" variant="soft" onClick={() => go("marketplace")}>
-              Open marketplace
+              {t("home.open_marketplace")}
             </Button>
           </div>
         ) : (
@@ -275,9 +276,9 @@ export default function HomePage({ user, lang, t, go }) {
 
                   <div className="rail-foot">
                     <strong>₹{item.price_per_day}</strong>
-                    <small>/ day</small>
+                    <small>{t("common.day")}</small>
 
-                    <Pill tone={item.availability === "Available" ? "good" : "warn"}>{item.availability}</Pill>
+                    <Pill tone={item.availability === "Available" ? "good" : "warn"}>{enumText(t, "status.", item.availability)}</Pill>
                   </div>
                 </Reveal>
               );
