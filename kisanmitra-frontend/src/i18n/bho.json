@@ -631,5 +631,12 @@
   "kit.yes_continue": "हँ, आगे बढ़ीं",
   "landing.whatsapp_aria": "WhatsApp पर AgriPulse",
   "landing.whatsapp_title": "WhatsApp पर चैट करीं",
-  "landing.whatsapp_text": "चैट खोले खातिर ई कोड आपन फोन से स्कैन करीं। पत्ता के फोटो भा आवाज के संदेश भेजीं, AgriPulse रउरा भाषा में जवाब दी।"
+  "landing.whatsapp_text": "चैट खोले खातिर ई कोड आपन फोन से स्कैन करीं। पत्ता के फोटो भा आवाज के संदेश भेजीं, AgriPulse रउरा भाषा में जवाब दी।",
+  "market.book_now": "अबहिंए बुक करीं",
+  "market.held_until_start": "रउरा बुकिंग सुरु होखे के तारीख तक रोकल रहेला। ओकरा पहिले भुगतान करीं, ना त ई अपने-आप खतम हो जाई।",
+  "market.booked_pay_before": "बुक हो गइल! {equipment} · किराया #{id}। {start} से पहिले भुगतान करीं, ना त बुकिंग खतम हो जाई।",
+  "market.pay_now": "अबहिंए भुगतान करीं",
+  "market.pay_before": "{when} से पहिले भुगतान करीं",
+  "server.bookings_must_start_at_least_2_days_from_today": "बुकिंग आज से कम से कम 2 दिन बाद सुरु होखे के चाहीं",
+  "market.earliest_start": "औजार {date} से आगे के तारीख खातिर बुक हो सकेला।"
 }

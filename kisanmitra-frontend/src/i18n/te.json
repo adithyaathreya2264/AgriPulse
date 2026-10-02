@@ -631,5 +631,12 @@
   "kit.yes_continue": "అవును, కొనసాగండి",
   "landing.whatsapp_aria": "WhatsApp లో AgriPulse",
   "landing.whatsapp_title": "WhatsApp లో చాట్ చేయండి",
-  "landing.whatsapp_text": "చాట్ తెరవడానికి ఈ కోడ్‌ను మీ ఫోన్‌తో స్కాన్ చేయండి. ఆకు ఫోటో లేదా వాయిస్ నోట్ పంపండి, AgriPulse మీ భాషలో సమాధానం ఇస్తుంది."
+  "landing.whatsapp_text": "చాట్ తెరవడానికి ఈ కోడ్‌ను మీ ఫోన్‌తో స్కాన్ చేయండి. ఆకు ఫోటో లేదా వాయిస్ నోట్ పంపండి, AgriPulse మీ భాషలో సమాధానం ఇస్తుంది.",
+  "market.book_now": "ఇప్పుడే బుక్ చేయండి",
+  "market.held_until_start": "మీ బుకింగ్ ప్రారంభ తేదీ వరకు ఉంచబడుతుంది. అంతకు ముందే చెల్లించండి, లేకపోతే అది ఆటోమేటిక్‌గా ముగుస్తుంది.",
+  "market.booked_pay_before": "బుక్ అయింది! {equipment} · అద్దె #{id}. {start} లోపు చెల్లించండి, లేకపోతే బుకింగ్ ముగుస్తుంది.",
+  "market.pay_now": "ఇప్పుడే చెల్లించండి",
+  "market.pay_before": "{when} లోపు చెల్లించండి",
+  "server.bookings_must_start_at_least_2_days_from_today": "బుకింగ్ ఈరోజు నుండి కనీసం 2 రోజుల తర్వాత ప్రారంభం కావాలి",
+  "market.earliest_start": "పరికరాన్ని {date} నుండి ముందుకు బుక్ చేసుకోవచ్చు."
 }

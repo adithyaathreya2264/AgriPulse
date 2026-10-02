@@ -631,5 +631,12 @@
   "kit.yes_continue": "ಹೌದು, ಮುಂದುವರಿಸಿ",
   "landing.whatsapp_aria": "WhatsApp ನಲ್ಲಿ AgriPulse",
   "landing.whatsapp_title": "WhatsApp ನಲ್ಲಿ ಚಾಟ್ ಮಾಡಿ",
-  "landing.whatsapp_text": "ಚಾಟ್ ತೆರೆಯಲು ಈ ಕೋಡ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ. ಎಲೆಯ ಫೋಟೋ ಅಥವಾ ಧ್ವನಿ ಸಂದೇಶ ಕಳುಹಿಸಿ, AgriPulse ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ."
+  "landing.whatsapp_text": "ಚಾಟ್ ತೆರೆಯಲು ಈ ಕೋಡ್ ಅನ್ನು ನಿಮ್ಮ ಫೋನ್‌ನಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ. ಎಲೆಯ ಫೋಟೋ ಅಥವಾ ಧ್ವನಿ ಸಂದೇಶ ಕಳುಹಿಸಿ, AgriPulse ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಉತ್ತರಿಸುತ್ತದೆ.",
+  "market.book_now": "ಈಗಲೇ ಬುಕ್ ಮಾಡಿ",
+  "market.held_until_start": "ನಿಮ್ಮ ಬುಕಿಂಗ್ ಆರಂಭ ದಿನಾಂಕದವರೆಗೆ ಕಾಯ್ದಿರಿಸಲಾಗುತ್ತದೆ. ಅದಕ್ಕಿಂತ ಮೊದಲು ಪಾವತಿಸಿ, ಇಲ್ಲದಿದ್ದರೆ ಅದು ತಾನಾಗಿ ಮುಗಿಯುತ್ತದೆ.",
+  "market.booked_pay_before": "ಬುಕ್ ಆಗಿದೆ! {equipment} · ಬಾಡಿಗೆ #{id}. {start} ಒಳಗೆ ಪಾವತಿಸಿ, ಇಲ್ಲದಿದ್ದರೆ ಬುಕಿಂಗ್ ಮುಗಿಯುತ್ತದೆ.",
+  "market.pay_now": "ಈಗ ಪಾವತಿಸಿ",
+  "market.pay_before": "{when} ಒಳಗೆ ಪಾವತಿಸಿ",
+  "server.bookings_must_start_at_least_2_days_from_today": "ಬುಕಿಂಗ್ ಇಂದಿನಿಂದ ಕನಿಷ್ಠ 2 ದಿನಗಳ ನಂತರ ಆರಂಭವಾಗಬೇಕು",
+  "market.earliest_start": "ಉಪಕರಣವನ್ನು {date} ರಿಂದ ಮುಂದಿನ ದಿನಗಳಿಗೆ ಬುಕ್ ಮಾಡಬಹುದು."
 }

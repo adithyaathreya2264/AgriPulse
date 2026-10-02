@@ -24,7 +24,6 @@ import {
   Calendar,
   Clock,
   CreditCard,
-  Lock,
   MapPin,
   Navigation,
   Phone,
@@ -36,7 +35,19 @@ import {
 } from "../ui/icons";
 import { CATEGORIES, categoryClass, categoryIcon } from "./marketplaceParts";
 
-const today = () => new Date().toISOString().split("T")[0];
+// Equipment can only be booked from this many days after today (same rule as the server)
+const MIN_LEAD_DAYS = 2;
+
+// earliest bookable date, as YYYY-MM-DD in the farmer's local time
+const earliestDate = () => {
+  const day = new Date();
+
+  day.setDate(day.getDate() + MIN_LEAD_DAYS);
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  return `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`;
+};
 
 const blankEquipment = (user) => ({
   name: "",
@@ -65,7 +76,6 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
   const [adding, setAdding] = useState(false);
 
   const [selected, setSelected] = useState(null);
-  const [showCheckout, setShowCheckout] = useState(false);
   const [paying, setPaying] = useState(false);
   const [renterName, setRenterName] = useState("");
   const [renterPhone, setRenterPhone] = useState("");
@@ -229,7 +239,6 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
   const openRental = (item) => {
     setSelected(item);
-    setShowCheckout(false);
     setRenterName((user && user.name) || "");
     setRenterPhone((user && user.phone) || "");
     setStartDate("");
@@ -242,20 +251,10 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
   const closeRental = () => {
     setSelected(null);
-    setShowCheckout(false);
   };
 
-  const continueToCheckout = () => {
-    if (!renterName.trim()) return notify(t("market.please_enter_your_name"), "error");
-    if (!renterPhone.trim()) return notify(t("market.please_enter_your_phone_number"), "error");
-    if (isHourly ? !startTime || !endTime : !startDate || !endDate) return notify(t("market.please_select_the_rental_period"), "error");
-    if (rentalUnits <= 0) return notify(t("market.please_select_a_valid_rental_period"), "error");
-
-    setShowCheckout(true);
-  };
-
-  // ---------------------------------------------------------------- payment
-  const rentEquipment = async () => {
+  // Step 1: book. The slot is held until the start date; pay before then or the booking expires.
+  const bookNow = async () => {
     if (!selected) return;
 
     if (!token) {
@@ -264,10 +263,14 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
       return;
     }
 
+    if (!renterName.trim()) return notify(t("market.please_enter_your_name"), "error");
+    if (!renterPhone.trim()) return notify(t("market.please_enter_your_phone_number"), "error");
+    if (isHourly ? !startTime || !endTime : !startDate || !endDate) return notify(t("market.please_select_the_rental_period"), "error");
+    if (rentalUnits <= 0) return notify(t("market.please_select_a_valid_rental_period"), "error");
+
     setPaying(true);
 
     try {
-      // 1. create the rental
       const rentalResponse = await fetch(`${API_URL}/rent-equipment`, {
         method: "POST",
         headers: jsonHeaders(),
@@ -292,21 +295,59 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         return;
       }
 
-      // 2. create the Razorpay order
+      notify(
+        t("market.booked_pay_before", {
+          equipment: selected.equipment_name,
+          id: rentalData.rental_id,
+          start: String(rentalData.start_at).slice(0, 16).replace("T", " "),
+        }),
+        "success"
+      );
+
+      closeRental();
+      fetchEquipment();
+      fetchMyRentals();
+    } catch (error) {
+      console.error("Booking error:", error);
+      notify(t("market.something_went_wrong_while_processing_"), "error");
+    } finally {
+      setPaying(false);
+    }
+  };
+
+  // ---------------------------------------------------------------- payment
+  // Step 2: pay a booking (from "My rentals"), once the renter has met the owner
+  const payRental = async (rentalData, equipmentName) => {
+    if (!token) {
+      notify(t("market.please_login_to_rent_equipment"), "error");
+      goLogin();
+      return;
+    }
+
+    setPaying(true);
+
+    try {
+      // 1. create the Razorpay order
       const paymentResponse = await fetch(`${API_URL}/create-payment-order`, {
         method: "POST",
         headers: jsonHeaders(),
-        body: JSON.stringify({ rental_id: rentalData.rental_id }),
+        body: JSON.stringify({ rental_id: rentalData.id }),
       });
+
+      if (paymentResponse.status === 401) {
+        sessionExpired();
+        return;
+      }
 
       const paymentData = await paymentResponse.json();
 
       if (!paymentResponse.ok) {
         notify(typeof paymentData.detail === "string" ? serverText(t, paymentData.detail) : t("market.err_order"), "error");
+        fetchMyRentals();
         return;
       }
 
-      // 3. open Razorpay checkout
+      // 2. open Razorpay checkout
       if (!window.Razorpay) {
         notify(t("market.razorpay_checkout_failed_to_load_pleas"), "error");
         return;
@@ -317,10 +358,10 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         amount: paymentData.amount,
         currency: paymentData.currency,
         name: "AgriPulse",
-        description: t("market.rzp_description", { equipment: selected.equipment_name }),
+        description: t("market.rzp_description", { equipment: equipmentName }),
         order_id: paymentData.order_id,
-        prefill: { name: renterName, contact: renterPhone },
-        notes: { rental_id: String(rentalData.rental_id), equipment: selected.equipment_name },
+        prefill: { name: rentalData.renter_name, contact: rentalData.renter_phone },
+        notes: { rental_id: String(rentalData.id), equipment: equipmentName },
         theme: { color: "#0f9d58" },
 
         // UPI first: most farmers pay with GPay / PhonePe / Paytm
@@ -333,13 +374,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         },
 
         handler: async function (response) {
-          // 4. verify the payment on the server
+          // 3. verify the payment on the server
           try {
             const verifyResponse = await fetch(`${API_URL}/verify-payment`, {
               method: "POST",
               headers: jsonHeaders(),
               body: JSON.stringify({
-                rental_id: rentalData.rental_id,
+                rental_id: rentalData.id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
@@ -355,14 +396,13 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
             notify(
               t("market.payment_success", {
-                equipment: selected.equipment_name,
-                id: rentalData.rental_id,
+                equipment: equipmentName,
+                id: rentalData.id,
                 amount: rentalData.total_amount,
               }),
               "success"
             );
 
-            closeRental();
             fetchEquipment();
             fetchMyRentals();
           } catch (error) {
@@ -383,7 +423,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
       razorpay.open();
     } catch (error) {
-      console.error("Rental/payment error:", error);
+      console.error("Payment error:", error);
       notify(t("market.something_went_wrong_while_processing_"), "error");
     } finally {
       setPaying(false);
@@ -449,6 +489,16 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                   {enumText(t, "status.", rental.status)}
                   {rental.payment_status === "Paid" ? " · " + enumText(t, "status.", "Paid") : ""}
                 </span>
+
+                {rental.status === "Pending" && rental.payment_status !== "Paid" && String(rental.expires_at) > new Date().toISOString() && (
+                  <span className="rental-pay">
+                    <Button size="sm" loading={paying} icon={CreditCard} onClick={() => payRental(rental, t("market.equipment_n", { id: rental.equipment_id }))}>
+                      {t("market.pay_now")}
+                    </Button>
+
+                    <small>{t("market.pay_before", { when: String(rental.start_at).slice(0, 16).replace("T", " ") })}</small>
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -696,10 +746,9 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
         {selected && (
           <>
             <ModalHead
-              title={showCheckout ? t("market.review_checkout") : t("market.rent_equipment_title")}
-              subtitle={showCheckout ? t("market.check_pay") : t("market.choose_when")}
+              title={t("market.rent_equipment_title")}
+              subtitle={t("market.choose_when")}
               onClose={closeRental}
-              onBack={showCheckout ? () => setShowCheckout(false) : undefined}
             />
 
             <div className="rent-preview">
@@ -727,7 +776,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
-              {!showCheckout ? (
+              {(
                 <motion.div
                   key="details"
                   className="form-grid"
@@ -765,7 +814,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                         label={t("market.start_date")}
                         type="date"
                         value={startDate}
-                        min={today()}
+                        min={earliestDate()}
                         onChange={(e) => setStartDate(e.target.value)}
                       />
 
@@ -774,17 +823,21 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                         label={t("market.end_date")}
                         type="date"
                         value={endDate}
-                        min={startDate || today()}
+                        min={startDate || earliestDate()}
                         onChange={(e) => setEndDate(e.target.value)}
                       />
                     </div>
                   ) : (
                     <div className="two-col">
-                      <Input id="rent-start-t" label={t("market.start_time")} type="datetime-local" step="900" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                      <Input id="rent-start-t" label={t("market.start_time")} type="datetime-local" step="900" min={`${earliestDate()}T00:00`} value={startTime} onChange={(e) => setStartTime(e.target.value)} />
 
-                      <Input id="rent-end-t" label={t("market.end_time")} type="datetime-local" step="900" value={endTime} min={startTime} onChange={(e) => setEndTime(e.target.value)} />
+                      <Input id="rent-end-t" label={t("market.end_time")} type="datetime-local" step="900" value={endTime} min={startTime || `${earliestDate()}T00:00`} onChange={(e) => setEndTime(e.target.value)} />
                     </div>
                   )}
+
+                  <p className="secure-note">
+                    <Calendar size={14} />{" "}{t("market.earliest_start", { date: earliestDate() })}
+                  </p>
 
                   {bookedSlots.length > 0 && (
                     <div className="booked">
@@ -836,79 +889,12 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                     )}
                   </AnimatePresence>
 
-                  <Button size="lg" block onClick={continueToCheckout}>
-                    {t("market.continue_to_checkout")}
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="checkout"
-                  className="form-grid"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="review-grid">
-                    <div className="review-box">
-                      <h4>{t("market.renter")}</h4>
-                      <p>
-                        <User size={14} /> {renterName}
-                      </p>
-                      <p>
-                        <Phone size={14} /> {renterPhone}
-                      </p>
-                    </div>
-
-                    <div className="review-box">
-                      <h4>{t("market.equipment_owner")}</h4>
-                      <p>
-                        <User size={14} /> {selected.owner_name}
-                      </p>
-                      <p>
-                        <MapPin size={14} /> {selected.location}
-                      </p>
-                      <p>
-                        <Phone size={14} /> {selected.contact_number}
-                      </p>
-                    </div>
-
-                    <div className="review-box wide">
-                      <h4>{t("market.rental_period")}</h4>
-                      <p>
-                        <Calendar size={14} /> {isHourly ? startTime.replace("T", " ") : startDate} → {isHourly ? endTime.replace("T", " ") : endDate}
-                      </p>
-                      <p>
-                        {count(rentalUnits)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="summary">
-                    <div className="summary-row">
-                      <span>{t(isHourly ? "market.price_per_hour_row" : "market.price_per_day_row")}</span>
-                      <strong>₹{rentalRate}</strong>
-                    </div>
-
-                    <div className="summary-row">
-                      <span>
-                        {t(isHourly ? "market.rate_hourly" : "market.rate_daily", { n: rentalUnits })}
-                      </span>
-                      <strong>₹{rentalTotal.toLocaleString("en-IN")}</strong>
-                    </div>
-
-                    <div className="summary-row total">
-                      <span>{t("market.total_to_pay")}</span>
-                      <strong>₹{rentalTotal.toLocaleString("en-IN")}</strong>
-                    </div>
-                  </div>
-
-                  <Button size="lg" block loading={paying} icon={CreditCard} onClick={rentEquipment}>
-                    {t("market.proceed_to_payment")}
+                  <Button size="lg" block loading={paying} icon={Calendar} onClick={bookNow}>
+                    {t("market.book_now")}
                   </Button>
 
                   <p className="secure-note">
-                    <Lock size={14} />{" "}{t("market.secure_payment")}
+                    <Clock size={14} />{" "}{t("market.held_until_start")}
                   </p>
                 </motion.div>
               )}

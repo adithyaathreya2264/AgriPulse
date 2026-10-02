@@ -3,8 +3,8 @@ from datetime import date, datetime, time, timedelta, timezone
 
 from app.db.database import get_database
 
-# A booking that is not paid within this time stops blocking the dates
-PENDING_MINUTES = 15
+# Equipment can only be booked starting this many days from today
+MIN_LEAD_DAYS = 2
 
 # Statuses that block the equipment for the booked dates
 BLOCKING_STATUSES = ["Confirmed", "Active"]
@@ -14,9 +14,16 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def pending_expiry_iso():
-    expiry = datetime.now(timezone.utc) + timedelta(minutes=PENDING_MINUTES)
-    return expiry.isoformat(timespec="seconds")
+def pending_expiry_iso(start_at):
+    """An unpaid booking is held until its start time (local wall-clock, like all rental times)."""
+    # a naive datetime is read as server-local time
+    start = datetime.fromisoformat(start_at).astimezone(timezone.utc)
+
+    return start.isoformat(timespec="seconds")
+
+
+def earliest_start_date():
+    return date.today() + timedelta(days=MIN_LEAD_DAYS)
 
 
 def local_now_iso():

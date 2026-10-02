@@ -894,7 +894,7 @@ def test_no_bookings_yet(registered):
 
 def test_bookings_are_listed(client, registered, owner, renter):
     equipment_id = add_equipment(client, owner, "Village Tractor", *KOLAR)
-    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    tomorrow = (date.today() + timedelta(days=3)).isoformat()
 
     client.post("/rent-equipment", headers=renter["headers"], json={
         "equipment_id": equipment_id, "start_date": tomorrow, "end_date": tomorrow
@@ -908,7 +908,7 @@ def test_bookings_are_listed(client, registered, owner, renter):
 
 def test_owners_see_bookings_of_their_equipment(client, owner, renter):
     equipment_id = add_equipment(client, owner, "Village Tractor", *KOLAR)
-    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    tomorrow = (date.today() + timedelta(days=3)).isoformat()
 
     client.post("/rent-equipment", headers=renter["headers"], json={
         "equipment_id": equipment_id, "start_date": tomorrow, "end_date": tomorrow

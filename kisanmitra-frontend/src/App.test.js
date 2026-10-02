@@ -719,3 +719,27 @@ describe("the WhatsApp logo", () => {
     expect(screen.queryByRole("dialog", { name: "Chat on WhatsApp" })).not.toBeInTheDocument();
   });
 });
+
+// ------------------------------------------------------- add equipment form
+test("typing in the add equipment form keeps the cursor in the field", async () => {
+  signIn();
+
+  render(<App />);
+
+  await openPage("Marketplace");
+
+  fireEvent.click(await screen.findByRole("button", { name: /Add Equipment|List equipment/i }, { timeout: 8000 }));
+
+  const name = await screen.findByLabelText("Equipment name *");
+
+  // let the modal's one-time focus on open happen first, like a person tapping the field afterwards
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  name.focus();
+
+  for (const text of ["T", "Tr", "Tra"]) {
+    fireEvent.change(name, { target: { value: text } });
+    // longer than the modal's focus timer: the old code stole the focus here
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(document.activeElement).toBe(name);
+  }
+});

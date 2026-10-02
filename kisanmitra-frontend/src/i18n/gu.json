@@ -631,5 +631,12 @@
   "kit.yes_continue": "હા, આગળ વધો",
   "landing.whatsapp_aria": "WhatsApp પર AgriPulse",
   "landing.whatsapp_title": "WhatsApp પર ચેટ કરો",
-  "landing.whatsapp_text": "ચેટ ખોલવા આ કોડ તમારા ફોનથી સ્કેન કરો. પાંદડાનો ફોટો અથવા વૉઇસ નોટ મોકલો, AgriPulse તમારી ભાષામાં જવાબ આપશે."
+  "landing.whatsapp_text": "ચેટ ખોલવા આ કોડ તમારા ફોનથી સ્કેન કરો. પાંદડાનો ફોટો અથવા વૉઇસ નોટ મોકલો, AgriPulse તમારી ભાષામાં જવાબ આપશે.",
+  "market.book_now": "હમણાં બુક કરો",
+  "market.held_until_start": "તમારું બુકિંગ શરૂઆતની તારીખ સુધી રાખવામાં આવે છે. તે પહેલાં ચુકવણી કરો, નહીં તો તે આપોઆપ રદ થઈ જશે.",
+  "market.booked_pay_before": "બુક થઈ ગયું! {equipment} · ભાડું #{id}. {start} પહેલાં ચુકવણી કરો, નહીં તો બુકિંગ રદ થશે.",
+  "market.pay_now": "હમણાં ચુકવો",
+  "market.pay_before": "{when} પહેલાં ચુકવણી કરો",
+  "server.bookings_must_start_at_least_2_days_from_today": "બુકિંગ આજથી ઓછામાં ઓછા 2 દિવસ પછી શરૂ થવું જોઈએ",
+  "market.earliest_start": "સાધન {date} થી આગળની તારીખો માટે બુક કરી શકાય છે."
 }

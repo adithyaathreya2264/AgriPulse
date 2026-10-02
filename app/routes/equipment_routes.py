@@ -28,10 +28,14 @@ from app.services.rental_lifecycle import (
     day_interval,
     now_iso,
     overlap_filter,
-    pending_expiry_iso
+    pending_expiry_iso,
+    earliest_start_date,
+    MIN_LEAD_DAYS
 )
 
 DEFAULT_RADIUS_KM = 10
+
+LEAD_TIME_MESSAGE = f"Bookings must start at least {MIN_LEAD_DAYS} days from today"
 MAX_RADIUS_KM = 200
 
 # An hourly booking longer than this should be booked by the day
@@ -614,6 +618,12 @@ def rent_equipment(
                 detail="Start date cannot be in the past"
             )
 
+        if start_date < earliest_start_date():
+            raise HTTPException(
+                status_code=400,
+                detail=LEAD_TIME_MESSAGE
+            )
+
         start_at, end_at = day_interval(start_date, end_date)
 
         rental_days = (end_date - start_date).days + 1
@@ -639,6 +649,12 @@ def rent_equipment(
             raise HTTPException(
                 status_code=400,
                 detail="Start time cannot be in the past"
+            )
+
+        if start.date() < earliest_start_date():
+            raise HTTPException(
+                status_code=400,
+                detail=LEAD_TIME_MESSAGE
             )
 
         hours = math.ceil((end - start).total_seconds() / 3600)
@@ -695,7 +711,7 @@ def rent_equipment(
         "total_amount": total_amount,
         "status": "Pending",
         "payment_status": "Pending",
-        "expires_at": pending_expiry_iso(),
+        "expires_at": pending_expiry_iso(start_at),
         "razorpay_order_id": None
     }
 

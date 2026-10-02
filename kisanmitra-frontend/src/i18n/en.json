@@ -631,5 +631,12 @@
   "kit.yes_continue": "Yes, continue",
   "landing.whatsapp_aria": "AgriPulse on WhatsApp",
   "landing.whatsapp_title": "Chat on WhatsApp",
-  "landing.whatsapp_text": "Scan this code with your phone to open the chat. Send a leaf photo or a voice note and AgriPulse answers in your language."
+  "landing.whatsapp_text": "Scan this code with your phone to open the chat. Send a leaf photo or a voice note and AgriPulse answers in your language.",
+  "market.book_now": "Book now",
+  "market.held_until_start": "Your booking is held until the start date. Pay before then, or it expires automatically.",
+  "market.booked_pay_before": "Booked! {equipment} · Rental #{id}. Pay before {start} or the booking expires.",
+  "market.pay_now": "Pay now",
+  "market.pay_before": "Pay before {when}",
+  "server.bookings_must_start_at_least_2_days_from_today": "Bookings must start at least 2 days from today",
+  "market.earliest_start": "Equipment can be booked from {date} onwards."
 }

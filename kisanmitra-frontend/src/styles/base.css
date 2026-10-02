@@ -804,9 +804,10 @@ input[type="datetime-local"] {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 88px 20px 24px;
   background: rgba(4, 18, 11, 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -815,8 +816,11 @@ input[type="datetime-local"] {
 
 .modal {
   width: 100%;
-  max-height: calc(100dvh - 40px);
+  margin: auto;
+  max-height: calc(100vh - 116px);
+  max-height: calc(100dvh - 116px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 24px;
   border-radius: var(--r-xl);
   background: var(--surface);
@@ -838,10 +842,15 @@ input[type="datetime-local"] {
 }
 
 .modal-head {
+  position: sticky;
+  top: -24px;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin: -24px -24px 18px;
+  padding: 24px 24px 12px;
+  background: var(--surface);
 }
 
 .modal-head-text {
@@ -1182,9 +1191,16 @@ input[type="datetime-local"] {
 
   .modal {
     max-width: none;
-    max-height: 92dvh;
+    max-height: 86vh;
+    max-height: 86dvh;
     border-radius: 28px 28px 0 0;
     padding: 20px 18px 28px;
+  }
+
+  .modal-head {
+    top: -20px;
+    margin: -20px -18px 16px;
+    padding: 20px 18px 10px;
   }
 
   .toast-stack {
@@ -1215,4 +1231,18 @@ input[type="datetime-local"] {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* pay button on a held booking in "My rentals" */
+.rental-pay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-basis: 100%;
+}
+
+.rental-pay small {
+  color: var(--ink-2);
+  font-size: 12px;
 }

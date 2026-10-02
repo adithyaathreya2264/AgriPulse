@@ -5,8 +5,8 @@ import app.db.database as database
 
 
 def start_rental(client, renter, equipment_id):
-    start = (date.today() + timedelta(days=1)).isoformat()
-    end = (date.today() + timedelta(days=3)).isoformat()
+    start = (date.today() + timedelta(days=3)).isoformat()
+    end = (date.today() + timedelta(days=5)).isoformat()
 
     return client.post("/rent-equipment", headers=renter["headers"], json={
         "equipment_id": equipment_id, "start_date": start, "end_date": end

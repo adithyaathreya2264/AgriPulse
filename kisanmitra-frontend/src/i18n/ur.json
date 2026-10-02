@@ -631,5 +631,12 @@
   "kit.yes_continue": "ہاں، جاری رکھیں",
   "landing.whatsapp_aria": "WhatsApp پر AgriPulse",
   "landing.whatsapp_title": "WhatsApp پر چیٹ کریں",
-  "landing.whatsapp_text": "چیٹ کھولنے کے لیے اس کوڈ کو اپنے فون سے اسکین کریں۔ پتے کی تصویر یا وائس نوٹ بھیجیں، AgriPulse آپ کی زبان میں جواب دے گا۔"
+  "landing.whatsapp_text": "چیٹ کھولنے کے لیے اس کوڈ کو اپنے فون سے اسکین کریں۔ پتے کی تصویر یا وائس نوٹ بھیجیں، AgriPulse آپ کی زبان میں جواب دے گا۔",
+  "market.book_now": "ابھی بک کریں",
+  "market.held_until_start": "آپ کی بکنگ ابتدائی تاریخ تک روکی جاتی ہے۔ اس سے پہلے ادائیگی کریں، ورنہ یہ خود بخود ختم ہو جائے گی۔",
+  "market.booked_pay_before": "بک ہو گیا! {equipment} · کرایہ #{id}۔ {start} سے پہلے ادائیگی کریں، ورنہ بکنگ ختم ہو جائے گی۔",
+  "market.pay_now": "ابھی ادائیگی کریں",
+  "market.pay_before": "{when} سے پہلے ادائیگی کریں",
+  "server.bookings_must_start_at_least_2_days_from_today": "بکنگ آج سے کم از کم 2 دن بعد شروع ہونی چاہیے",
+  "market.earliest_start": "سامان {date} سے آگے کی تاریخوں کے لیے بک کیا جا سکتا ہے۔"
 }

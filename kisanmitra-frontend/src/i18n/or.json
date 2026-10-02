@@ -631,5 +631,12 @@
   "kit.yes_continue": "ହଁ, ଜାରି ରଖନ୍ତୁ",
   "landing.whatsapp_aria": "WhatsApp ରେ AgriPulse",
   "landing.whatsapp_title": "WhatsApp ରେ ଚାଟ୍ କରନ୍ତୁ",
-  "landing.whatsapp_text": "ଚାଟ୍ ଖୋଲିବାକୁ ଏହି କୋଡ୍ ଆପଣଙ୍କ ଫୋନରେ ସ୍କାନ୍ କରନ୍ତୁ। ପତ୍ରର ଫଟୋ କିମ୍ବା ଭଏସ୍ ନୋଟ୍ ପଠାନ୍ତୁ, AgriPulse ଆପଣଙ୍କ ଭାଷାରେ ଉତ୍ତର ଦେବ।"
+  "landing.whatsapp_text": "ଚାଟ୍ ଖୋଲିବାକୁ ଏହି କୋଡ୍ ଆପଣଙ୍କ ଫୋନରେ ସ୍କାନ୍ କରନ୍ତୁ। ପତ୍ରର ଫଟୋ କିମ୍ବା ଭଏସ୍ ନୋଟ୍ ପଠାନ୍ତୁ, AgriPulse ଆପଣଙ୍କ ଭାଷାରେ ଉତ୍ତର ଦେବ।",
+  "market.book_now": "ଏବେ ବୁକ୍ କରନ୍ତୁ",
+  "market.held_until_start": "ଆପଣଙ୍କ ବୁକିଂ ଆରମ୍ଭ ତାରିଖ ପର୍ଯ୍ୟନ୍ତ ରଖାଯାଏ। ତା' ପୂର୍ବରୁ ଦେୟ ଦିଅନ୍ତୁ, ନଚେତ୍ ଏହା ନିଜେ ନିଜେ ଶେଷ ହୋଇଯିବ।",
+  "market.booked_pay_before": "ବୁକ୍ ହେଲା! {equipment} · ଭଡ଼ା #{id}। {start} ପୂର୍ବରୁ ଦେୟ ଦିଅନ୍ତୁ, ନଚେତ୍ ବୁକିଂ ଶେଷ ହୋଇଯିବ।",
+  "market.pay_now": "ଏବେ ଦେୟ ଦିଅନ୍ତୁ",
+  "market.pay_before": "{when} ପୂର୍ବରୁ ଦେୟ ଦିଅନ୍ତୁ",
+  "server.bookings_must_start_at_least_2_days_from_today": "ବୁକିଂ ଆଜିଠାରୁ ଅତି କମରେ 2 ଦିନ ପରେ ଆରମ୍ଭ ହେବା ଉଚିତ",
+  "market.earliest_start": "ଯନ୍ତ୍ର {date} ଠାରୁ ଆଗକୁ ବୁକ୍ କରାଯାଇପାରିବ।"
 }

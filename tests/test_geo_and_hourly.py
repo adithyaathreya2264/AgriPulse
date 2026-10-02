@@ -130,7 +130,7 @@ def test_other_owner_cannot_move_my_equipment(client, owner):
 
 def test_owner_availability_toggle_blocks_rentals(client, owner, renter):
     equipment_id = add_equipment(client, owner, "Tractor")
-    day_after = (date.today() + timedelta(days=2)).isoformat()
+    day_after = (date.today() + timedelta(days=4)).isoformat()
 
     rent = {
         "equipment_id": equipment_id,
@@ -169,7 +169,7 @@ def test_availability_value_is_validated(client, owner):
 # ----------------------------------------------------------------
 
 def tomorrow_at(hour, minute=0):
-    day = date.today() + timedelta(days=1)
+    day = date.today() + timedelta(days=3)
     return datetime(day.year, day.month, day.day, hour, minute)
 
 
@@ -238,7 +238,7 @@ def test_hourly_overlap_matrix(client, owner, renter, other):
 
 def test_hourly_and_day_bookings_block_each_other(client, owner, renter, other):
     equipment_id = add_equipment(client, owner, "Drone", per_hour=250)
-    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    tomorrow = (date.today() + timedelta(days=3)).isoformat()
 
     assert rent_hours(client, renter, equipment_id, tomorrow_at(10), tomorrow_at(12)).status_code == 200
 
@@ -249,7 +249,7 @@ def test_hourly_and_day_bookings_block_each_other(client, owner, renter, other):
     assert whole_day.status_code == 400
 
     # ... and the day after is free
-    day_after = (date.today() + timedelta(days=2)).isoformat()
+    day_after = (date.today() + timedelta(days=4)).isoformat()
     free = client.post("/rent-equipment", headers=other["headers"], json={
         "equipment_id": equipment_id, "start_date": day_after, "end_date": day_after
     })
@@ -320,7 +320,7 @@ def test_old_day_rentals_are_migrated():
 
 def test_payment_order_asks_for_upi(client, owner, renter, fake_razorpay, monkeypatch):
     equipment_id = add_equipment(client, owner, "Tractor")
-    day_after = (date.today() + timedelta(days=2)).isoformat()
+    day_after = (date.today() + timedelta(days=4)).isoformat()
 
     rental = client.post("/rent-equipment", headers=renter["headers"], json={
         "equipment_id": equipment_id, "start_date": day_after, "end_date": day_after

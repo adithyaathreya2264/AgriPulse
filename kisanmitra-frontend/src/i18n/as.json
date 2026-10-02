@@ -631,5 +631,12 @@
   "kit.yes_continue": "হয়, আগবাঢ়ক",
   "landing.whatsapp_aria": "WhatsApp ত AgriPulse",
   "landing.whatsapp_title": "WhatsApp ত চেট কৰক",
-  "landing.whatsapp_text": "চেট খুলিবলৈ এই কোডটো আপোনাৰ ফোনেৰে স্কেন কৰক। পাতৰ ফটো বা ভইচ নোট পঠিয়াওক, AgriPulse এ আপোনাৰ ভাষাত উত্তৰ দিব।"
+  "landing.whatsapp_text": "চেট খুলিবলৈ এই কোডটো আপোনাৰ ফোনেৰে স্কেন কৰক। পাতৰ ফটো বা ভইচ নোট পঠিয়াওক, AgriPulse এ আপোনাৰ ভাষাত উত্তৰ দিব।",
+  "market.book_now": "এতিয়াই বুক কৰক",
+  "market.held_until_start": "আপোনাৰ বুকিং আৰম্ভণিৰ তাৰিখলৈকে ৰখা হয়। তাৰ আগতে পেমেণ্ট কৰক, নহ'লে ই নিজেই শেষ হৈ যাব।",
+  "market.booked_pay_before": "বুক হ'ল! {equipment} · ভাড়া #{id}। {start} ৰ আগতে পেমেণ্ট কৰক, নহ'লে বুকিং শেষ হ'ব।",
+  "market.pay_now": "এতিয়াই পেমেণ্ট কৰক",
+  "market.pay_before": "{when} ৰ আগতে পেমেণ্ট কৰক",
+  "server.bookings_must_start_at_least_2_days_from_today": "বুকিং আজিৰ পৰা কমেও ২ দিনৰ পিছত আৰম্ভ হ'ব লাগিব",
+  "market.earliest_start": "সঁজুলি {date} ৰ পৰা আগলৈ বুক কৰিব পাৰি।"
 }

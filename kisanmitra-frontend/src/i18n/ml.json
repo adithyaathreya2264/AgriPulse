@@ -631,5 +631,12 @@
   "kit.yes_continue": "അതെ, തുടരുക",
   "landing.whatsapp_aria": "WhatsApp ലെ AgriPulse",
   "landing.whatsapp_title": "WhatsApp ൽ ചാറ്റ് ചെയ്യുക",
-  "landing.whatsapp_text": "ചാറ്റ് തുറക്കാൻ ഈ കോഡ് നിങ്ങളുടെ ഫോണിൽ സ്കാൻ ചെയ്യുക. ഇലയുടെ ഫോട്ടോയോ വോയ്സ് നോട്ടോ അയയ്ക്കൂ, AgriPulse നിങ്ങളുടെ ഭാഷയിൽ മറുപടി നൽകും."
+  "landing.whatsapp_text": "ചാറ്റ് തുറക്കാൻ ഈ കോഡ് നിങ്ങളുടെ ഫോണിൽ സ്കാൻ ചെയ്യുക. ഇലയുടെ ഫോട്ടോയോ വോയ്സ് നോട്ടോ അയയ്ക്കൂ, AgriPulse നിങ്ങളുടെ ഭാഷയിൽ മറുപടി നൽകും.",
+  "market.book_now": "ഇപ്പോൾ ബുക്ക് ചെയ്യുക",
+  "market.held_until_start": "നിങ്ങളുടെ ബുക്കിംഗ് ആരംഭ തീയതി വരെ നിലനിർത്തും. അതിനു മുമ്പ് പണമടയ്ക്കുക, ഇല്ലെങ്കിൽ അത് സ്വയം കാലഹരണപ്പെടും.",
+  "market.booked_pay_before": "ബുക്ക് ചെയ്തു! {equipment} · വാടക #{id}. {start} ന് മുമ്പ് പണമടയ്ക്കുക, ഇല്ലെങ്കിൽ ബുക്കിംഗ് കാലഹരണപ്പെടും.",
+  "market.pay_now": "ഇപ്പോൾ പണമടയ്ക്കുക",
+  "market.pay_before": "{when} ന് മുമ്പ് പണമടയ്ക്കുക",
+  "server.bookings_must_start_at_least_2_days_from_today": "ബുക്കിംഗ് ഇന്നു മുതൽ കുറഞ്ഞത് 2 ദിവസം കഴിഞ്ഞ് ആരംഭിക്കണം",
+  "market.earliest_start": "ഉപകരണം {date} മുതലുള്ള തീയതികളിലേക്ക് ബുക്ക് ചെയ്യാം."
 }

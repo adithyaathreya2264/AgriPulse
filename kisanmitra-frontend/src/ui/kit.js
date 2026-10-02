@@ -535,11 +535,16 @@ export function PageHeader({ icon: Icon, title, subtitle, actions, tone = "green
 
 export function Modal({ open, onClose, title, children, size = "md", className = "" }) {
   const panelRef = useRef(null);
+  const closeRef = useRef(onClose);
+
+  // callers pass a new onClose on every render; keep the latest without re-running the effect below,
+  // otherwise the panel is re-focused after each keystroke and the on-screen keyboard closes
+  closeRef.current = onClose;
 
   useEffect(() => {
     if (!open) return undefined;
 
-    const onKey = (event) => event.key === "Escape" && onClose();
+    const onKey = (event) => event.key === "Escape" && closeRef.current();
 
     document.addEventListener("keydown", onKey);
     document.body.classList.add("no-scroll");
@@ -551,7 +556,7 @@ export function Modal({ open, onClose, title, children, size = "md", className =
       document.body.classList.remove("no-scroll");
       clearTimeout(timer);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   return (
     <AnimatePresence>
