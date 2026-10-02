@@ -638,5 +638,7 @@
   "market.pay_now": "ابھی ادائیگی کریں",
   "market.pay_before": "{when} سے پہلے ادائیگی کریں",
   "server.bookings_must_start_at_least_2_days_from_today": "بکنگ آج سے کم از کم 2 دن بعد شروع ہونی چاہیے",
-  "market.earliest_start": "سامان {date} سے آگے کی تاریخوں کے لیے بک کیا جا سکتا ہے۔"
+  "market.earliest_start": "سامان {date} سے آگے کی تاریخوں کے لیے بک کیا جا سکتا ہے۔",
+  "server.the_ai_assistant_is_busy_right_now": "AI معاون ابھی مصروف ہے۔ براہِ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "کوئی بیماری کی تشخیص نہیں ملی۔ براہِ کرم پہلے فصل کی تصویر کا تجزیہ کریں۔"
 }

@@ -638,5 +638,7 @@
   "market.pay_now": "अबहिंए भुगतान करीं",
   "market.pay_before": "{when} से पहिले भुगतान करीं",
   "server.bookings_must_start_at_least_2_days_from_today": "बुकिंग आज से कम से कम 2 दिन बाद सुरु होखे के चाहीं",
-  "market.earliest_start": "औजार {date} से आगे के तारीख खातिर बुक हो सकेला।"
+  "market.earliest_start": "औजार {date} से आगे के तारीख खातिर बुक हो सकेला।",
+  "server.the_ai_assistant_is_busy_right_now": "एआई सहायक अभी बिजी बा। कृपा करके थोड़ा देर बाद फेर कोशिश करीं।",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "कवनो रोग के जाँच ना मिलल। कृपा करके पहिले फसल के फोटो जाँचीं।"
 }

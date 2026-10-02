@@ -39,11 +39,23 @@ def ai_chat(request: ChatRequest, db=Depends(get_db)):
     # Understand the question in any supported language
     question, detected_lang = translate_to_english(request.question)
 
-    # Ask Gemini AI
-    answer = ask_ai(
-        report=report,
-        question=question
-    )
+    # Ask Gemini AI. If every model is out of quota, answer cleanly instead of crashing (a 500
+    # has no CORS headers, so the browser would only show "server not reachable").
+    try:
+        answer = ask_ai(
+            report=report,
+            question=question
+        )
+    except Exception as error:
+        print(f"AI chat failed: {error}")
+
+        return {
+            "success": False,
+            "message": (
+                "The AI assistant is busy right now. "
+                "Please try again in a little while."
+            )
+        }
 
     # Save the conversation in English
     conversation.append({

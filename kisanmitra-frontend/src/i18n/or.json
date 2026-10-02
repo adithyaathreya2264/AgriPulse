@@ -638,5 +638,7 @@
   "market.pay_now": "ଏବେ ଦେୟ ଦିଅନ୍ତୁ",
   "market.pay_before": "{when} ପୂର୍ବରୁ ଦେୟ ଦିଅନ୍ତୁ",
   "server.bookings_must_start_at_least_2_days_from_today": "ବୁକିଂ ଆଜିଠାରୁ ଅତି କମରେ 2 ଦିନ ପରେ ଆରମ୍ଭ ହେବା ଉଚିତ",
-  "market.earliest_start": "ଯନ୍ତ୍ର {date} ଠାରୁ ଆଗକୁ ବୁକ୍ କରାଯାଇପାରିବ।"
+  "market.earliest_start": "ଯନ୍ତ୍ର {date} ଠାରୁ ଆଗକୁ ବୁକ୍ କରାଯାଇପାରିବ।",
+  "server.the_ai_assistant_is_busy_right_now": "AI ସହାୟକ ବର୍ତ୍ତମାନ ବ୍ୟସ୍ତ ଅଛି। ଦୟାକରି କିଛି ସମୟ ପରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "କୌଣସି ରୋଗ ନିର୍ଣ୍ଣୟ ମିଳିଲା ନାହିଁ। ଦୟାକରି ପ୍ରଥମେ ଏକ ଫସଲ ଚିତ୍ର ଯାଞ୍ଚ କରନ୍ତୁ।"
 }

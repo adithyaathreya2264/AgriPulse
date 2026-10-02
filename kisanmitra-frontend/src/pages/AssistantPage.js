@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { API_URL, SpeakButton, VoiceMic } from "../voice";
 import { Avatar, Button, PageHeader } from "../ui/kit";
 import { Bot, Send, Sparkles, Trash2 } from "../ui/icons";
+import { serverText } from "../i18n";
 
 const SUGGESTIONS = ["assistant.q_aphids", "assistant.q_fertilizer", "assistant.q_ragi", "assistant.q_paddy"];
 
@@ -32,7 +33,7 @@ export default function AssistantPage({ user, lang, t, messages, setMessages, in
 
       setMessages((prev) => [
         ...prev,
-        { sender: "assistant", text: data.answer || data.Message || t("assistant.no_answer") },
+        { sender: "assistant", text: data.answer || (data.message ? serverText(t, data.message) : t("assistant.no_answer")) },
       ]);
     } catch (err) {
       console.error(err);

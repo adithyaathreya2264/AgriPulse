@@ -638,5 +638,7 @@
   "market.pay_now": "ਹੁਣੇ ਭੁਗਤਾਨ ਕਰੋ",
   "market.pay_before": "{when} ਤੋਂ ਪਹਿਲਾਂ ਭੁਗਤਾਨ ਕਰੋ",
   "server.bookings_must_start_at_least_2_days_from_today": "ਬੁਕਿੰਗ ਅੱਜ ਤੋਂ ਘੱਟੋ-ਘੱਟ 2 ਦਿਨ ਬਾਅਦ ਸ਼ੁਰੂ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ",
-  "market.earliest_start": "ਸਾਧਨ {date} ਤੋਂ ਅੱਗੇ ਦੀਆਂ ਤਾਰੀਖਾਂ ਲਈ ਬੁੱਕ ਕੀਤਾ ਜਾ ਸਕਦਾ ਹੈ।"
+  "market.earliest_start": "ਸਾਧਨ {date} ਤੋਂ ਅੱਗੇ ਦੀਆਂ ਤਾਰੀਖਾਂ ਲਈ ਬੁੱਕ ਕੀਤਾ ਜਾ ਸਕਦਾ ਹੈ।",
+  "server.the_ai_assistant_is_busy_right_now": "AI ਸਹਾਇਕ ਹੁਣ ਰੁੱਝਿਆ ਹੋਇਆ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "ਕੋਈ ਬਿਮਾਰੀ ਨਿਦਾਨ ਨਹੀਂ ਮਿਲਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਫ਼ਸਲ ਦੀ ਤਸਵੀਰ ਦੀ ਜਾਂਚ ਕਰੋ।"
 }

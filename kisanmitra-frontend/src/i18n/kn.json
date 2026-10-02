@@ -638,5 +638,7 @@
   "market.pay_now": "ಈಗ ಪಾವತಿಸಿ",
   "market.pay_before": "{when} ಒಳಗೆ ಪಾವತಿಸಿ",
   "server.bookings_must_start_at_least_2_days_from_today": "ಬುಕಿಂಗ್ ಇಂದಿನಿಂದ ಕನಿಷ್ಠ 2 ದಿನಗಳ ನಂತರ ಆರಂಭವಾಗಬೇಕು",
-  "market.earliest_start": "ಉಪಕರಣವನ್ನು {date} ರಿಂದ ಮುಂದಿನ ದಿನಗಳಿಗೆ ಬುಕ್ ಮಾಡಬಹುದು."
+  "market.earliest_start": "ಉಪಕರಣವನ್ನು {date} ರಿಂದ ಮುಂದಿನ ದಿನಗಳಿಗೆ ಬುಕ್ ಮಾಡಬಹುದು.",
+  "server.the_ai_assistant_is_busy_right_now": "AI ಸಹಾಯಕ ಈಗ ಬ್ಯುಸಿಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "ಯಾವುದೇ ರೋಗ ನಿರ್ಣಯ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮೊದಲು ಬೆಳೆಯ ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸಿ."
 }

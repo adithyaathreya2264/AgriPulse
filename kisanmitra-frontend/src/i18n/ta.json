@@ -638,5 +638,7 @@
   "market.pay_now": "இப்போதே செலுத்து",
   "market.pay_before": "{when} க்கு முன் செலுத்துங்கள்",
   "server.bookings_must_start_at_least_2_days_from_today": "முன்பதிவு இன்றிலிருந்து குறைந்தது 2 நாட்களுக்குப் பிறகு தொடங்க வேண்டும்",
-  "market.earliest_start": "கருவியை {date} முதல் முன்பதிவு செய்யலாம்."
+  "market.earliest_start": "கருவியை {date} முதல் முன்பதிவு செய்யலாம்.",
+  "server.the_ai_assistant_is_busy_right_now": "AI உதவியாளர் இப்போது பிஸியாக உள்ளார். சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+  "server.no_disease_diagnosis_found_analyze_a_crop": "எந்த நோய் கண்டறிதலும் கிடைக்கவில்லை. முதலில் ஒரு பயிர் படத்தை ஆய்வு செய்யுங்கள்."
 }
