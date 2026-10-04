@@ -92,6 +92,14 @@ async def whatsapp_reply(
     form = await request.form()
 
     if not twilio_io.valid_signature(request, form):
+        # no secrets here: the URL the signature was checked against, to compare with Twilio's webhook URL
+        print(
+            "Twilio signature rejected. Checked against URL:",
+            twilio_io.public_url(request),
+            "| signature header present:",
+            bool(request.headers.get("X-Twilio-Signature"))
+        )
+
         raise HTTPException(status_code=403, detail="Invalid Twilio signature")
 
     incoming = parse_form(form)
