@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "बुकिंग आजपासून किमान 2 दिवसांनी सुरू झाले पाहिजे",
   "market.earliest_start": "अवजार {date} पासूनच्या तारखांसाठी बुक करता येते.",
   "server.the_ai_assistant_is_busy_right_now": "AI सहाय्यक सध्या व्यस्त आहे. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "कोणतेही रोग निदान आढळले नाही. कृपया आधी पिकाचे चित्र तपासा."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "कोणतेही रोग निदान आढळले नाही. कृपया आधी पिकाचे चित्र तपासा.",
+  "market.delete": "हटवा",
+  "market.delete_confirm": "हे अवजार हटवायचे का? ते बाजारपेठेतून काढले जाईल. हे परत घेता येणार नाही.",
+  "market.deleted": "अवजार हटवले",
+  "market.err_delete": "अवजार हटवता आले नाही",
+  "server.this_equipment_has_active_bookings_and_cannot": "या अवजाराचे सक्रिय बुकिंग आहे, म्हणून ते हटवता येत नाही"
 }

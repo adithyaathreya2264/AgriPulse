@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { API_URL, VoiceMic } from "../voice";
 import { enumText, serverText } from "../i18n";
-import { notify } from "../ui/notify";
+import { notify, confirmDialog } from "../ui/notify";
 import TrackingPanel from "../TrackingPanel";
 import {
   Button,
@@ -28,6 +28,7 @@ import {
   Navigation,
   Phone,
   Plus,
+  Trash2,
   Radio,
   Search,
   Tractor,
@@ -430,6 +431,35 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
     }
   };
 
+  // ------------------------------------------------------- delete equipment
+  const deleteEquipment = async (item) => {
+    const yes = await confirmDialog(t("market.delete_confirm"), { confirmLabel: t("market.delete") });
+
+    if (!yes) return;
+
+    try {
+      const res = await fetch(`${API_URL}/equipment/${item.id}`, { method: "DELETE", headers: jsonHeaders() });
+
+      if (res.status === 401) {
+        sessionExpired();
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+
+        notify(typeof data.detail === "string" ? serverText(t, data.detail) : t("market.err_delete"), "error");
+        return;
+      }
+
+      notify(t("market.deleted"), "success");
+      fetchEquipment();
+    } catch (error) {
+      console.error("Delete equipment error:", error);
+      notify(t("market.err_delete"), "error");
+    }
+  };
+
   // ---------------------------------------------------------------- render
   const query = search.toLowerCase();
 
@@ -658,11 +688,19 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
                       {item.price_per_hour && <span className="hourly">{t("market.or_per_hour", { price: item.price_per_hour })}</span>}
                     </div>
 
-                    {available && (
-                      <Button size="sm" onClick={() => openRental(item)}>
-                        {t("btn_rent")}
-                      </Button>
-                    )}
+                    <div className="equipment-actions">
+                      {user && item.owner_id === user.id && (
+                        <Button size="sm" variant="ghost" icon={Trash2} onClick={() => deleteEquipment(item)}>
+                          {t("market.delete")}
+                        </Button>
+                      )}
+
+                      {available && (
+                        <Button size="sm" onClick={() => openRental(item)}>
+                          {t("btn_rent")}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Reveal>

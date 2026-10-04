@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "بکنگ آج سے کم از کم 2 دن بعد شروع ہونی چاہیے",
   "market.earliest_start": "سامان {date} سے آگے کی تاریخوں کے لیے بک کیا جا سکتا ہے۔",
   "server.the_ai_assistant_is_busy_right_now": "AI معاون ابھی مصروف ہے۔ براہِ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "کوئی بیماری کی تشخیص نہیں ملی۔ براہِ کرم پہلے فصل کی تصویر کا تجزیہ کریں۔"
+  "server.no_disease_diagnosis_found_analyze_a_crop": "کوئی بیماری کی تشخیص نہیں ملی۔ براہِ کرم پہلے فصل کی تصویر کا تجزیہ کریں۔",
+  "market.delete": "حذف کریں",
+  "market.delete_confirm": "یہ سامان حذف کریں؟ یہ منڈی سے ہٹ جائے گا۔ اسے واپس نہیں کیا جا سکتا۔",
+  "market.deleted": "سامان حذف ہو گیا",
+  "market.err_delete": "سامان حذف نہیں ہو سکا",
+  "server.this_equipment_has_active_bookings_and_cannot": "اس سامان کی فعال بکنگ ہے، اس لیے اسے حذف نہیں کیا جا سکتا"
 }

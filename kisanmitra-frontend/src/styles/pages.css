@@ -2588,3 +2588,9 @@ p.callout {
     padding: 0;
   }
 }
+
+.equipment-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -513,6 +513,27 @@ def update_equipment_availability(
     return {"message": "Availability updated", "availability": request.availability}
 
 
+@router.delete("/equipment/{equipment_id}")
+def delete_equipment(
+    equipment_id: int,
+    user=Depends(require_owner),
+    db=Depends(get_db)
+):
+    get_own_equipment(db, equipment_id, user)
+
+    # Paid / running bookings and unexpired held bookings must not lose their machine
+    if db.rentals.find_one({"equipment_id": equipment_id, **blocking_filter()}):
+        raise HTTPException(
+            status_code=400,
+            detail="This equipment has active bookings and cannot be deleted"
+        )
+
+    db.equipment.delete_one({"id": equipment_id})
+    db.tracker_keys.delete_many({"equipment_id": equipment_id})
+
+    return {"message": "Equipment deleted"}
+
+
 @router.get("/equipment/{equipment_id}/bookings")
 def get_equipment_bookings(
     equipment_id: int,

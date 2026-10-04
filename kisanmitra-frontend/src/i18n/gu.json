@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "બુકિંગ આજથી ઓછામાં ઓછા 2 દિવસ પછી શરૂ થવું જોઈએ",
   "market.earliest_start": "સાધન {date} થી આગળની તારીખો માટે બુક કરી શકાય છે.",
   "server.the_ai_assistant_is_busy_right_now": "AI સહાયક હમણાં વ્યસ્ત છે. કૃપા કરીને થોડા સમય પછી ફરી પ્રયાસ કરો.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "કોઈ રોગ નિદાન મળ્યું નથી. કૃપા કરીને પહેલા પાકનું ચિત્ર તપાસો."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "કોઈ રોગ નિદાન મળ્યું નથી. કૃપા કરીને પહેલા પાકનું ચિત્ર તપાસો.",
+  "market.delete": "કાઢી નાખો",
+  "market.delete_confirm": "આ સાધન કાઢી નાખવું છે? તે બજારમાંથી દૂર થશે. આ પાછું લઈ શકાશે નહીં.",
+  "market.deleted": "સાધન કાઢી નાખ્યું",
+  "market.err_delete": "સાધન કાઢી શકાયું નહીં",
+  "server.this_equipment_has_active_bookings_and_cannot": "આ સાધનનું સક્રિય બુકિંગ છે, તેથી તે કાઢી શકાતું નથી"
 }

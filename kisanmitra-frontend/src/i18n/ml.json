@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "ബുക്കിംഗ് ഇന്നു മുതൽ കുറഞ്ഞത് 2 ദിവസം കഴിഞ്ഞ് ആരംഭിക്കണം",
   "market.earliest_start": "ഉപകരണം {date} മുതലുള്ള തീയതികളിലേക്ക് ബുക്ക് ചെയ്യാം.",
   "server.the_ai_assistant_is_busy_right_now": "AI സഹായി ഇപ്പോൾ തിരക്കിലാണ്. ദയവായി അൽപ്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "രോഗനിർണയം ഒന്നും കണ്ടെത്തിയില്ല. ദയവായി ആദ്യം ഒരു വിളയുടെ ചിത്രം വിശകലനം ചെയ്യുക."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "രോഗനിർണയം ഒന്നും കണ്ടെത്തിയില്ല. ദയവായി ആദ്യം ഒരു വിളയുടെ ചിത്രം വിശകലനം ചെയ്യുക.",
+  "market.delete": "ഇല്ലാതാക്കുക",
+  "market.delete_confirm": "ഈ ഉപകരണം ഇല്ലാതാക്കണോ? ഇത് വിപണിയിൽ നിന്ന് നീക്കം ചെയ്യപ്പെടും. ഇത് തിരിച്ചെടുക്കാൻ കഴിയില്ല.",
+  "market.deleted": "ഉപകരണം ഇല്ലാതാക്കി",
+  "market.err_delete": "ഉപകരണം ഇല്ലാതാക്കാൻ കഴിഞ്ഞില്ല",
+  "server.this_equipment_has_active_bookings_and_cannot": "ഈ ഉപകരണത്തിന് സജീവമായ ബുക്കിംഗുകൾ ഉള്ളതിനാൽ ഇല്ലാതാക്കാൻ കഴിയില്ല"
 }

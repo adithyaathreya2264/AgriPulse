@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "Bookings must start at least 2 days from today",
   "market.earliest_start": "Equipment can be booked from {date} onwards.",
   "server.the_ai_assistant_is_busy_right_now": "The AI assistant is busy right now. Please try again in a little while.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "No disease diagnosis found. Please analyze a crop image first."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "No disease diagnosis found. Please analyze a crop image first.",
+  "market.delete": "Delete",
+  "market.delete_confirm": "Delete this equipment? It will be removed from the marketplace. This cannot be undone.",
+  "market.deleted": "Equipment deleted",
+  "market.err_delete": "Could not delete the equipment",
+  "server.this_equipment_has_active_bookings_and_cannot": "This equipment has active bookings and cannot be deleted"
 }

@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "बुकिंग आज से कम से कम 2 दिन बाद शुरू होनी चाहिए",
   "market.earliest_start": "उपकरण {date} से आगे की तारीख के लिए बुक किया जा सकता है।",
   "server.the_ai_assistant_is_busy_right_now": "एआई सहायक अभी व्यस्त है। कृपया थोड़ी देर बाद फिर कोशिश करें।",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "कोई रोग निदान नहीं मिला। कृपया पहले किसी फसल की तस्वीर जाँचें।"
+  "server.no_disease_diagnosis_found_analyze_a_crop": "कोई रोग निदान नहीं मिला। कृपया पहले किसी फसल की तस्वीर जाँचें।",
+  "market.delete": "हटाएँ",
+  "market.delete_confirm": "यह उपकरण हटाएँ? यह बाज़ार से हट जाएगा। इसे वापस नहीं किया जा सकता।",
+  "market.deleted": "उपकरण हटा दिया गया",
+  "market.err_delete": "उपकरण हटाया नहीं जा सका",
+  "server.this_equipment_has_active_bookings_and_cannot": "इस उपकरण की सक्रिय बुकिंग है, इसलिए इसे हटाया नहीं जा सकता"
 }

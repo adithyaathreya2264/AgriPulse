@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "বুকিং আজিৰ পৰা কমেও ২ দিনৰ পিছত আৰম্ভ হ'ব লাগিব",
   "market.earliest_start": "সঁজুলি {date} ৰ পৰা আগলৈ বুক কৰিব পাৰি।",
   "server.the_ai_assistant_is_busy_right_now": "AI সহায়ক এতিয়া ব্যস্ত আছে। অনুগ্ৰহ কৰি অলপ সময়ৰ পিছত পুনৰ চেষ্টা কৰক।",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "কোনো ৰোগ নিৰ্ণয় পোৱা নগ'ল। অনুগ্ৰহ কৰি প্ৰথমে এখন শস্যৰ ছবি বিশ্লেষণ কৰক।"
+  "server.no_disease_diagnosis_found_analyze_a_crop": "কোনো ৰোগ নিৰ্ণয় পোৱা নগ'ল। অনুগ্ৰহ কৰি প্ৰথমে এখন শস্যৰ ছবি বিশ্লেষণ কৰক।",
+  "market.delete": "মচক",
+  "market.delete_confirm": "এই সঁজুলি মচিব নেকি? ই বজাৰৰ পৰা আঁতৰি যাব। ইয়াক উভতাব নোৱাৰি।",
+  "market.deleted": "সঁজুলি মচা হ'ল",
+  "market.err_delete": "সঁজুলি মচিব পৰা নগ'ল",
+  "server.this_equipment_has_active_bookings_and_cannot": "এই সঁজুলিৰ সক্ৰিয় বুকিং আছে, গতিকে ইয়াক মচিব নোৱাৰি"
 }

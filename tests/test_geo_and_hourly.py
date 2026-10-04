@@ -153,6 +153,33 @@ def test_owner_availability_toggle_blocks_rentals(client, owner, renter):
     assert client.post("/rent-equipment", json=rent, headers=renter["headers"]).status_code == 200
 
 
+def test_owner_can_delete_unbooked_equipment(client, owner, other):
+    equipment_id = add_equipment(client, owner, "Tractor")
+
+    # only the owner
+    assert client.delete(f"/equipment/{equipment_id}", headers=other["headers"]).status_code in (403, 404)
+    assert client.get(f"/equipment/{equipment_id}").status_code == 200
+
+    assert client.delete(f"/equipment/{equipment_id}", headers=owner["headers"]).status_code == 200
+    assert client.get(f"/equipment/{equipment_id}").status_code == 404
+    assert client.delete(f"/equipment/{equipment_id}", headers=owner["headers"]).status_code == 404
+
+
+def test_equipment_with_a_live_booking_cannot_be_deleted(client, owner, renter):
+    equipment_id = add_equipment(client, owner, "Tractor")
+    day_after = (date.today() + timedelta(days=4)).isoformat()
+
+    client.post("/rent-equipment", headers=renter["headers"], json={
+        "equipment_id": equipment_id, "start_date": day_after, "end_date": day_after
+    })
+
+    response = client.delete(f"/equipment/{equipment_id}", headers=owner["headers"])
+
+    assert response.status_code == 400
+    assert "active bookings" in response.json()["detail"]
+    assert client.get(f"/equipment/{equipment_id}").status_code == 200
+
+
 def test_availability_value_is_validated(client, owner):
     equipment_id = add_equipment(client, owner, "Tractor")
 
@@ -353,3 +380,11 @@ def test_within_radius_helper_ignores_items_without_gps():
     result = within_radius(items, *MYSURU, 10)
 
     assert [item["name"] for item in result] == ["a"]
+
+
+def test_equipment_list_exposes_owner_id_for_the_delete_button(client, owner):
+    equipment_id = add_equipment(client, owner, "Tractor")
+
+    item = next(row for row in client.get("/equipment").json() if row["id"] == equipment_id)
+
+    assert item["owner_id"]

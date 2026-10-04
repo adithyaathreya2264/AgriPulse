@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "ಬುಕಿಂಗ್ ಇಂದಿನಿಂದ ಕನಿಷ್ಠ 2 ದಿನಗಳ ನಂತರ ಆರಂಭವಾಗಬೇಕು",
   "market.earliest_start": "ಉಪಕರಣವನ್ನು {date} ರಿಂದ ಮುಂದಿನ ದಿನಗಳಿಗೆ ಬುಕ್ ಮಾಡಬಹುದು.",
   "server.the_ai_assistant_is_busy_right_now": "AI ಸಹಾಯಕ ಈಗ ಬ್ಯುಸಿಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "ಯಾವುದೇ ರೋಗ ನಿರ್ಣಯ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮೊದಲು ಬೆಳೆಯ ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸಿ."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "ಯಾವುದೇ ರೋಗ ನಿರ್ಣಯ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮೊದಲು ಬೆಳೆಯ ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸಿ.",
+  "market.delete": "ಅಳಿಸಿ",
+  "market.delete_confirm": "ಈ ಉಪಕರಣವನ್ನು ಅಳಿಸಬೇಕೇ? ಇದು ಮಾರುಕಟ್ಟೆಯಿಂದ ತೆಗೆಯಲ್ಪಡುತ್ತದೆ. ಇದನ್ನು ಹಿಂದಕ್ಕೆ ಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+  "market.deleted": "ಉಪಕರಣ ಅಳಿಸಲಾಗಿದೆ",
+  "market.err_delete": "ಉಪಕರಣ ಅಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+  "server.this_equipment_has_active_bookings_and_cannot": "ಈ ಉಪಕರಣಕ್ಕೆ ಸಕ್ರಿಯ ಬುಕಿಂಗ್‌ಗಳಿವೆ, ಆದ್ದರಿಂದ ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ"
 }

@@ -640,5 +640,10 @@
   "server.bookings_must_start_at_least_2_days_from_today": "బుకింగ్ ఈరోజు నుండి కనీసం 2 రోజుల తర్వాత ప్రారంభం కావాలి",
   "market.earliest_start": "పరికరాన్ని {date} నుండి ముందుకు బుక్ చేసుకోవచ్చు.",
   "server.the_ai_assistant_is_busy_right_now": "AI సహాయకుడు ఇప్పుడు బిజీగా ఉన్నారు. దయచేసి కొంత సేపటి తర్వాత మళ్లీ ప్రయత్నించండి.",
-  "server.no_disease_diagnosis_found_analyze_a_crop": "ఏ వ్యాధి నిర్ధారణా కనిపించలేదు. దయచేసి ముందుగా పంట చిత్రాన్ని విశ్లేషించండి."
+  "server.no_disease_diagnosis_found_analyze_a_crop": "ఏ వ్యాధి నిర్ధారణా కనిపించలేదు. దయచేసి ముందుగా పంట చిత్రాన్ని విశ్లేషించండి.",
+  "market.delete": "తొలగించండి",
+  "market.delete_confirm": "ఈ పరికరాన్ని తొలగించాలా? ఇది మార్కెట్ నుండి తీసివేయబడుతుంది. దీన్ని వెనక్కి తీసుకోలేము.",
+  "market.deleted": "పరికరం తొలగించబడింది",
+  "market.err_delete": "పరికరాన్ని తొలగించలేకపోయాము",
+  "server.this_equipment_has_active_bookings_and_cannot": "ఈ పరికరానికి క్రియాశీల బుకింగ్‌లు ఉన్నాయి, కాబట్టి తొలగించలేము"
 }
