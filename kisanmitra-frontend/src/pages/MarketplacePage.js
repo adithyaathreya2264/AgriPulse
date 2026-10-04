@@ -33,7 +33,7 @@ import {
   Tractor,
   User,
 } from "../ui/icons";
-import { CATEGORIES, categoryClass, categoryIcon } from "./marketplaceParts";
+import { CATEGORIES, categoryClass, categoryIcon, directImageUrl } from "./marketplaceParts";
 
 // Equipment can only be booked from this many days after today (same rule as the server)
 const MIN_LEAD_DAYS = 2;
@@ -178,7 +178,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
           contact_number: addForm.contact,
           category: addForm.category || "Other",
           description: addForm.description,
-          image_url: addForm.image,
+          image_url: directImageUrl(addForm.image),
         }),
       });
 
@@ -594,7 +594,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
               <Reveal key={item.id} delay={Math.min(index, 8) * 0.05} className="equipment-card">
                 <div className={`equipment-media ${item.image_url ? "" : categoryClass(item.category)}`}>
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.equipment_name} />
+                    <img src={directImageUrl(item.image_url)} alt={item.equipment_name} referrerPolicy="no-referrer" loading="lazy" />
                   ) : (
                     <Icon size={64} className="media-icon" />
                   )}
@@ -753,7 +753,7 @@ export default function MarketplacePage({ token, user, lang, t, jsonHeaders, ses
 
             <div className="rent-preview">
               {selected.image_url ? (
-                <img src={selected.image_url} alt={selected.equipment_name} />
+                <img src={directImageUrl(selected.image_url)} alt={selected.equipment_name} referrerPolicy="no-referrer" />
               ) : (
                 <span className={`rent-icon ${categoryClass(selected.category)}`}>
                   {(() => {
