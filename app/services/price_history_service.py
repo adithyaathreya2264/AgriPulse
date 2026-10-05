@@ -7,7 +7,9 @@ per crop + market and stored in the `price_history` collection.
 
 from datetime import datetime, timedelta, timezone
 
-import pandas as pd
+from app.services.lazy_import import lazy
+
+pd = lazy("pandas")
 from app.db.database import get_database
 from app.services import price_service
 

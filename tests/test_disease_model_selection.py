@@ -199,3 +199,31 @@ def test_yolo_wrapper_reports_missing_weights(monkeypatch):
 
     with pytest.raises(ModelNotFoundError):
         yolo_classifier.predict_disease("leaf.jpg")
+
+
+def test_big_photos_are_shrunk_before_the_model_runs(tmp_path):
+    from PIL import Image
+    from app.services.disease_service import MAX_PHOTO_SIDE, shrink_photo
+
+    big = tmp_path / "big.jpg"
+    small = tmp_path / "small.jpg"
+
+    Image.new("RGB", (4000, 3000), (30, 120, 30)).save(big)
+    Image.new("RGB", (300, 200), (30, 120, 30)).save(small)
+
+    shrink_photo(str(big))
+    shrink_photo(str(small))
+    shrink_photo(str(tmp_path / "missing.jpg"))  # unreadable files are left alone, no crash
+
+    with Image.open(big) as image:
+        assert max(image.size) == MAX_PHOTO_SIDE
+        assert image.size[0] / image.size[1] == pytest_approx_ratio(4000 / 3000)
+
+    with Image.open(small) as image:
+        assert image.size == (300, 200)
+
+
+def pytest_approx_ratio(value):
+    import pytest
+
+    return pytest.approx(value, rel=0.01)

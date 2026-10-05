@@ -7,7 +7,9 @@ import json
 import os
 from datetime import date, datetime, timedelta, timezone
 
-import pandas as pd
+from app.services.lazy_import import lazy
+
+pd = lazy("pandas")
 import requests
 
 from app.db.database import get_database

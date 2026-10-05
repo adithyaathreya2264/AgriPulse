@@ -26,6 +26,29 @@ TREATMENT_MAP = {
 }
 
 
+# The models look at 224-px images, so a 12-megapixel phone photo only wastes memory
+# (about 100 MB of extra peak on a 512 MB server). Photos are shrunk before the model runs.
+MAX_PHOTO_SIDE = 1024
+
+
+def shrink_photo(image_path):
+    """Downscale a big photo in place. Small photos and unreadable files are left alone."""
+    try:
+        from PIL import Image
+
+        with Image.open(image_path) as image:
+            if max(image.size) <= MAX_PHOTO_SIDE:
+                return
+
+            # JPEG can be decoded at a fraction of its size, which also saves memory
+            image.draft("RGB", (MAX_PHOTO_SIDE, MAX_PHOTO_SIDE))
+            image = image.convert("RGB")
+            image.thumbnail((MAX_PHOTO_SIDE, MAX_PHOTO_SIDE))
+            image.save(image_path, format="JPEG", quality=90)
+    except Exception as error:
+        print("Could not shrink the photo:", error)
+
+
 def classify_disease(image_path):
     """
     Run the configured model.
@@ -34,6 +57,8 @@ def classify_disease(image_path):
     EfficientNet model when the YOLO weights are not available;
     DISEASE_MODEL=efficientnet uses only EfficientNet.
     """
+
+    shrink_photo(image_path)
 
     backend = os.getenv("DISEASE_MODEL", "yolo").strip().lower()
 

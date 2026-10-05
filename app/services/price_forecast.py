@@ -12,8 +12,9 @@ linear-trend baseline, so the accuracy claim is measured, not assumed.
 """
 
 import numpy as np
-import pandas as pd
-from sklearn.ensemble import GradientBoostingRegressor
+from app.services.lazy_import import lazy
+
+pd = lazy("pandas")
 
 HORIZONS = (7, 14, 21, 28)
 MIN_DAYS_FOR_MODEL = 90
@@ -74,6 +75,8 @@ def _training_set(prices, weather, horizon):
 
 
 def _new_model():
+    from sklearn.ensemble import GradientBoostingRegressor
+
     return GradientBoostingRegressor(
         n_estimators=150,
         max_depth=3,

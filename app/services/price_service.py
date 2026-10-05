@@ -3,9 +3,10 @@ import json
 import subprocess
 from urllib.parse import urlencode
 
-import pandas as pd
+from app.services.lazy_import import lazy
+
+pd = lazy("pandas")
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from dotenv import load_dotenv
 
 
