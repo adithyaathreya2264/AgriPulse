@@ -56,7 +56,7 @@ def start(ctx, arg=""):
     if not crop:
         set_state(ctx, "price_crop")
 
-        return say("Which crop? (for example: tomato, onion, potato)", static=True)
+        return say("Which crop? (for example: rice, wheat, maize, cotton, groundnut)", static=True)
 
     if district and market:
         return forecast(ctx, crop, district, market)
@@ -180,8 +180,8 @@ def alert_from_context(ctx):
 
     if ctx.state != "price_done" or not data.get("crop"):
         return say(
-            "To set an alert, first look up a price (for example: price tomato), "
-            "or send: alert tomato, Kolar, Kolar",
+            "To set an alert, first look up a price (for example: price maize), "
+            "or send: alert maize, Mandya, Mandya",
             static=True
         )
 

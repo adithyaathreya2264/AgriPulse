@@ -42,7 +42,7 @@ MENU = (
     "7. 🔔 My alerts & bookings\n"
     "8. 🌐 Language\n\n"
     "You can also send a photo, a voice note, or type things like "
-    "'weather Mysuru' or 'price tomato'. Send STOP to stop messages."
+    "'weather Mysuru' or 'price maize'. Send STOP to stop messages."
 )
 
 WELCOME = (

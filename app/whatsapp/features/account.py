@@ -34,7 +34,7 @@ def alerts_list(ctx):
 
     if not alerts:
         return say(
-            "You have no price alerts. Look up a price (for example: price tomato) "
+            "You have no price alerts. Look up a price (for example: price maize) "
             "and reply ALERT to get one."
         )
 
