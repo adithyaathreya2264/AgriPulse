@@ -355,7 +355,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
         </div>
 
         <div className="chip-row quick-crops">
-          {["Tomato", "Onion", "Potato", "Ragi", "Maize", "Chilli"].map((name) => (
+          {["Rice", "Wheat", "Maize", "Cotton", "Groundnut", "Bajra", "Jowar", "Bengal gram"].map((name) => (
             <button
               key={name}
               type="button"
@@ -365,7 +365,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
                 searchMarkets(name);
               }}
             >
-              {t("price.crop_" + name.toLowerCase())}
+              {t("price.crop_" + name.toLowerCase().replace(" ", "_"))}
             </button>
           ))}
         </div>
@@ -468,7 +468,7 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
                   </p>
 
                   <p className="ph-date">
-                    <Calendar size={14} /> {t("price.latest_price_note", { date: priceResult.latest_price_date })}
+                    <Calendar size={14} /> {t("price.weekly_price_note", { date: priceResult.latest_price_date })}
                   </p>
                 </>
               )}
@@ -521,12 +521,11 @@ export default function PricePage({ token, lang, t, jsonHeaders, sessionExpired,
 
               {priceResult.model_metrics && priceResult.model_metrics.mae !== undefined && (
                 <p className="note model-line">
-                  {t("price.model_line", {
+                  {t("price.model_line_short", {
                     model: priceResult.model_metrics.model,
-                    years: priceResult.model_metrics.history_years,
                     error: priceResult.model_metrics.mae,
                   })}
-                  {priceResult.model_metrics.beats_linear_baseline ? " " + t("price.better_than_linear") : ""}
+                  {priceResult.model_metrics.beats_baseline ? " " + t("price.better_than_no_change") : ""}
                 </p>
               )}
 
