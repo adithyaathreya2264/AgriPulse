@@ -84,7 +84,7 @@ flowchart LR
     S --> DB[(MongoDB Atlas)]
     S --> G[Gemini]
     S --> SV[Sarvam AI<br/>translate · STT · TTS]
-    S --> AG[Agmarknet + Open-Meteo + OpenWeather]
+    S --> AG[Open-Meteo + OpenWeather]
     S --> RZ[Razorpay]
 ```
 
@@ -98,9 +98,14 @@ flowchart LR
 - On WhatsApp the farmer can confirm or correct the result; corrections are kept for retraining.
 
 ### Mandi price forecast
-- Five years of Agmarknet history per crop and market, plus rainfall / temperature from Open-Meteo.
-- One gradient-boosting model per horizon (7 / 14 / 21 / 28 days), back-tested against a straight-line
-  baseline; reports its own average error and falls back to the linear model when history is short.
+- Runs on a trained weekly gradient-boosting model stored in `ml/` (`price_forecast_model.pkl` plus its
+  metrics file). **No price API is called**, so the page works even when data.gov.in is unreachable.
+- Forecasts 1 to 4 weeks ahead for rice, wheat, maize, cotton, groundnut, bajra, jowar and bengal gram, per
+  Karnataka district and for the state average. Other crops in the data (ragi, paddy, arhar, jaggery,
+  soyabean) show their latest price and typical seasonal prices only.
+- The prices are the weekly averages inside the model file (the data ends on the date stored in it), not
+  today's mandi board. The model reports its typical error, measured against "no change". To refresh the data,
+  retrain and replace the files in `ml/`.
 - **Best time to sell**, confidence band, and alerts (rise, fall, best time) delivered in-app and on WhatsApp.
 
 ### Equipment marketplace
@@ -146,7 +151,7 @@ is stored in MongoDB and restored on the next login. *(The OTP is a fixed demo c
 | Database | MongoDB Atlas (PyMongo); `mongomock` in tests |
 | ML | Ultralytics YOLOv8-cls, PyTorch / torchvision (EfficientNet-B0), scikit-learn (gradient boosting) |
 | AI services | Google Gemini, Sarvam AI (translate / STT / TTS) |
-| Data | Agmarknet (data.gov.in), Open-Meteo archive, OpenWeather |
+| Data | Trained price model in `ml/`, Open-Meteo archive, OpenWeather |
 | Payments | Razorpay (test mode) |
 | Messaging | Twilio WhatsApp |
 | Hosting | Vercel (frontend), Docker on Hugging Face Spaces / Render (backend), Atlas (data) |
@@ -214,7 +219,7 @@ feature off or makes it fall back.
 | `JWT_SECRET` | signs login tokens |
 | `GEMINI_API_KEY` | assistant, treatments, explanations, translation fallback |
 | `SARVAM_API_KEY` | translation, speech-to-text, text-to-speech |
-| `AGMARKNET_API_KEY` | mandi prices (data.gov.in) |
+| `AGMARKNET_API_KEY` | data.gov.in key (kept in the settings; the price forecast no longer calls the API) |
 | `WEATHER_API_KEY` | OpenWeather |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | payments |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` | WhatsApp |
@@ -246,7 +251,7 @@ transferred into a classification model. Current result: **94.49 % top-1** over 
 phone → WhatsApp → Twilio → your server → /whatsapp → bot → reply
 ```
 
-Send a leaf photo, `weather Mysuru`, `price tomato`, a voice note, a shared location, `loan`, `bookings`,
+Send a leaf photo, `weather Mysuru`, `price maize`, a voice note, a shared location, `loan`, `bookings`,
 `language kannada`, `menu`, `STOP`. Setup (Twilio sandbox, tunnel or hosted URL, webhook) and limits:
 [`docs/WHATSAPP_BOT.md`](docs/WHATSAPP_BOT.md).
 
