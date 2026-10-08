@@ -68,7 +68,7 @@ Vercel serves HTTPS, which the microphone, GPS and camera need.
 
 1. Open the Vercel URL: the splash, then the information page.
 2. Log in (demo OTP 123456), finish onboarding.
-3. Weather works -> the backend and CORS are fine. Price forecast needs the Agmarknet key and network.
+3. Weather works -> the backend and CORS are fine. The price forecast reads the model files in `ml/` (copied into the Docker image), so it needs no key or network.
 4. Upload a leaf photo (first scan is slow: the model loads).
 5. Send "hi" to the WhatsApp sandbox number.
 

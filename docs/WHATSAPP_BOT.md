@@ -13,7 +13,7 @@ phone -> WhatsApp -> Twilio -> ngrok / your server -> /whatsapp -> the bot -> re
 |---|---|
 | a leaf photo | Diagnoses the disease, gives treatment, asks "Was I right? 👍 👎". A 👎 plus the right name keeps the photo for retraining; a 👍 deletes it. Unsure photos get retake tips instead of a guess. |
 | `weather Mysuru` (or "tell me the weather in Mysuru") | Weather and farming advice. Without a city it uses the district on the farmer's account. |
-| `price tomato` | Lists markets, then the farmer replies with a number for the 4-week forecast and best time to sell. `price tomato, Kolar, Kolar` skips the list. |
+| `price maize` | Lists markets, then the farmer replies with a number for the 4-week forecast and best time to sell. `price maize, Mandya, Mandya` skips the list. |
 | `ALERT` (after a forecast) | Price alerts for that market. `alerts` lists them, `stop alert 1` removes one. Needs an account. |
 | a shared location 📎 | Equipment for rent within 10 km: price, distance, owner phone, "live" if its GPS is reporting. |
 | a voice note | Understood in any supported language (Sarvam), answered in text and as a voice note. |
@@ -73,7 +73,8 @@ The free ngrok address changes every time ngrok restarts: repeat steps 4 and 5 t
 - **Sandbox:** only phones that joined can use it, the join lasts a few days, and you can only message
   a farmer within 24 hours of their last message. That also limits the morning digest and price alerts.
   A real WhatsApp business number (via Twilio or Meta) with approved templates removes this.
-- The price service (`api.data.gov.in`) must be reachable from the server. If it is not, the bot says so.
+- Prices and forecasts come from the model files in `ml/`, so they do not depend on the internet. Only the
+  crops the model knows (rice, wheat, maize, cotton, groundnut, bajra, jowar, bengal gram and a few more) work.
 - Answers from the assistant are advice, not a substitute for the local agriculture officer.
 
 ## Code map
