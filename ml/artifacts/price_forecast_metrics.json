@@ -1,0 +1,176 @@
+{
+  "chosen": "shallow",
+  "validation": {
+    "shallow": {
+      "rows": 836,
+      "mae": 0.1477100024858907,
+      "persistence_mae": 0.15019960518015685,
+      "sn_rows": 772,
+      "mae_on_sn_rows": 0.1495078047966696,
+      "seasonal_naive_mae": 0.18414894407843163,
+      "moves": 602,
+      "direction_accuracy": 0.5897009966777409
+    },
+    "deeper": {
+      "rows": 836,
+      "mae": 0.1493337652333045,
+      "persistence_mae": 0.15019960518015685,
+      "sn_rows": 772,
+      "mae_on_sn_rows": 0.1509384412815459,
+      "seasonal_naive_mae": 0.18414894407843163,
+      "moves": 602,
+      "direction_accuracy": 0.5697674418604651
+    }
+  },
+  "test_pooled": {
+    "rows": 1382,
+    "mae": 0.13241320160218595,
+    "persistence_mae": 0.15222434680805913,
+    "sn_rows": 283,
+    "mae_on_sn_rows": 0.11550610807597501,
+    "seasonal_naive_mae": 0.15151447921290573,
+    "moves": 1094,
+    "direction_accuracy": 0.7193784277879341
+  },
+  "test_per_crop": {
+    "bajra": {
+      "rows": 107,
+      "mae": 0.10297231557808231,
+      "persistence_mae": 0.12005775836892149,
+      "sn_rows": 28,
+      "mae_on_sn_rows": 0.06370372636837189,
+      "seasonal_naive_mae": 0.08982924966129967,
+      "moves": 90,
+      "direction_accuracy": 0.7666666666666667,
+      "ratio_vs_persistence": 0.8576898067816835,
+      "passes": true
+    },
+    "bengal_gram": {
+      "rows": 198,
+      "mae": 0.08416206527783411,
+      "persistence_mae": 0.09690570013378207,
+      "sn_rows": 39,
+      "mae_on_sn_rows": 0.08031256580558989,
+      "seasonal_naive_mae": 0.13604824420956715,
+      "moves": 145,
+      "direction_accuracy": 0.8,
+      "ratio_vs_persistence": 0.8684944761933006,
+      "passes": true
+    },
+    "cotton": {
+      "rows": 85,
+      "mae": 0.1555444987219405,
+      "persistence_mae": 0.1769329790649129,
+      "sn_rows": 12,
+      "mae_on_sn_rows": 0.11954737103175704,
+      "seasonal_naive_mae": 0.12746752743236867,
+      "moves": 73,
+      "direction_accuracy": 0.5753424657534246,
+      "ratio_vs_persistence": 0.8791153551135008,
+      "passes": true
+    },
+    "groundnut": {
+      "rows": 169,
+      "mae": 0.14246200091020178,
+      "persistence_mae": 0.1680539762591485,
+      "sn_rows": 30,
+      "mae_on_sn_rows": 0.13789362525728463,
+      "seasonal_naive_mae": 0.16859531497888605,
+      "moves": 140,
+      "direction_accuracy": 0.7785714285714286,
+      "ratio_vs_persistence": 0.8477157403911557,
+      "passes": true
+    },
+    "jaggery": {
+      "rows": 60,
+      "mae": 0.09424733515558349,
+      "persistence_mae": 0.10147291307310692,
+      "sn_rows": 12,
+      "mae_on_sn_rows": 0.09344118193616796,
+      "seasonal_naive_mae": 0.1598446333909136,
+      "moves": 41,
+      "direction_accuracy": 0.6585365853658537,
+      "ratio_vs_persistence": 0.9287930374846172,
+      "passes": false
+    },
+    "jowar": {
+      "rows": 142,
+      "mae": 0.16064159942436065,
+      "persistence_mae": 0.191271720510808,
+      "sn_rows": 32,
+      "mae_on_sn_rows": 0.12455076777410157,
+      "seasonal_naive_mae": 0.19828949881962554,
+      "moves": 117,
+      "direction_accuracy": 0.7008547008547008,
+      "ratio_vs_persistence": 0.8398606913523499,
+      "passes": true
+    },
+    "maize": {
+      "rows": 293,
+      "mae": 0.1302322744808926,
+      "persistence_mae": 0.15996935721359154,
+      "sn_rows": 60,
+      "mae_on_sn_rows": 0.11881126845094293,
+      "seasonal_naive_mae": 0.1428312397213132,
+      "moves": 235,
+      "direction_accuracy": 0.8042553191489362,
+      "ratio_vs_persistence": 0.8141076312946992,
+      "passes": true
+    },
+    "rice": {
+      "rows": 121,
+      "mae": 0.15007123089846128,
+      "persistence_mae": 0.1709827607111981,
+      "sn_rows": 31,
+      "mae_on_sn_rows": 0.11651647004113683,
+      "seasonal_naive_mae": 0.1883384085304277,
+      "moves": 75,
+      "direction_accuracy": 0.68,
+      "ratio_vs_persistence": 0.8776980221529007,
+      "passes": true
+    },
+    "soyabean": {
+      "rows": 112,
+      "mae": 0.18333244189494138,
+      "persistence_mae": 0.17500661364018882,
+      "sn_rows": 24,
+      "mae_on_sn_rows": 0.19758508559335206,
+      "seasonal_naive_mae": 0.13036498732712967,
+      "moves": 104,
+      "direction_accuracy": 0.4423076923076923,
+      "ratio_vs_persistence": 1.0475743635144574,
+      "passes": false
+    },
+    "wheat": {
+      "rows": 95,
+      "mae": 0.13368106627076823,
+      "persistence_mae": 0.15253134499158952,
+      "sn_rows": 15,
+      "mae_on_sn_rows": 0.10742063240609051,
+      "seasonal_naive_mae": 0.17796686783437796,
+      "moves": 74,
+      "direction_accuracy": 0.7567567567567568,
+      "ratio_vs_persistence": 0.8764170163066438,
+      "passes": true
+    }
+  },
+  "shipped_crops": [
+    "bajra",
+    "bengal_gram",
+    "cotton",
+    "groundnut",
+    "jowar",
+    "maize",
+    "rice",
+    "wheat"
+  ],
+  "outlook_iqr_coverage": 0.3563766388557807,
+  "rows": {
+    "train": 11051,
+    "val": 836,
+    "test": 1382
+  },
+  "data_end": "2026-09-21",
+  "latest_known_weeks": 167,
+  "minutes": 0.2
+}
